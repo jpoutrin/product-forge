@@ -1,0 +1,39 @@
+{
+  "name": "security-compliance",
+  "version": "1.0.0",
+  "description": "Security and privacy expertise with MCP security, OAuth, and GDPR/CCPA compliance",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "skills": {
+    "mcp-security": {
+      "description": "5-layer defense architecture for MCP servers, multi-agent systems, and text-to-SQL pipelines",
+      "file": "../skills/mcp-security.md",
+      "triggers": ["mcp security", "agent security", "text-to-sql", "prompt injection", "authorization", "trust boundary"]
+    },
+    "privacy-compliance": {
+      "description": "Privacy regulation compliance for GDPR, CCPA/CPRA, and regional requirements",
+      "file": "../skills/privacy-compliance.md",
+      "triggers": ["gdpr", "ccpa", "cpra", "privacy", "data protection", "personal data", "consent", "dpo"]
+    },
+    "oauth": {
+      "description": "OAuth 2.0 and OpenID Connect implementation with secure flow selection and token management",
+      "file": "../skills/oauth.md",
+      "triggers": ["oauth", "oauth2", "oidc", "openid connect", "jwt", "access token", "refresh token", "pkce"]
+    }
+  },
+  "agents": {
+    "mcp-security-expert": {
+      "description": "Multi-agent and MCP pipeline security specialist with 5-layer defense architecture",
+      "file": "../agents/mcp-security-expert.md",
+      "capabilities": ["5-layer defense", "prompt injection prevention", "SQL validation", "user context propagation", "authorization (RBAC/ABAC)"],
+      "requires_documentation_research": true
+    },
+    "dpo-expert": {
+      "description": "Data Protection Officer specialist for GDPR, CCPA, and privacy compliance across regions",
+      "file": "../agents/dpo-expert.md",
+      "capabilities": ["GDPR compliance", "CCPA/CPRA", "privacy audits", "data breach response", "DPIA", "international transfers"]
+    }
+  }
+}

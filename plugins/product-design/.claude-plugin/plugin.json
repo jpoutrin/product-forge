@@ -1,0 +1,135 @@
+{
+  "name": "product-design",
+  "version": "1.0.0",
+  "description": "Product development toolkit with PRD management, discovery, strategy, and UX/UI expertise",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "commands": {
+    "create-prd": {
+      "description": "Interactive PRD creation wizard with comprehensive question flow",
+      "file": "../commands/create-prd.md",
+      "arguments": "<product-name>"
+    },
+    "create-prd-feature": {
+      "description": "Create a feature-specific PRD (FRD) for individual features",
+      "file": "../commands/create-prd-feature.md",
+      "arguments": "<feature-name>"
+    },
+    "generate-tasks": {
+      "description": "Convert PRD to structured task list with automatic linking",
+      "file": "../commands/generate-tasks.md",
+      "arguments": "<prd-file> [--output-dir <directory>]"
+    },
+    "prd-status": {
+      "description": "Check and update PRD status through lifecycle",
+      "file": "../commands/prd-status.md",
+      "arguments": "<prd-file> [--set <status>]"
+    },
+    "list-prds": {
+      "description": "List all PRDs with status, progress, and metadata",
+      "file": "../commands/list-prds.md",
+      "arguments": "[--status <status>] [--type <type>]"
+    },
+    "task-list": {
+      "description": "List tasks by directory with progress and visual indicators",
+      "file": "../commands/task-list.md",
+      "arguments": "[--dir <directory>] [--status <status>] [--format <format>]"
+    },
+    "task-focus": {
+      "description": "Focus on a specific task with context loading",
+      "file": "../commands/task-focus.md",
+      "arguments": "<task-id>"
+    },
+    "discovery-session": {
+      "description": "Start interactive product discovery with expert guidance",
+      "file": "../commands/discovery-session.md",
+      "arguments": "<product-name>"
+    },
+    "create-persona": {
+      "description": "Create detailed user persona with guided questions",
+      "file": "../commands/create-persona.md",
+      "arguments": "<persona-name>"
+    },
+    "position-product": {
+      "description": "Define product positioning and brand strategy",
+      "file": "../commands/position-product.md",
+      "arguments": "<product-name>"
+    },
+    "brainstorm-solution": {
+      "description": "Structured brainstorming for technical solutions",
+      "file": "../commands/brainstorm-solution.md",
+      "arguments": "<problem-statement>"
+    },
+    "prd-progress": {
+      "description": "Show implementation progress from linked tasks",
+      "file": "../commands/prd-progress.md",
+      "arguments": "<prd-file>"
+    },
+    "prd-archive": {
+      "description": "Archive completed or cancelled PRDs",
+      "file": "../commands/prd-archive.md",
+      "arguments": "<prd-file> [--reason <reason>]"
+    },
+    "quick-start": {
+      "description": "Quick start guide for new product development",
+      "file": "../commands/quick-start.md",
+      "arguments": ""
+    }
+  },
+  "skills": {
+    "prd-management": {
+      "description": "Automatic PRD lifecycle management, organization, and status tracking",
+      "file": "../skills/prd-management.md",
+      "triggers": ["prd", "product requirements", "feature requirements", "documentation lifecycle"]
+    },
+    "task-orchestration": {
+      "description": "Documentation-first task execution with quality checks and progress tracking",
+      "file": "../skills/task-orchestration.md",
+      "triggers": ["task list", "implement", "task management", "progress tracking"]
+    },
+    "product-strategy": {
+      "description": "Chief Product Officer expertise with proven frameworks and methodologies",
+      "file": "../skills/product-strategy.md",
+      "triggers": ["product strategy", "market research", "competitive analysis", "product-market fit"]
+    },
+    "design-system": {
+      "description": "Design system management for building and reusing UI components, tokens, and patterns",
+      "file": "../skills/design-system.md",
+      "triggers": ["design system", "component library", "ui components", "design tokens", "style guide"]
+    }
+  },
+  "agents": {
+    "product-architect": {
+      "description": "Full product development guidance from discovery to launch (CPO expertise)",
+      "file": "../agents/product-architect.md",
+      "capabilities": ["strategic planning", "market analysis", "feature prioritization", "roadmap creation"]
+    },
+    "prd-orchestrator": {
+      "description": "PRD lifecycle management with validation and organization",
+      "file": "../agents/prd-orchestrator.md",
+      "capabilities": ["prd creation", "status tracking", "task generation", "archival"]
+    },
+    "task-executor": {
+      "description": "Task implementation with documentation-first approach and quality assurance",
+      "file": "../agents/task-executor.md",
+      "capabilities": ["task execution", "progress tracking", "quality checks", "file management"]
+    },
+    "ui-product-expert": {
+      "description": "UI Product specialist for interface design, UI guidelines, and visual quality",
+      "file": "../agents/ui-product-expert.md",
+      "capabilities": ["UI guidelines", "design tokens", "typography", "color systems", "component specs"]
+    },
+    "ux-expert": {
+      "description": "UX specialist for user research, interaction design, and usability testing",
+      "file": "../agents/ux-expert.md",
+      "capabilities": ["user research", "journey mapping", "usability testing", "accessibility", "interaction design"]
+    },
+    "marketing-expert": {
+      "description": "Marketing specialist for brand strategy, brand guidelines, messaging, and go-to-market planning",
+      "file": "../agents/marketing-expert.md",
+      "capabilities": ["brand strategy", "brand guidelines", "messaging framework", "content strategy", "GTM planning"]
+    }
+  }
+}

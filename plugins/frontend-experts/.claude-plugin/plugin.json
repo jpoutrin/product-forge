@@ -1,0 +1,30 @@
+{
+  "name": "frontend-experts",
+  "version": "1.0.0",
+  "description": "Frontend development with React, TypeScript, and Playwright testing expertise",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "skills": {
+    "typescript-style": {
+      "description": "TypeScript/JavaScript style enforcement with strict typing, ESLint, and modern patterns",
+      "file": "../skills/typescript-style.md",
+      "triggers": ["typescript", "javascript", "react", "node", "nextjs", "jsx", "tsx", "eslint"]
+    }
+  },
+  "agents": {
+    "react-typescript-expert": {
+      "description": "React and TypeScript specialist for modern frontend development",
+      "file": "../agents/react-typescript-expert.md",
+      "capabilities": ["React components", "TypeScript", "hooks", "state management", "testing"],
+      "requires_documentation_research": true
+    },
+    "playwright-testing-expert": {
+      "description": "Playwright TypeScript specialist for E2E testing, visual regression, and frontend quality assurance",
+      "file": "../agents/playwright-testing-expert.md",
+      "capabilities": ["E2E testing", "visual regression", "component testing", "accessibility testing", "API mocking"],
+      "requires_documentation_research": true
+    }
+  }
+}

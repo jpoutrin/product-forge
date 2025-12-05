@@ -1,0 +1,23 @@
+{
+  "name": "git-workflow",
+  "version": "1.0.0",
+  "description": "Git best practices with atomic commits and conventional commit format",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "commands": {
+    "commit": {
+      "description": "Guided git commit with atomic commit analysis and conventional commit format",
+      "file": "../commands/commit.md",
+      "arguments": "[--all | --staged | --interactive]"
+    }
+  },
+  "skills": {
+    "git-commits": {
+      "description": "Atomic commits, conventional commits, and disciplined version control practices",
+      "file": "../skills/git-commits.md",
+      "triggers": ["git commit", "commit message", "atomic commit", "conventional commit", "version control"]
+    }
+  }
+}
