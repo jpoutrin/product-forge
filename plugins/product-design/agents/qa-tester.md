@@ -143,6 +143,67 @@ Group related steps into logical test cases:
 ### 4. Generate the Procedure
 Create the markdown file following the structure above.
 
+### 5. Final Review: Validate Screenshot Integration (REQUIRED)
+
+**Before completing, you MUST verify all screenshots are properly embedded in the final document.**
+
+```
+FINAL REVIEW CHECKLIST:
+
+1. LIST all captured screenshots
+   $ ls qa-tests/screenshots/{test-id}/
+   $ ls qa-tests/screenshots/{test-id}/elements/
+
+2. SCAN the markdown for image references
+   - Look for ![...](./screenshots/...)
+   - Check each test case has a Screenshots section
+
+3. COMPARE captured vs referenced
+   - Every screenshot file should appear in the markdown
+   - No orphaned screenshots
+
+4. ADD missing references if needed:
+   - Add "#### Screenshots" section to each test case
+   - Add "## Element Visual Reference" section
+   - Use relative paths: ./screenshots/{test-id}/filename.png
+
+5. VERIFY paths are valid
+   - All referenced files actually exist
+   - Paths are relative to the QA test file location
+
+6. REPORT completion status:
+   ✅ "All X screenshots properly referenced in document"
+   ⚠️ "Added Y missing screenshot references"
+```
+
+**Example final document structure:**
+
+```markdown
+### TC-001: User Login
+
+#### Steps
+| Step | Action | Expected Result | Pass/Fail |
+|------|--------|-----------------|-----------|
+| 1 | Navigate to login | Form displays | ☐ |
+| 2 | Enter credentials | Fields populated | ☐ |
+| 3 | Click **Login button** | Dashboard loads | ☐ |
+
+#### Screenshots
+| Step | Screenshot | Description |
+|------|------------|-------------|
+| 1 | ![](./screenshots/QA-20250105-001/01-login-page.png) | Initial state |
+| 3 | ![](./screenshots/QA-20250105-001/03-dashboard.png) | After login |
+
+---
+
+## Element Visual Reference
+
+| Element | Screenshot | Selector |
+|---------|------------|----------|
+| Login button | ![](./screenshots/QA-20250105-001/elements/login-button.png) | `button#login` |
+| Email field | ![](./screenshots/QA-20250105-001/elements/email-field.png) | `input#email` |
+```
+
 ## Best Practices
 
 1. **Be Specific**: "Click the blue 'Submit' button in the bottom right" not "Click submit"

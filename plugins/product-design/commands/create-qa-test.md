@@ -191,10 +191,109 @@ When `--explore` flag is used:
    - URL to test
    - Path to QA test file
 3. Agent navigates and documents steps
-4. Agent takes screenshots to `qa-tests/screenshots/`
-5. Agent updates the QA test file with discovered steps
+4. Agent takes screenshots to `qa-tests/screenshots/{test-id}/`
+5. Agent extracts element screenshots to `qa-tests/screenshots/{test-id}/elements/`
+6. Agent updates the QA test file with discovered steps
+7. **Agent validates and embeds all screenshots** (see Final Review below)
+
+## Final Review: Screenshot Integration (REQUIRED)
+
+**Before marking the QA test as complete, the agent MUST verify all screenshots are properly referenced in the final markdown file.**
+
+### Verification Checklist
+
+1. **Check screenshot directory exists**
+   ```
+   qa-tests/screenshots/{test-id}/
+   ├── 01-initial-state.png
+   ├── 02-form-filled.png
+   ├── 03-success-state.png
+   └── elements/
+       ├── login-button.png
+       ├── email-field.png
+       └── password-field.png
+   ```
+
+2. **Verify all screenshots are referenced in the markdown**
+   - Each test case should have a "Screenshots" subsection
+   - Element references should use relative paths
+   - No orphaned screenshots (captured but not referenced)
+
+3. **Add missing references**
+   If screenshots exist but aren't in the document, add them:
+
+### Required Sections in Final Document
+
+#### Screenshots Reference (per test case)
+
+```markdown
+### TC-001: User Login
+
+#### Steps
+| Step | Action | Expected Result | Pass/Fail | Notes |
+|------|--------|-----------------|-----------|-------|
+| 1 | Navigate to login page | Login form displays | ☐ | |
+| 2 | Enter email in **Email field** | Email accepted | ☐ | |
+| 3 | Click **Login button** | Dashboard loads | ☐ | |
+
+#### Screenshots
+| Step | Screenshot | Description |
+|------|------------|-------------|
+| 1 | ![Initial state](./screenshots/{test-id}/01-initial-state.png) | Login page before input |
+| 3 | ![Success](./screenshots/{test-id}/03-success-state.png) | Dashboard after login |
+```
+
+#### Element Visual Reference (document level)
+
+```markdown
+## Element Visual Reference
+
+| Element | Screenshot | Selector | Test Case |
+|---------|------------|----------|-----------|
+| Email field | ![](./screenshots/{test-id}/elements/email-field.png) | `input#email` | TC-001 |
+| Login button | ![](./screenshots/{test-id}/elements/login-button.png) | `button[type=submit]` | TC-001 |
+```
+
+### Validation Steps
+
+The agent should run these checks before completing:
+
+```
+1. LIST all files in qa-tests/screenshots/{test-id}/
+2. SCAN the QA test markdown for image references
+3. COMPARE: Are all screenshots referenced?
+4. IF missing references:
+   - Add Screenshots section to each test case
+   - Add Element Visual Reference section
+   - Use relative paths: ./screenshots/{test-id}/filename.png
+5. VERIFY: All image paths are valid (files exist)
+6. REPORT: "✅ All X screenshots properly referenced" or "⚠️ Added Y missing references"
+```
+
+### Auto-Fix Missing References
+
+If the agent finds screenshots that aren't referenced:
+
+```markdown
+## Auto-Generated Screenshot References
+
+The following screenshots were captured but not initially referenced.
+They have been added to the document:
+
+| Screenshot | Added To | Path |
+|------------|----------|------|
+| 02-form-filled.png | TC-001 Screenshots | ./screenshots/QA-20250105-001/02-form-filled.png |
+| submit-button.png | Element Reference | ./screenshots/QA-20250105-001/elements/submit-button.png |
+```
 
 ## Related Commands
 
 - `list-qa-tests` - List and filter existing QA tests
+- `enrich-qa-test` - Add element screenshots to existing test
 - `/prd-progress` - Check linked PRD implementation status
+
+## Related Skills
+
+- `qa-screenshot-management` - Screenshot naming and organization
+- `qa-element-extraction` - Extract element screenshots from test steps
+- `qa-screenshot-validation` - Validate screenshots for layout issues
