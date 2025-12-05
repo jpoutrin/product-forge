@@ -15,5 +15,6 @@
     "./agents/task-executor.md",
     "./agents/ui-product-expert.md",
     "./agents/ux-expert.md"
-  ]
+  ],
+  "mcpServers": "./.mcp.json"
 }
