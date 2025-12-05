@@ -152,6 +152,43 @@ Create the markdown file following the structure above.
 5. **Screenshots**: Take screenshots at key decision points and results
 6. **Accessibility**: Note any accessibility concerns observed
 
+## Related Skills
+
+Apply these skills during QA testing:
+
+### qa-test-management
+Automatic lifecycle management for QA tests:
+- Naming convention: `QA-YYYYMMDD-###-feature-name.md`
+- Directory structure: `qa-tests/{draft,active,executed,archived}/`
+- Status transitions: DRAFT → ACTIVE → EXECUTED → ARCHIVED
+
+### qa-testing-methodology
+Test design patterns for comprehensive coverage:
+- Equivalence partitioning (test one value per partition)
+- Boundary value analysis (test at limits)
+- Prioritization matrix (Critical → High → Medium → Low)
+- Accessibility testing checklist
+
+### qa-screenshot-management
+Screenshot organization standards:
+- Naming: `{sequence}-{state-description}.png`
+- Directory: `screenshots/{test-id}/TC-001/`
+- Always capture: initial state, after actions, errors, success, final
+
+### qa-element-extraction
+Extract UI elements mentioned in test steps:
+- Scan for **bold** element names in steps
+- Capture targeted screenshots of each element
+- Create element reference table with selectors
+- Store in `screenshots/{test-id}/elements/`
+
+### qa-screenshot-validation
+Validate screenshots after capture:
+- Check for clipped/masked elements
+- **Desktop (>1024px)**: Auto-resize if clipped, retake
+- **Mobile/Tablet (≤1024px)**: Do NOT resize - document as responsive bug
+- Log validation results for each screenshot
+
 ## Example Interaction
 
 **User**: Create a QA test procedure for the login flow on https://example.com
