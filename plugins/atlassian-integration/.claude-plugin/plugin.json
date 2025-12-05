@@ -1,0 +1,10 @@
+{
+  "name": "atlassian-integration",
+  "version": "1.0.0",
+  "description": "Atlassian Jira and Confluence integration via Remote MCP Server for issue tracking, documentation, and project management",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "mcpServers": "./.mcp.json"
+}
