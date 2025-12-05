@@ -26,7 +26,7 @@ plugin-name/
 
 ## Plugin Manifest (plugin.json)
 
-Minimal required manifest:
+### Minimal Required Manifest
 
 ```json
 {
@@ -40,6 +40,97 @@ Minimal required manifest:
 }
 ```
 
+### Full Manifest with Components
+
+```json
+{
+  "name": "plugin-name",
+  "version": "1.0.0",
+  "description": "What this plugin does",
+  "author": {
+    "name": "Your Name",
+    "email": "your@email.com"
+  },
+  "commands": {
+    "command-name": {
+      "description": "What this command does",
+      "source": "../commands/command-name.md"
+    }
+  },
+  "agents": "./agents/",
+  "skills": "./skills/"
+}
+```
+
+## CRITICAL: Manifest Format Rules
+
+### Commands Configuration
+
+Commands MUST use `"source"` (NOT `"file"`):
+
+**CORRECT:**
+```json
+"commands": {
+  "my-command": {
+    "description": "Command description",
+    "source": "../commands/my-command.md"
+  }
+}
+```
+
+**WRONG - Will cause validation errors:**
+```json
+"commands": {
+  "my-command": {
+    "description": "Command description",
+    "file": "../commands/my-command.md",     // WRONG: use "source"
+    "arguments": "<arg>"                      // WRONG: use frontmatter
+  }
+}
+```
+
+### Agents and Skills Configuration
+
+Agents and skills MUST use directory paths (NOT object format):
+
+**CORRECT:**
+```json
+{
+  "agents": "./agents/",
+  "skills": "./skills/"
+}
+```
+
+**WRONG - Will cause validation errors:**
+```json
+{
+  "agents": {
+    "agent-name": {
+      "description": "...",
+      "file": "../agents/agent-name.md"
+    }
+  },
+  "skills": {
+    "skill-name": {
+      "description": "...",
+      "file": "../skills/skill-name.md",
+      "triggers": ["keyword"]
+    }
+  }
+}
+```
+
+### Command Arguments
+
+Command arguments go in the markdown file's frontmatter, NOT in plugin.json:
+
+```markdown
+---
+description: My command description
+argument-hint: <required-arg> [--optional-flag]
+---
+```
+
 ## Manifest Fields
 
 | Field | Required | Description |
@@ -49,6 +140,9 @@ Minimal required manifest:
 | `description` | Yes | Brief description of plugin purpose |
 | `author.name` | Yes | Author name |
 | `author.email` | No | Author email |
+| `commands` | No | Object with command definitions |
+| `agents` | No | Directory path string: `"./agents/"` |
+| `skills` | No | Directory path string: `"./skills/"` |
 
 ## Creation Process
 
@@ -73,13 +167,21 @@ Minimal required manifest:
      "description": "Plugin description",
      "author": {
        "name": "Author Name"
-     }
+     },
+     "commands": {
+       "my-command": {
+         "description": "Command description",
+         "source": "../commands/my-command.md"
+       }
+     },
+     "agents": "./agents/",
+     "skills": "./skills/"
    }
    ```
 
 4. **Add components**
-   - Add agents to `agents/`
-   - Add commands to `commands/`
+   - Add agents to `agents/` with proper frontmatter
+   - Add commands to `commands/` with proper frontmatter
    - Add skills to `skills/skill-name/SKILL.md`
 
 5. **Add to marketplace**
@@ -96,7 +198,19 @@ Minimal required manifest:
   "author": {
     "name": "Developer",
     "email": "dev@example.com"
-  }
+  },
+  "commands": {
+    "lint": {
+      "description": "Run linter on codebase",
+      "source": "../commands/lint.md"
+    },
+    "format": {
+      "description": "Format code files",
+      "source": "../commands/format.md"
+    }
+  },
+  "agents": "./agents/",
+  "skills": "./skills/"
 }
 ```
 
@@ -138,3 +252,11 @@ Update the marketplace.json to include your plugin:
 2. Install plugin: `/plugin install plugin-name@marketplace-name`
 3. Verify with `/help` to see commands
 4. Test components individually
+
+## Common Errors
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `Command must have either "source" or "content"` | Using `"file"` instead of `"source"` | Change to `"source": "../path.md"` |
+| `agents: Invalid input` | Using object format for agents | Change to `"agents": "./agents/"` |
+| `skills: Invalid input` | Using object format for skills | Change to `"skills": "./skills/"` |
