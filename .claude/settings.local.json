@@ -3,7 +3,10 @@
     "allow": [
       "WebSearch",
       "WebFetch(domain:www.conventionalcommits.org)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
