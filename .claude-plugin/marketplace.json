@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "Product Forge Marketplace",
+  "description": "Comprehensive product development toolkit with PRD management, task tracking, and specialized technical agents",
+  "version": "1.0.0",
+  "plugins": [
+    {
+      "name": "product-forge",
+      "source": "github:jpoutrin/product-forge",
+      "category": "productivity",
+      "tags": [
+        "product-development",
+        "prd",
+        "task-management",
+        "documentation",
+        "security",
+        "devops",
+        "data-engineering"
+      ],
+      "strict": true,
+      "featured": true
+    }
+  ]
+}
