@@ -20,3 +20,6 @@ npm-debug.log
 tmp/
 temp/
 *.tmp
+
+# Local settings (machine-specific)
+*.local.json
