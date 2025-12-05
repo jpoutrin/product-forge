@@ -1,10 +1,11 @@
+---
+description: Define product positioning and brand strategy
+argument-hint: <product-name>
+---
+
 # position-product
 
-**Description**: Start product positioning discovery (3 core + 5 branding questions)
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/processes/product-positioning.md`
 
 ## Usage
 

@@ -1,10 +1,11 @@
+---
+description: Check and update PRD status through lifecycle
+argument-hint: <prd-file> [--set <status>]
+---
+
 # prd-status
 
-**Description**: Update PRD status and move to appropriate directory
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/shared/processes/prd-management.md`
 
 ## Usage
 

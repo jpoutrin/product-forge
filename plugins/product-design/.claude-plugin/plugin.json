@@ -99,37 +99,5 @@
       "file": "../skills/design-system.md",
       "triggers": ["design system", "component library", "ui components", "design tokens", "style guide"]
     }
-  },
-  "agents": {
-    "product-architect": {
-      "description": "Full product development guidance from discovery to launch (CPO expertise)",
-      "file": "../agents/product-architect.md",
-      "capabilities": ["strategic planning", "market analysis", "feature prioritization", "roadmap creation"]
-    },
-    "prd-orchestrator": {
-      "description": "PRD lifecycle management with validation and organization",
-      "file": "../agents/prd-orchestrator.md",
-      "capabilities": ["prd creation", "status tracking", "task generation", "archival"]
-    },
-    "task-executor": {
-      "description": "Task implementation with documentation-first approach and quality assurance",
-      "file": "../agents/task-executor.md",
-      "capabilities": ["task execution", "progress tracking", "quality checks", "file management"]
-    },
-    "ui-product-expert": {
-      "description": "UI Product specialist for interface design, UI guidelines, and visual quality",
-      "file": "../agents/ui-product-expert.md",
-      "capabilities": ["UI guidelines", "design tokens", "typography", "color systems", "component specs"]
-    },
-    "ux-expert": {
-      "description": "UX specialist for user research, interaction design, and usability testing",
-      "file": "../agents/ux-expert.md",
-      "capabilities": ["user research", "journey mapping", "usability testing", "accessibility", "interaction design"]
-    },
-    "marketing-expert": {
-      "description": "Marketing specialist for brand strategy, brand guidelines, messaging, and go-to-market planning",
-      "file": "../agents/marketing-expert.md",
-      "capabilities": ["brand strategy", "brand guidelines", "messaging framework", "content strategy", "GTM planning"]
-    }
   }
 }

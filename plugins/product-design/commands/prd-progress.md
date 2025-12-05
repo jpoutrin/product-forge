@@ -1,10 +1,11 @@
+---
+description: Show implementation progress from linked tasks
+argument-hint: <prd-file>
+---
+
 # prd-progress
 
-**Description**: Show implementation progress from linked task file
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/shared/processes/prd-management.md`
 
 ## Usage
 

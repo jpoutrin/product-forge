@@ -1,3 +1,11 @@
+---
+name: task-executor
+description: Task implementation with documentation-first approach, quality assurance, and systematic progress tracking
+tools: Glob, Grep, Read, Write, Edit, Bash, TodoWrite
+model: sonnet
+color: green
+---
+
 # Task Executor Agent
 
 **Description**: Autonomous task implementation with documentation-first approach, quality assurance, and systematic progress tracking

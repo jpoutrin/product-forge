@@ -1,6 +1,9 @@
-# discovery-session
+---
+description: Start interactive product discovery with expert guidance
+argument-hint: <product-name>
+---
 
-**Description**: Start interactive product discovery with expert CPO guidance through 20 comprehensive questions
+# discovery-session
 
 **Category**: Product & Strategy
 

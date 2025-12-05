@@ -1,10 +1,11 @@
+---
+description: Quick start guide for new product development
+argument-hint: ""
+---
+
 # quick-start
 
-**Description**: Show quick start guide
-
 **Category**: Documentation
-
-**Source**: `claude_settings/python/quick-reference/quick-start.md`
 
 ## Usage
 

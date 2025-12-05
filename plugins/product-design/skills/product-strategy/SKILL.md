@@ -1,17 +1,6 @@
 ---
-name: Product Strategy
-description: Chief Product Officer expertise with proven frameworks, market analysis, and strategic product development guidance
-version: 1.0.0
-triggers:
-  - product strategy
-  - market research
-  - competitive analysis
-  - product-market fit
-  - product vision
-  - business model
-  - mvp
-  - feature prioritization
-  - user research
+name: product-strategy
+description: Chief Product Officer expertise with proven frameworks and strategic guidance. Use when discussing product strategy, market analysis, competitive positioning, feature prioritization, or business models to apply expert CPO perspective.
 ---
 
 # Product Strategy Skill
@@ -94,38 +83,6 @@ When discussing users:
 4. **The Competitive Judo**: Use competitor strengths against them
 5. **The Network Effect Design**: Built-in viral growth
 
-## Interactive Discovery Questions
-
-When exploring product ideas, guide through:
-
-### Product Foundation (5 Questions)
-1. Product Name & Category
-2. Big Idea & Vision
-3. Problem Statement
-4. Solution Overview
-5. Mission Statement
-
-### Market & User Context (5 Questions)
-6. Target Market (TAM/SAM/SOM)
-7. Primary Users (Personas)
-8. User Journey
-9. Competitive Landscape
-10. Differentiation
-
-### Product Scope & Strategy (5 Questions)
-11. Core Features (MVP)
-12. Success Metrics (KPIs)
-13. Business Model
-14. Platform Strategy
-15. Timeline & Milestones
-
-### Technical & Resource Context (5 Questions)
-16. Technical Constraints
-17. Team & Resources
-18. Integration Needs
-19. Scalability Requirements
-20. Compliance & Security
-
 ## Expert Analysis Format
 
 For each question, provide:
@@ -142,15 +99,3 @@ For each question, provide:
    - Specific improvements
    - Strategic alternatives to consider
 ```
-
-## Success Outcomes
-
-After strategic guidance:
-- ✅ Crystal-clear product vision validated by market evidence
-- ✅ Detailed personas based on real insights
-- ✅ Prioritized feature roadmap with MVP defined
-- ✅ Go-to-market strategy with distribution channels
-- ✅ Success metrics and measurement framework
-- ✅ Risk mitigation plan for top risks
-- ✅ Avoided 80% of common startup failures
-- ✅ Clear differentiation competitors can't copy

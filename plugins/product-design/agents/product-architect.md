@@ -1,3 +1,11 @@
+---
+name: product-architect
+description: Full product development guidance from discovery to launch with CPO expertise, market analysis, and strategic planning
+tools: Glob, Grep, Read, Write, Edit, WebFetch, WebSearch, TodoWrite
+model: opus
+color: purple
+---
+
 # Product Architect Agent
 
 **Description**: Full product development guidance from discovery to launch with expert CPO perspective

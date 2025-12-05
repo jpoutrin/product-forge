@@ -1,0 +1,9 @@
+{
+  "name": "claude-code-dev",
+  "version": "1.0.0",
+  "description": "Tools for creating and managing Claude Code plugins, agents, commands, and skills",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  }
+}

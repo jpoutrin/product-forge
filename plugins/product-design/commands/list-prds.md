@@ -1,10 +1,11 @@
+---
+description: List all PRDs with status, progress, and metadata
+argument-hint: "[--status <status>] [--type <type>]"
+---
+
 # list-prds
 
-**Description**: List all PRDs with status, location, and linked tasks
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/shared/processes/prd-management.md`
 
 ## Usage
 

@@ -1,10 +1,11 @@
+---
+description: Focus on a specific task with context loading
+argument-hint: <task-id>
+---
+
 # task-focus
 
-**Description**: Move task to focus directory and load into TodoTools
-
 **Category**: Task Management
-
-**Source**: `claude_settings/python/shared/processes/task-file-management.md`
 
 ## Usage
 

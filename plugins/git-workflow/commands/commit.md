@@ -1,6 +1,9 @@
-# commit
+---
+description: Guided git commit with atomic commit analysis and conventional commit format
+argument-hint: "[--all | --staged | --interactive]"
+---
 
-**Description**: Guided git commit with atomic commit analysis and conventional commit format
+# commit
 
 **Category**: Development
 

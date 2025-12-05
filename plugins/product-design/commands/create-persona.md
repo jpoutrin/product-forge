@@ -1,10 +1,11 @@
+---
+description: Create detailed user persona with guided questions
+argument-hint: <persona-name>
+---
+
 # create-persona
 
-**Description**: Generate user persona from template
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/templates/persona-template.md`
 
 ## Usage
 

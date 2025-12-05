@@ -1,10 +1,11 @@
+---
+description: Interactive PRD creation wizard with comprehensive question flow
+argument-hint: <product-name>
+---
+
 # create-prd
 
-**Description**: Interactive Product Requirements Document creation guide with comprehensive question flow
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/shared/templates/prd-template.md`
 
 ## Usage
 

@@ -1,10 +1,11 @@
+---
+description: Archive completed or cancelled PRDs
+argument-hint: <prd-file> [--reason <reason>]
+---
+
 # prd-archive
 
-**Description**: Move completed or cancelled PRDs to archive
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/shared/processes/prd-management.md`
 
 ## Usage
 

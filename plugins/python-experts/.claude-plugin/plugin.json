@@ -17,36 +17,5 @@
       "file": "../skills/documentation-research.md",
       "triggers": ["implement", "code", "build", "create", "develop", "technical"]
     }
-  },
-  "agents": {
-    "django-expert": {
-      "description": "Python Django specialist for web applications, admin, ORM, and authentication",
-      "file": "../agents/django-expert.md",
-      "capabilities": ["django models", "views", "REST APIs (DRF)", "admin customization", "authentication"],
-      "requires_documentation_research": true
-    },
-    "fastapi-expert": {
-      "description": "Python FastAPI specialist for high-performance async REST APIs",
-      "file": "../agents/fastapi-expert.md",
-      "capabilities": ["REST APIs", "async services", "Pydantic schemas", "OpenAPI documentation"],
-      "requires_documentation_research": true
-    },
-    "fastmcp-expert": {
-      "description": "Python FastMCP specialist for building MCP servers that extend Claude",
-      "file": "../agents/fastmcp-expert.md",
-      "capabilities": ["MCP tools", "resources", "prompts", "Claude Code integration"],
-      "requires_documentation_research": true
-    },
-    "celery-expert": {
-      "description": "Python Celery specialist for distributed task queues, async processing, and scheduling",
-      "file": "../agents/celery-expert.md",
-      "capabilities": ["task queues", "async processing", "scheduling", "worker management", "Django/FastAPI integration"],
-      "requires_documentation_research": true
-    },
-    "python-testing-expert": {
-      "description": "Python testing specialist for unit and integration tests with pytest",
-      "file": "../agents/python-testing-expert.md",
-      "capabilities": ["unit tests", "integration tests", "mocking", "coverage", "CI/CD testing"]
-    }
   }
 }

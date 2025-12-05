@@ -1,10 +1,11 @@
+---
+description: Convert PRD to structured task list with automatic linking
+argument-hint: <prd-file> [--output-dir <directory>]
+---
+
 # generate-tasks
 
-**Description**: Convert PRD to task list with automatic linking
-
 **Category**: Task Management
-
-**Source**: `claude_settings/python/shared/processes/task-generation.md`
 
 ## Usage
 

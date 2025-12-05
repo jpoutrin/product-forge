@@ -1,3 +1,11 @@
+---
+name: react-typescript-expert
+description: React and TypeScript specialist for modern frontend development with hooks, state management, and component architecture
+tools: Glob, Grep, Read, Write, Edit, Bash, WebFetch, WebSearch, TodoWrite
+model: sonnet
+color: blue
+---
+
 # React TypeScript Expert Agent
 
 **Description**: React and TypeScript specialist for modern frontend development with hooks, state management, and component architecture

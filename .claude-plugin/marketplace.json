@@ -49,6 +49,12 @@
       "description": "Git best practices with atomic commits and conventional commit format",
       "source": "./plugins/git-workflow",
       "category": "productivity"
+    },
+    {
+      "name": "claude-code-dev",
+      "description": "Tools for creating and managing Claude Code plugins, agents, commands, and skills",
+      "source": "./plugins/claude-code-dev",
+      "category": "development"
     }
   ]
 }

@@ -1,6 +1,9 @@
-# brainstorm-solution
+---
+description: Structured brainstorming for technical solutions
+argument-hint: <problem-statement>
+---
 
-**Description**: Interactive technical brainstorming session for architecture decisions and solution design
+# brainstorm-solution
 
 **Category**: Documentation
 

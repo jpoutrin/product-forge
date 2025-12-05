@@ -32,24 +32,5 @@
       "file": "../skills/sqlmesh.md",
       "triggers": ["sqlmesh", "sql mesh", "virtual environments", "data transformation", "column-level lineage"]
     }
-  },
-  "agents": {
-    "cto-architect": {
-      "description": "CTO and IT System Design specialist who orchestrates technical implementation",
-      "file": "../agents/cto-architect.md",
-      "capabilities": ["system architecture", "technology selection", "technical decisions", "team coordination"]
-    },
-    "devops-expert": {
-      "description": "DevOps specialist for CI/CD, infrastructure as code, Kubernetes, and cloud deployments",
-      "file": "../agents/devops-expert.md",
-      "capabilities": ["CI/CD pipelines", "Terraform", "Kubernetes", "Docker", "GitOps", "monitoring"],
-      "requires_documentation_research": true
-    },
-    "data-engineering-expert": {
-      "description": "Data Engineering specialist for data pipelines, warehousing, and transformation with dbt/SQLMesh",
-      "file": "../agents/data-engineering-expert.md",
-      "capabilities": ["data modeling", "ELT pipelines", "data quality", "dbt", "SQLMesh", "orchestration"],
-      "requires_documentation_research": true
-    }
   }
 }

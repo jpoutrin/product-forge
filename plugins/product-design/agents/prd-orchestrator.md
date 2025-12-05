@@ -1,3 +1,11 @@
+---
+name: prd-orchestrator
+description: PRD lifecycle management with creation, validation, task generation, and archival
+tools: Glob, Grep, Read, Write, Edit, TodoWrite
+model: sonnet
+color: blue
+---
+
 # PRD Orchestrator Agent
 
 **Description**: Autonomous PRD lifecycle management with creation, validation, task generation, and archival

@@ -1,15 +1,6 @@
 ---
-name: Task Orchestration
-description: Documentation-first task execution with quality checks, progress tracking, and systematic implementation
-version: 1.0.0
-triggers:
-  - task list
-  - implement
-  - task management
-  - progress tracking
-  - work on task
-  - execute tasks
-  - implementation
+name: task-orchestration
+description: Documentation-first task execution with quality checks and progress tracking. Use when working with task lists, implementing features, or executing multi-step work to ensure systematic completion with proper documentation review.
 ---
 
 # Task Orchestration Skill
@@ -35,8 +26,6 @@ The FIRST sub-task for any coding task MUST be documentation review:
 4. **Immediate file updates** - Update markdown checkboxes immediately
 
 ## Automatic Behaviors
-
-When this skill activates, Claude will:
 
 ### 1. Initialize Task Tracking
 - Read task list file completely
@@ -99,11 +88,6 @@ Before marking any task complete:
 - [ ] Manual testing completed
 - [ ] Edge cases considered
 
-### Documentation Updates
-- [ ] Code comments updated
-- [ ] README updated if needed
-- [ ] Relevant files list updated
-
 ## Error Handling Protocol
 
 When encountering issues:
@@ -116,11 +100,6 @@ When encountering issues:
 
    Proceed with solution? (y/n)
 ```
-
-1. Document the problem clearly
-2. Propose solution with rationale
-3. Wait for approval before proceeding
-4. Update task list with notes
 
 ## New Task Discovery
 
@@ -138,41 +117,3 @@ When new tasks are discovered during implementation:
 1. Add to task list with [NEW] tag
 2. Update TodoWrite
 3. Get user confirmation
-
-## Progress Tracking Format
-
-### Task File Header
-```markdown
-# [Feature Name] Implementation Tasks
-
-Source PRD: [path]
-Generated: [date]
-Total Tasks: [count]
-Completed: [count]
-Progress: [percentage]
-
-## Relevant Files
-
-### Created Files
-- `path/file.js` - Description
-
-### Modified Files
-- `path/existing.js` - What was changed
-```
-
-### Visual Progress
-```
-Progress: ████████░░ 80%
-Status: 8/10 tasks complete
-Blocked: 0
-```
-
-## Best Practices Applied Automatically
-
-1. **Documentation review is non-negotiable**
-2. **One sub-task at a time for focus**
-3. **Immediate file updates prevent drift**
-4. **User confirmation maintains control**
-5. **Clear communication at every step**
-6. **Quality checks before completion**
-7. **Systematic discovery handling**

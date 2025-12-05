@@ -1,10 +1,11 @@
+---
+description: List tasks by directory with progress and visual indicators
+argument-hint: "[--dir <directory>] [--status <status>] [--format <format>]"
+---
+
 # task-list
 
-**Description**: List tasks by directory with progress and metadata
-
 **Category**: Task Management
-
-**Source**: `claude_settings/python/shared/processes/task-file-management.md`
 
 ## Usage
 

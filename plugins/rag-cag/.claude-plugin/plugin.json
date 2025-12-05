@@ -17,13 +17,5 @@
       "file": "../skills/chunking-strategies.md",
       "triggers": ["chunking", "chunk", "text splitting", "document splitting", "semantic chunking", "late chunking"]
     }
-  },
-  "agents": {
-    "rag-cag-expert": {
-      "description": "RAG/CAG specialist for retrieval-augmented and cache-augmented generation systems with multi-tenant security",
-      "file": "../agents/rag-cag-expert.md",
-      "capabilities": ["RAG architecture", "CAG optimization", "chunking strategies", "vector databases", "hybrid search", "GraphRAG"],
-      "requires_documentation_research": true
-    }
   }
 }

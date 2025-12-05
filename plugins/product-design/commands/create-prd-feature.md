@@ -1,10 +1,11 @@
+---
+description: Create a feature-specific PRD (FRD) for individual features
+argument-hint: <feature-name>
+---
+
 # create-prd-feature
 
-**Description**: Interactive Feature Requirements Document creation for precise task breakdown and code generation
-
 **Category**: Product & Strategy
-
-**Source**: `claude_settings/python/shared/templates/prd-feature-template.md`
 
 ## Usage
 

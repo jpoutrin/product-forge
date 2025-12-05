@@ -1,14 +1,6 @@
 ---
-name: PRD Management
-description: Automatic PRD lifecycle management, organization, and status tracking for product requirements documents
-version: 1.0.0
-triggers:
-  - prd
-  - product requirements
-  - feature requirements
-  - documentation lifecycle
-  - frd
-  - requirements document
+name: prd-management
+description: Automatic PRD lifecycle management, organization, and status tracking. Use when working with Product Requirements Documents (PRDs) or Feature Requirements Documents (FRDs) for proper naming, directory structure, and status transitions.
 ---
 
 # PRD Management Skill
@@ -90,14 +82,6 @@ Before marking any PRD as APPROVED, verify:
 - [ ] Technical requirements are complete
 - [ ] All required sections are filled
 
-## Progress Tracking
-
-When checking PRD implementation:
-- Calculate progress from linked task file
-- Show completion percentage with visual indicator
-- Identify blocked tasks
-- Estimate completion based on velocity
-
 ## Archival Rules
 
 Archive PRDs when:
@@ -113,11 +97,3 @@ archive_reason: Implementation complete
 final_task_completion: 100%
 implementation_duration: X days
 ```
-
-## Best Practices Applied Automatically
-
-1. **Version Control**: Increment version on significant changes
-2. **Cross-Reference**: Link related PRDs together
-3. **Regular Updates**: Prompt for updates on stale PRDs
-4. **Consistent Templates**: Use standard PRD structure
-5. **Clear Ownership**: Track author and approvers
