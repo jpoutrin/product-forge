@@ -11,145 +11,195 @@ Create new Claude Code plugins with proper structure and configuration.
 
 ```
 plugin-name/
-├── .claude-plugin/
-│   └── plugin.json          # Plugin manifest (required)
-├── agents/                   # Agent definitions (optional)
-│   └── agent-name.md
-├── commands/                 # Slash commands (optional)
-│   └── command-name.md
-├── skills/                   # Agent skills (optional)
-│   └── skill-name/
-│       └── SKILL.md
-└── hooks/                    # Event handlers (optional)
-    └── hooks.json
+├── .claude-plugin/           # Required: Metadata directory
+│   └── plugin.json          # Required: Plugin manifest
+├── commands/                 # Optional: Command definitions
+│   ├── command1.md
+│   └── command2.md
+├── agents/                   # Optional: Agent definitions
+│   ├── agent1.md
+│   └── agent2.md
+├── skills/                   # Optional: Agent Skills
+│   ├── skill-name/
+│   │   └── SKILL.md
+│   └── another-skill/
+│       ├── SKILL.md
+│       └── scripts/
+├── hooks/                    # Optional: Hook configurations
+│   ├── hooks.json           # Main hook config
+│   └── additional-hooks.json
+├── .mcp.json                # Optional: MCP server definitions
+├── scripts/                 # Optional: Hook and utility scripts
+│   ├── script1.sh
+│   └── script2.py
+├── LICENSE                  # Optional: License file
+├── CHANGELOG.md             # Optional: Version history
+└── README.md                # Optional: Documentation
 ```
 
 ## Plugin Manifest (plugin.json)
 
-### Minimal Required Manifest
+### Required Fields
 
-```json
-{
-  "name": "plugin-name",
-  "version": "1.0.0",
-  "description": "What this plugin does",
-  "author": {
-    "name": "Your Name",
-    "email": "your@email.com"
-  }
-}
-```
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Plugin identifier (kebab-case recommended) |
+| `version` | string | Semantic version (e.g., "1.2.0") |
+| `description` | string | Brief description of the plugin |
 
-### Full Manifest with Components
+### Optional Fields
 
-```json
-{
-  "name": "plugin-name",
-  "version": "1.0.0",
-  "description": "What this plugin does",
-  "author": {
-    "name": "Your Name",
-    "email": "your@email.com"
-  },
-  "commands": {
-    "command-name": {
-      "description": "What this command does",
-      "source": "../commands/command-name.md"
-    }
-  },
-  "agents": "./agents/",
-  "skills": "./skills/"
-}
-```
+| Field | Type | Description |
+|-------|------|-------------|
+| `author` | object | Author information |
+| `author.name` | string | Author's name (required if author present) |
+| `author.email` | string | Author's email |
+| `author.url` | string | Author's website or GitHub profile |
+| `homepage` | string | Plugin documentation URL |
+| `repository` | string | Git repository URL |
+| `license` | string | License identifier (e.g., "MIT", "Apache-2.0") |
+| `keywords` | array | Searchable keywords |
+| `commands` | string or array | Custom command locations |
+| `agents` | string | Custom agent directory location |
+| `hooks` | string | Custom hook configuration file location |
+| `mcpServers` | string | Custom MCP server configuration file location |
 
-## CRITICAL: Manifest Format Rules
+## CRITICAL: Manifest Format
 
 ### Commands Configuration
 
-Commands MUST use `"source"` (NOT `"file"`):
+Commands MUST be a **string** (directory path) or **array of strings** (file paths):
 
-**CORRECT:**
+**CORRECT - Directory path:**
 ```json
-"commands": {
-  "my-command": {
-    "description": "Command description",
-    "source": "../commands/my-command.md"
+{
+  "commands": "./commands/"
+}
+```
+
+**CORRECT - Array of file paths:**
+```json
+{
+  "commands": ["./commands/lint.md", "./commands/format.md"]
+}
+```
+
+**CORRECT - Single custom path:**
+```json
+{
+  "commands": "./custom/commands/special.md"
+}
+```
+
+**WRONG - Object format (INVALID):**
+```json
+{
+  "commands": {
+    "my-command": {
+      "description": "...",
+      "source": "..."
+    }
   }
 }
 ```
 
-**WRONG - Will cause validation errors:**
-```json
-"commands": {
-  "my-command": {
-    "description": "Command description",
-    "file": "../commands/my-command.md",     // WRONG: use "source"
-    "arguments": "<arg>"                      // WRONG: use frontmatter
-  }
-}
-```
+### Agents Configuration
 
-### Agents and Skills Configuration
-
-Agents and skills MUST use directory paths (NOT object format):
+Agents MUST be a **string** (directory path):
 
 **CORRECT:**
 ```json
 {
-  "agents": "./agents/",
-  "skills": "./skills/"
+  "agents": "./agents/"
 }
 ```
 
-**WRONG - Will cause validation errors:**
+**CORRECT - Custom location:**
+```json
+{
+  "agents": "./custom/agents/"
+}
+```
+
+**WRONG - Object format (INVALID):**
 ```json
 {
   "agents": {
     "agent-name": {
       "description": "...",
-      "file": "../agents/agent-name.md"
-    }
-  },
-  "skills": {
-    "skill-name": {
-      "description": "...",
-      "file": "../skills/skill-name.md",
-      "triggers": ["keyword"]
+      "file": "..."
     }
   }
 }
 ```
 
-### Command Arguments
+### Skills Auto-Discovery
 
-Command arguments go in the markdown file's frontmatter, NOT in plugin.json:
+Skills are automatically discovered from the `skills/` directory. No manifest entry needed.
 
-```markdown
----
-description: My command description
-argument-hint: <required-arg> [--optional-flag]
----
+Each skill must be in its own folder with a `SKILL.md` file:
+```
+skills/
+├── skill-name/
+│   └── SKILL.md
+└── another-skill/
+    └── SKILL.md
 ```
 
-## Manifest Fields
+## Example Manifests
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Plugin identifier (kebab-case) |
-| `version` | Yes | Semantic version (e.g., "1.0.0") |
-| `description` | Yes | Brief description of plugin purpose |
-| `author.name` | Yes | Author name |
-| `author.email` | No | Author email |
-| `commands` | No | Object with command definitions |
-| `agents` | No | Directory path string: `"./agents/"` |
-| `skills` | No | Directory path string: `"./skills/"` |
+### Minimal
+```json
+{
+  "name": "my-plugin",
+  "version": "1.0.0",
+  "description": "A simple plugin for Claude Code"
+}
+```
+
+### With Commands and Agents
+```json
+{
+  "name": "code-quality",
+  "version": "1.0.0",
+  "description": "Code quality tools including linting and review",
+  "author": {
+    "name": "Developer",
+    "email": "dev@example.com"
+  },
+  "commands": "./commands/",
+  "agents": "./agents/"
+}
+```
+
+### Complete
+```json
+{
+  "name": "enterprise-plugin",
+  "version": "1.2.0",
+  "description": "Enterprise-grade development plugin",
+  "author": {
+    "name": "Jane Developer",
+    "email": "jane@example.com",
+    "url": "https://github.com/janedev"
+  },
+  "homepage": "https://docs.example.com/plugin",
+  "repository": "https://github.com/janedev/enterprise-plugin",
+  "license": "MIT",
+  "keywords": ["enterprise", "security", "compliance"],
+  "commands": ["./custom/commands/special.md"],
+  "agents": "./custom/agents/",
+  "hooks": "./config/hooks.json",
+  "mcpServers": "./mcp-config.json"
+}
+```
 
 ## Creation Process
 
 1. **Plan the plugin**
    - Define the plugin's purpose
    - List components needed (commands, agents, skills)
-   - Choose a descriptive name
+   - Choose a descriptive name (kebab-case)
 
 2. **Create directory structure**
    ```bash
@@ -168,14 +218,8 @@ argument-hint: <required-arg> [--optional-flag]
      "author": {
        "name": "Author Name"
      },
-     "commands": {
-       "my-command": {
-         "description": "Command description",
-         "source": "../commands/my-command.md"
-       }
-     },
-     "agents": "./agents/",
-     "skills": "./skills/"
+     "commands": "./commands/",
+     "agents": "./agents/"
    }
    ```
 
@@ -186,48 +230,6 @@ argument-hint: <required-arg> [--optional-flag]
 
 5. **Add to marketplace**
    Update marketplace.json to include the new plugin
-
-## Example Plugin
-
-### plugin.json
-```json
-{
-  "name": "code-quality",
-  "version": "1.0.0",
-  "description": "Code quality tools including linting, formatting, and review",
-  "author": {
-    "name": "Developer",
-    "email": "dev@example.com"
-  },
-  "commands": {
-    "lint": {
-      "description": "Run linter on codebase",
-      "source": "../commands/lint.md"
-    },
-    "format": {
-      "description": "Format code files",
-      "source": "../commands/format.md"
-    }
-  },
-  "agents": "./agents/",
-  "skills": "./skills/"
-}
-```
-
-### Directory Structure
-```
-code-quality/
-├── .claude-plugin/
-│   └── plugin.json
-├── agents/
-│   └── code-reviewer.md
-├── commands/
-│   ├── lint.md
-│   └── format.md
-└── skills/
-    └── code-standards/
-        └── SKILL.md
-```
 
 ## Adding to Marketplace
 
@@ -253,10 +255,41 @@ Update the marketplace.json to include your plugin:
 3. Verify with `/help` to see commands
 4. Test components individually
 
-## Common Errors
+## Common Validation Errors
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `Command must have either "source" or "content"` | Using `"file"` instead of `"source"` | Change to `"source": "../path.md"` |
-| `agents: Invalid input` | Using object format for agents | Change to `"agents": "./agents/"` |
-| `skills: Invalid input` | Using object format for skills | Change to `"skills": "./skills/"` |
+| `Missing required file: .claude-plugin/plugin.json` | No manifest | Create `.claude-plugin/plugin.json` |
+| `plugin.json missing required fields` | Missing name, version, or description | Add all required fields |
+| `'author' must be an object` | Author is a string | Use object format with `name` field |
+| `Invalid JSON syntax` | Trailing commas, missing quotes | Fix JSON syntax |
+
+## Best Practices
+
+1. **Use semantic versioning** for the `version` field
+2. **Include descriptive keywords** for better discoverability
+3. **Provide author information** for attribution and support
+4. **Link to repository** for open-source contributions
+5. **Document your plugin** with a README.md
+6. **Track changes** with CHANGELOG.md
+7. **Use clear names** that describe the plugin's purpose
+8. **Keep descriptions concise** but informative
+
+## Migration Guide
+
+If you have an existing plugin without `plugin.json`:
+
+```bash
+cd plugins/your-plugin
+mkdir -p .claude-plugin
+cat > .claude-plugin/plugin.json << 'EOF'
+{
+  "name": "your-plugin",
+  "version": "1.0.0",
+  "description": "Your plugin description",
+  "author": {
+    "name": "Your Name"
+  }
+}
+EOF
+```

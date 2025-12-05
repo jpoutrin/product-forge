@@ -6,6 +6,5 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "agents": "./agents/",
-  "skills": "./skills/"
+  "agents": "./agents/"
 }

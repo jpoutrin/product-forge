@@ -6,11 +6,5 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "commands": {
-    "commit": {
-      "description": "Guided git commit with atomic commit analysis and conventional commit format",
-      "source": "../commands/commit.md"
-    }
-  },
-  "skills": "./skills/"
+  "commands": "./commands/"
 }

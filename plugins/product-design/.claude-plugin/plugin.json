@@ -6,64 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "commands": {
-    "create-prd": {
-      "description": "Interactive PRD creation wizard with comprehensive question flow",
-      "source": "../commands/create-prd.md"
-    },
-    "create-prd-feature": {
-      "description": "Create a feature-specific PRD (FRD) for individual features",
-      "source": "../commands/create-prd-feature.md"
-    },
-    "generate-tasks": {
-      "description": "Convert PRD to structured task list with automatic linking",
-      "source": "../commands/generate-tasks.md"
-    },
-    "prd-status": {
-      "description": "Check and update PRD status through lifecycle",
-      "source": "../commands/prd-status.md"
-    },
-    "list-prds": {
-      "description": "List all PRDs with status, progress, and metadata",
-      "source": "../commands/list-prds.md"
-    },
-    "task-list": {
-      "description": "List tasks by directory with progress and visual indicators",
-      "source": "../commands/task-list.md"
-    },
-    "task-focus": {
-      "description": "Focus on a specific task with context loading",
-      "source": "../commands/task-focus.md"
-    },
-    "discovery-session": {
-      "description": "Start interactive product discovery with expert guidance",
-      "source": "../commands/discovery-session.md"
-    },
-    "create-persona": {
-      "description": "Create detailed user persona with guided questions",
-      "source": "../commands/create-persona.md"
-    },
-    "position-product": {
-      "description": "Define product positioning and brand strategy",
-      "source": "../commands/position-product.md"
-    },
-    "brainstorm-solution": {
-      "description": "Structured brainstorming for technical solutions",
-      "source": "../commands/brainstorm-solution.md"
-    },
-    "prd-progress": {
-      "description": "Show implementation progress from linked tasks",
-      "source": "../commands/prd-progress.md"
-    },
-    "prd-archive": {
-      "description": "Archive completed or cancelled PRDs",
-      "source": "../commands/prd-archive.md"
-    },
-    "quick-start": {
-      "description": "Quick start guide for new product development",
-      "source": "../commands/quick-start.md"
-    }
-  },
-  "agents": "./agents/",
-  "skills": "./skills/"
+  "commands": "./commands/",
+  "agents": "./agents/"
 }
