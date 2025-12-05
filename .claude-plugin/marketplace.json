@@ -55,6 +55,12 @@
       "description": "Tools for creating and managing Claude Code plugins, agents, commands, and skills",
       "source": "./plugins/claude-code-dev",
       "category": "development"
+    },
+    {
+      "name": "atlassian-integration",
+      "description": "Atlassian Jira and Confluence integration via Remote MCP Server for issue tracking and documentation",
+      "source": "./plugins/atlassian-integration",
+      "category": "productivity"
     }
   ]
 }

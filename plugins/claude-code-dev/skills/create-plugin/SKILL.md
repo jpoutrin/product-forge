@@ -240,25 +240,51 @@ skills/
    - Add commands to `commands/` with proper frontmatter
    - Add skills to `skills/skill-name/SKILL.md`
 
-5. **Add to marketplace**
-   Update marketplace.json to include the new plugin
+5. **IMPORTANT: Register in marketplace.json**
+   Every new plugin MUST be added to `.claude-plugin/marketplace.json`
 
-## Adding to Marketplace
+6. **Validate the plugin**
+   ```bash
+   ./scripts/validate-all-plugins.sh plugin-name
+   ```
 
-Update the marketplace.json to include your plugin:
+7. **Commit the changes**
+   Include both the plugin directory AND marketplace.json
+
+## Adding to Marketplace (REQUIRED)
+
+**Every new plugin must be registered in `.claude-plugin/marketplace.json`.**
+
+Add a new entry to the `plugins` array:
 
 ```json
 {
   "plugins": [
+    // ... existing plugins ...
     {
       "name": "plugin-name",
+      "description": "Brief plugin description",
       "source": "./plugins/plugin-name",
-      "description": "Plugin description",
       "category": "development"
     }
   ]
 }
 ```
+
+### Marketplace Entry Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Must match plugin.json name |
+| `description` | Yes | Brief description for marketplace listing |
+| `source` | Yes | Relative path to plugin directory |
+| `category` | Yes | One of: `productivity`, `development`, `security` |
+
+### Categories
+
+- `productivity` - Workflow, project management, documentation tools
+- `development` - Code quality, testing, language-specific tools
+- `security` - Security, compliance, privacy tools
 
 ## Testing Your Plugin
 
