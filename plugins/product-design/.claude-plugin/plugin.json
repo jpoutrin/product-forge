@@ -11,6 +11,7 @@
     "./agents/marketing-expert.md",
     "./agents/prd-orchestrator.md",
     "./agents/product-architect.md",
+    "./agents/qa-tester.md",
     "./agents/task-executor.md",
     "./agents/ui-product-expert.md",
     "./agents/ux-expert.md"
