@@ -531,6 +531,199 @@ Examples:
 - deployment-guide-v1.docx
 ```
 
+## QA Screenshot to Confluence Mapping
+
+### Local QA Structure vs Confluence Attachments
+
+The QA test screenshots use a specific local directory structure that needs mapping when uploading to Confluence.
+
+#### Local Structure (product-design plugin)
+
+```
+qa-tests/
+├── active/
+│   └── QA-20250105-001-login.md          # Test document
+└── screenshots/
+    └── QA-20250105-001/                   # Test ID folder
+        ├── 01-initial-state.png
+        ├── 02-form-filled.png
+        ├── 03-success-state.png
+        └── elements/
+            ├── login-button.png
+            ├── email-field.png
+            └── password-field.png
+```
+
+#### Confluence Attachment Names (Flattened)
+
+When uploading to Confluence, flatten the structure with prefixed names:
+
+| Local Path | Confluence Attachment Name |
+|------------|---------------------------|
+| `QA-20250105-001/01-initial-state.png` | `QA-20250105-001-01-initial-state.png` |
+| `QA-20250105-001/02-form-filled.png` | `QA-20250105-001-02-form-filled.png` |
+| `QA-20250105-001/elements/login-button.png` | `QA-20250105-001-elem-login-button.png` |
+| `QA-20250105-001/elements/email-field.png` | `QA-20250105-001-elem-email-field.png` |
+
+#### Naming Rules
+
+1. **Prefix with test-id**: All screenshots get `{test-id}-` prefix
+2. **Element prefix**: Files from `elements/` get `-elem-` infix
+3. **No nested folders**: Confluence attachments are flat
+4. **Preserve sequence**: Keep `01-`, `02-` numbering
+
+### Upload Script with Renaming
+
+```bash
+#!/bin/bash
+# upload-qa-screenshots-confluence.sh
+# Upload QA screenshots to Confluence with proper naming
+
+TEST_ID="$1"
+PAGE_ID="$2"
+LOCAL_DIR="qa-tests/screenshots/${TEST_ID}"
+
+# Upload main screenshots
+for file in "$LOCAL_DIR"/*.png; do
+    filename=$(basename "$file")
+    # Prefix with test-id
+    new_name="${TEST_ID}-${filename}"
+
+    echo "Uploading: $new_name"
+    curl -s -u "${ATLASSIAN_EMAIL}:${ATLASSIAN_API_TOKEN}" \
+      -X POST \
+      -H "X-Atlassian-Token: nocheck" \
+      -F "file=@${file};filename=${new_name}" \
+      "https://${ATLASSIAN_DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}/child/attachment"
+done
+
+# Upload element screenshots with elem- infix
+if [ -d "$LOCAL_DIR/elements" ]; then
+    for file in "$LOCAL_DIR/elements"/*.png; do
+        filename=$(basename "$file")
+        # Add elem- infix
+        new_name="${TEST_ID}-elem-${filename}"
+
+        echo "Uploading element: $new_name"
+        curl -s -u "${ATLASSIAN_EMAIL}:${ATLASSIAN_API_TOKEN}" \
+          -X POST \
+          -H "X-Atlassian-Token: nocheck" \
+          -F "file=@${file};filename=${new_name}" \
+          "https://${ATLASSIAN_DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}/child/attachment"
+    done
+fi
+
+echo "Done! All screenshots uploaded to page ${PAGE_ID}"
+```
+
+### Python Upload with Mapping
+
+```python
+import os
+import requests
+from requests.auth import HTTPBasicAuth
+from pathlib import Path
+
+def upload_qa_screenshots_to_confluence(
+    domain: str,
+    email: str,
+    api_token: str,
+    page_id: str,
+    test_id: str,
+    local_dir: str = "qa-tests/screenshots"
+):
+    """Upload QA screenshots with Confluence-compatible naming."""
+
+    base_url = f"https://{domain}.atlassian.net/wiki/rest/api"
+    auth = HTTPBasicAuth(email, api_token)
+    headers = {"X-Atlassian-Token": "nocheck"}
+
+    screenshot_dir = Path(local_dir) / test_id
+    uploaded = []
+
+    # Upload main screenshots
+    for file in screenshot_dir.glob("*.png"):
+        confluence_name = f"{test_id}-{file.name}"
+        with open(file, 'rb') as f:
+            files = {'file': (confluence_name, f, 'image/png')}
+            response = requests.post(
+                f"{base_url}/content/{page_id}/child/attachment",
+                auth=auth, headers=headers, files=files
+            )
+        if response.ok:
+            uploaded.append({"local": str(file), "confluence": confluence_name})
+
+    # Upload element screenshots
+    elements_dir = screenshot_dir / "elements"
+    if elements_dir.exists():
+        for file in elements_dir.glob("*.png"):
+            confluence_name = f"{test_id}-elem-{file.name}"
+            with open(file, 'rb') as f:
+                files = {'file': (confluence_name, f, 'image/png')}
+                response = requests.post(
+                    f"{base_url}/content/{page_id}/child/attachment",
+                    auth=auth, headers=headers, files=files
+                )
+            if response.ok:
+                uploaded.append({"local": str(file), "confluence": confluence_name})
+
+    return uploaded
+
+# Generate mapping table for documentation
+def generate_mapping_table(uploaded: list) -> str:
+    """Generate markdown table of local-to-confluence name mapping."""
+    lines = ["| Local Path | Confluence Name |", "|------------|-----------------|"]
+    for item in uploaded:
+        lines.append(f"| `{item['local']}` | `{item['confluence']}` |")
+    return "\n".join(lines)
+```
+
+### Updating Markdown References
+
+After upload, update the QA test document to use Confluence attachment names:
+
+**Before (local references):**
+```markdown
+![Initial state](./screenshots/QA-20250105-001/01-initial-state.png)
+![Login button](./screenshots/QA-20250105-001/elements/login-button.png)
+```
+
+**After (Confluence references):**
+```markdown
+![Initial state](QA-20250105-001-01-initial-state.png)
+![Login button](QA-20250105-001-elem-login-button.png)
+```
+
+### Automated Reference Update Script
+
+```python
+import re
+from pathlib import Path
+
+def update_qa_doc_for_confluence(qa_doc_path: str, test_id: str) -> str:
+    """Update QA doc image references for Confluence."""
+
+    content = Path(qa_doc_path).read_text()
+
+    # Pattern: ./screenshots/{test-id}/filename.png
+    # Replace with: {test-id}-filename.png
+    content = re.sub(
+        rf'\./screenshots/{test_id}/([^)]+\.png)',
+        rf'{test_id}-\1',
+        content
+    )
+
+    # Pattern: ./screenshots/{test-id}/elements/filename.png
+    # Replace with: {test-id}-elem-filename.png
+    content = re.sub(
+        rf'{test_id}-elements/([^)]+\.png)',
+        rf'{test_id}-elem-\1',
+        content
+    )
+
+    return content
+```
+
 ## Jira Attachment Commands
 
 ### Add Attachment
