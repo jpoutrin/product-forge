@@ -222,14 +222,45 @@ curl -u "${EMAIL}:${API_TOKEN}" \
 
 ### Embed Attachment in Page Content
 
-After uploading, the attachment is in the page's attachment list but NOT embedded in content. To embed it:
+After uploading, the attachment is in the page's attachment list but **NOT embedded** in content. You must update the page body to display it.
+
+#### Important: Use Markdown, Not Wiki Markup
+
+| Format | Syntax | Works with API? |
+|--------|--------|-----------------|
+| Wiki markup | `!image.png!` | **NO** - Not converted |
+| Markdown | `![alt text](image.png)` | **YES** - Converted to storage format |
+| Storage format | `<ac:image>...</ac:image>` | **YES** - Native format |
+
+**Key insight:** Markdown image syntax gets automatically converted to Confluence storage format when using the API.
+
+#### Method 1: Markdown (Recommended)
+
+Use `representation: "wiki"` with Markdown syntax:
 
 ```bash
-# 1. Get current page content
-PAGE_CONTENT=$(curl -u "${EMAIL}:${API_TOKEN}" \
-  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}?expand=body.storage,version")
+curl -u "${EMAIL}:${API_TOKEN}" \
+  -X PUT \
+  -H "Content-Type: application/json" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}" \
+  -d '{
+    "version": {"number": NEW_VERSION},
+    "title": "Page Title",
+    "type": "page",
+    "body": {
+      "wiki": {
+        "value": "# My Page\n\nHere is the diagram:\n\n![Architecture Diagram](architecture.png)\n\nMore content here.",
+        "representation": "wiki"
+      }
+    }
+  }'
+```
 
-# 2. Update page with embedded image
+#### Method 2: Storage Format (Direct)
+
+Use native Confluence storage format with `representation: "storage"`:
+
+```bash
 curl -u "${EMAIL}:${API_TOKEN}" \
   -X PUT \
   -H "Content-Type: application/json" \
@@ -240,11 +271,165 @@ curl -u "${EMAIL}:${API_TOKEN}" \
     "type": "page",
     "body": {
       "storage": {
-        "value": "<p>Existing content</p><ac:image><ri:attachment ri:filename=\"diagram.png\"/></ac:image>",
+        "value": "<p>Here is the diagram:</p><ac:image ac:align=\"center\" ac:width=\"800\"><ri:attachment ri:filename=\"architecture.png\"/></ac:image>",
         "representation": "storage"
       }
     }
   }'
+```
+
+#### Storage Format Image Options
+
+```xml
+<!-- Basic image -->
+<ac:image>
+  <ri:attachment ri:filename="screenshot.png"/>
+</ac:image>
+
+<!-- With width -->
+<ac:image ac:width="600">
+  <ri:attachment ri:filename="screenshot.png"/>
+</ac:image>
+
+<!-- With alignment -->
+<ac:image ac:align="center" ac:width="800">
+  <ri:attachment ri:filename="diagram.png"/>
+</ac:image>
+
+<!-- As thumbnail -->
+<ac:image ac:thumbnail="true">
+  <ri:attachment ri:filename="photo.jpg"/>
+</ac:image>
+
+<!-- With border -->
+<ac:image ac:border="true" ac:width="400">
+  <ri:attachment ri:filename="ui-mockup.png"/>
+</ac:image>
+```
+
+#### Python Example - Upload and Embed
+
+```python
+import requests
+from requests.auth import HTTPBasicAuth
+import json
+
+def upload_and_embed_image(domain, email, api_token, page_id, file_path, alt_text=""):
+    base_url = f"https://{domain}.atlassian.net/wiki/rest/api"
+    auth = HTTPBasicAuth(email, api_token)
+    filename = file_path.split('/')[-1]
+
+    # 1. Upload attachment
+    upload_url = f"{base_url}/content/{page_id}/child/attachment"
+    headers = {"X-Atlassian-Token": "nocheck"}
+    with open(file_path, 'rb') as f:
+        files = {'file': f}
+        response = requests.post(upload_url, auth=auth, headers=headers, files=files)
+
+    if response.status_code not in [200, 201]:
+        raise Exception(f"Upload failed: {response.text}")
+
+    # 2. Get current page version
+    page_url = f"{base_url}/content/{page_id}?expand=body.wiki,version"
+    page = requests.get(page_url, auth=auth).json()
+    current_version = page['version']['number']
+    title = page['title']
+
+    # 3. Update page with embedded image using Markdown
+    update_url = f"{base_url}/content/{page_id}"
+
+    # Get existing content or start fresh
+    existing_content = page.get('body', {}).get('wiki', {}).get('value', '')
+
+    # Append image in Markdown format
+    new_content = f"{existing_content}\n\n![{alt_text}]({filename})"
+
+    payload = {
+        "version": {"number": current_version + 1},
+        "title": title,
+        "type": "page",
+        "body": {
+            "wiki": {
+                "value": new_content,
+                "representation": "wiki"
+            }
+        }
+    }
+
+    response = requests.put(
+        update_url,
+        auth=auth,
+        headers={"Content-Type": "application/json"},
+        data=json.dumps(payload)
+    )
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Update failed: {response.text}")
+
+# Usage
+upload_and_embed_image(
+    domain="your-domain",
+    email="your-email@example.com",
+    api_token="your-api-token",
+    page_id="123456789",
+    file_path="./screenshots/feature-demo.png",
+    alt_text="Feature Demo Screenshot"
+)
+```
+
+#### Complete Workflow Script
+
+```bash
+#!/bin/bash
+# upload-and-embed.sh - Upload image and embed in Confluence page
+
+DOMAIN="${ATLASSIAN_DOMAIN}"
+EMAIL="${ATLASSIAN_EMAIL}"
+API_TOKEN="${ATLASSIAN_API_TOKEN}"
+PAGE_ID="$1"
+FILE_PATH="$2"
+FILENAME=$(basename "$FILE_PATH")
+
+# 1. Upload the attachment
+echo "Uploading ${FILENAME}..."
+curl -s -u "${EMAIL}:${API_TOKEN}" \
+  -X POST \
+  -H "X-Atlassian-Token: nocheck" \
+  -F "file=@${FILE_PATH}" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}/child/attachment" > /dev/null
+
+# 2. Get current page version
+VERSION=$(curl -s -u "${EMAIL}:${API_TOKEN}" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}?expand=version" \
+  | jq '.version.number')
+
+TITLE=$(curl -s -u "${EMAIL}:${API_TOKEN}" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}" \
+  | jq -r '.title')
+
+# 3. Update page with embedded image (Markdown format)
+NEW_VERSION=$((VERSION + 1))
+echo "Embedding image in page (version ${NEW_VERSION})..."
+
+curl -s -u "${EMAIL}:${API_TOKEN}" \
+  -X PUT \
+  -H "Content-Type: application/json" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}" \
+  -d "{
+    \"version\": {\"number\": ${NEW_VERSION}},
+    \"title\": \"${TITLE}\",
+    \"type\": \"page\",
+    \"body\": {
+      \"wiki\": {
+        \"value\": \"![${FILENAME}](${FILENAME})\",
+        \"representation\": \"wiki\"
+      }
+    }
+  }" > /dev/null
+
+echo "Done! Image embedded in page."
 ```
 
 ## Supported File Types
