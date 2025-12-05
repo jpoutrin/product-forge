@@ -11,43 +11,43 @@
     {
       "name": "product-design",
       "description": "Product development toolkit with PRD management, discovery, strategy, and UX/UI expertise",
-      "source": "../plugins/product-design",
+      "source": "./plugins/product-design",
       "category": "productivity"
     },
     {
       "name": "python-experts",
       "description": "Python technical specialists for Django, FastAPI, FastMCP, Celery, and testing",
-      "source": "../plugins/python-experts",
+      "source": "./plugins/python-experts",
       "category": "development"
     },
     {
       "name": "frontend-experts",
       "description": "Frontend development with React, TypeScript, and Playwright testing expertise",
-      "source": "../plugins/frontend-experts",
+      "source": "./plugins/frontend-experts",
       "category": "development"
     },
     {
       "name": "security-compliance",
       "description": "Security and privacy expertise with MCP security, OAuth, and GDPR/CCPA compliance",
-      "source": "../plugins/security-compliance",
+      "source": "./plugins/security-compliance",
       "category": "security"
     },
     {
       "name": "devops-data",
       "description": "DevOps and Data Engineering with AWS, GCP, Ansible, dbt, and SQLMesh expertise",
-      "source": "../plugins/devops-data",
+      "source": "./plugins/devops-data",
       "category": "development"
     },
     {
       "name": "rag-cag",
       "description": "RAG/CAG architecture patterns with multi-tenant security and chunking strategies",
-      "source": "../plugins/rag-cag",
+      "source": "./plugins/rag-cag",
       "category": "development"
     },
     {
       "name": "git-workflow",
       "description": "Git best practices with atomic commits and conventional commit format",
-      "source": "../plugins/git-workflow",
+      "source": "./plugins/git-workflow",
       "category": "productivity"
     }
   ]
