@@ -163,6 +163,9 @@ Reviewed-by: Jane Doe
 - "Updates"
 - "Misc changes"
 - "Addressing PR feedback"
+- Include "Generated with Claude Code" or AI tool attribution
+- Include "Co-Authored-By: Claude" or AI co-author footers
+- Include 🤖 emoji or any AI generation indicators
 ```
 
 ### The Body (When Needed)

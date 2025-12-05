@@ -236,6 +236,12 @@ The command should enforce:
    - Warn if >300 lines changed
    - Warn if multiple file types with different purposes
 
+5. **No AI Tool Attribution**
+   - NEVER include "Generated with Claude Code" or similar AI attribution
+   - NEVER include "Co-Authored-By: Claude" or any AI co-author footer
+   - NEVER include emojis like 🤖 indicating AI generation
+   - Commit messages should appear as human-written, professional commits
+
 ## Error Handling
 
 ```
