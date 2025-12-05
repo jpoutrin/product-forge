@@ -6,5 +6,11 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "agents": "./agents/"
+  "agents": [
+    "./agents/celery-expert.md",
+    "./agents/django-expert.md",
+    "./agents/fastapi-expert.md",
+    "./agents/fastmcp-expert.md",
+    "./agents/python-testing-expert.md"
+  ]
 }

@@ -7,5 +7,12 @@
     "email": "contact@jpoutrin.dev"
   },
   "commands": "./commands/",
-  "agents": "./agents/"
+  "agents": [
+    "./agents/marketing-expert.md",
+    "./agents/prd-orchestrator.md",
+    "./agents/product-architect.md",
+    "./agents/task-executor.md",
+    "./agents/ui-product-expert.md",
+    "./agents/ux-expert.md"
+  ]
 }

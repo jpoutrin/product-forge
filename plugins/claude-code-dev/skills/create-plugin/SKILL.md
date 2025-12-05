@@ -59,8 +59,8 @@ plugin-name/
 | `repository` | string | Git repository URL |
 | `license` | string | License identifier (e.g., "MIT", "Apache-2.0") |
 | `keywords` | array | Searchable keywords |
-| `commands` | string or array | Custom command locations |
-| `agents` | string | Custom agent directory location |
+| `commands` | string or array | Custom command locations (directory or file paths) |
+| `agents` | array | Array of agent file paths (must end with .md) |
 | `hooks` | string | Custom hook configuration file location |
 | `mcpServers` | string | Custom MCP server configuration file location |
 
@@ -105,19 +105,29 @@ Commands MUST be a **string** (directory path) or **array of strings** (file pat
 
 ### Agents Configuration
 
-Agents MUST be a **string** (directory path):
+Agents MUST be an **array of file paths** ending with `.md`:
 
 **CORRECT:**
 ```json
 {
-  "agents": "./agents/"
+  "agents": [
+    "./agents/my-agent.md",
+    "./agents/another-agent.md"
+  ]
 }
 ```
 
-**CORRECT - Custom location:**
+**CORRECT - Single agent:**
 ```json
 {
-  "agents": "./custom/agents/"
+  "agents": ["./agents/expert.md"]
+}
+```
+
+**WRONG - Directory path (INVALID):**
+```json
+{
+  "agents": "./agents/"
 }
 ```
 
@@ -168,7 +178,9 @@ skills/
     "email": "dev@example.com"
   },
   "commands": "./commands/",
-  "agents": "./agents/"
+  "agents": [
+    "./agents/code-reviewer.md"
+  ]
 }
 ```
 
@@ -188,7 +200,7 @@ skills/
   "license": "MIT",
   "keywords": ["enterprise", "security", "compliance"],
   "commands": ["./custom/commands/special.md"],
-  "agents": "./custom/agents/",
+  "agents": ["./custom/agents/security-expert.md"],
   "hooks": "./config/hooks.json",
   "mcpServers": "./mcp-config.json"
 }
@@ -219,7 +231,7 @@ skills/
        "name": "Author Name"
      },
      "commands": "./commands/",
-     "agents": "./agents/"
+     "agents": ["./agents/my-agent.md"]
    }
    ```
 
@@ -263,6 +275,7 @@ Update the marketplace.json to include your plugin:
 | `plugin.json missing required fields` | Missing name, version, or description | Add all required fields |
 | `'author' must be an object` | Author is a string | Use object format with `name` field |
 | `Invalid JSON syntax` | Trailing commas, missing quotes | Fix JSON syntax |
+| `agents: Invalid input: must end with ".md"` | Using directory path for agents | Use array of file paths: `["./agents/name.md"]` |
 
 ## Best Practices
 

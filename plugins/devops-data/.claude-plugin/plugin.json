@@ -6,5 +6,9 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "agents": "./agents/"
+  "agents": [
+    "./agents/cto-architect.md",
+    "./agents/data-engineering-expert.md",
+    "./agents/devops-expert.md"
+  ]
 }

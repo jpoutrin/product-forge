@@ -6,5 +6,7 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "agents": "./agents/"
+  "agents": [
+    "./agents/rag-cag-expert.md"
+  ]
 }
