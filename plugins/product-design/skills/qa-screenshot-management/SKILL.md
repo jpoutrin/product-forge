@@ -11,21 +11,28 @@ Standardize screenshot capture and organization during QA testing.
 
 ```
 qa-tests/
+├── draft/                           # QA test documents by status
+├── active/
+├── executed/
+├── archived/
 └── screenshots/
-    ├── {test-id}/           # Screenshots grouped by test
-    │   ├── TC-001/          # By test case
-    │   │   ├── 01-initial-state.png
-    │   │   ├── 02-after-action.png
-    │   │   └── 03-final-state.png
-    │   └── EC-001/          # Edge cases
-    │       └── 01-error-state.png
-    ├── baseline/            # Reference screenshots for comparison
+    ├── {test-id}/                   # e.g., QA-20250105-001
+    │   ├── 01-initial-state.png     # Numbered sequence
+    │   ├── 02-form-filled.png
+    │   ├── 03-success-state.png
+    │   └── elements/                # Extracted UI elements
+    │       ├── login-button.png
+    │       ├── email-field.png
+    │       └── password-field.png
+    ├── baseline/                    # Reference screenshots for comparison
     │   └── {feature}/
     │       └── {state}.png
-    └── failures/            # Failed test evidence
+    └── failures/                    # Failed test evidence
         └── {date}/
             └── {test-id}-{timestamp}.png
 ```
+
+**Key:** Screenshots are stored in `qa-tests/screenshots/{test-id}/` where `{test-id}` matches the QA test document name (e.g., `QA-20250105-001`).
 
 ## Naming Convention
 

@@ -15,21 +15,20 @@ When a test step says "Click the Login button", capture a screenshot of that spe
 
 ```
 qa-tests/
+├── active/
+│   └── QA-20250105-001-login.md        # QA test document
 └── screenshots/
-    └── {test-id}/
-        ├── TC-001/
-        │   ├── 01-initial-state.png        # Full page
-        │   ├── elements/                    # Extracted elements
-        │   │   ├── login-button.png
-        │   │   ├── username-field.png
-        │   │   └── password-field.png
-        │   └── 02-after-login.png          # Full page
-        └── elements-glossary/               # Reusable element library
-            ├── buttons/
-            ├── forms/
-            ├── navigation/
-            └── modals/
+    └── QA-20250105-001/                 # Matches test-id
+        ├── 01-initial-state.png         # Full page screenshots
+        ├── 02-form-filled.png
+        ├── 03-success-state.png
+        └── elements/                     # Extracted UI elements
+            ├── login-button.png
+            ├── email-field.png
+            └── password-field.png
 ```
+
+**Note:** The `{test-id}` folder name (e.g., `QA-20250105-001`) matches the QA test document filename.
 
 ## Element Extraction Process
 
@@ -82,7 +81,7 @@ const element = page.getByRole('button', { name: 'Login' });
 
 // Capture just this element
 await element.screenshot({
-  path: 'screenshots/TC-001/elements/login-button.png'
+  path: 'qa-tests/screenshots/QA-20250105-001/elements/login-button.png'
 });
 ```
 

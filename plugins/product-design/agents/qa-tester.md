@@ -72,8 +72,8 @@ All QA test procedures follow this markdown format:
 **Postconditions**: [Expected state after test completes]
 
 **Screenshots Reference**:
-- Step 2: `screenshots/tc-001-step-2.png`
-- Step 4: `screenshots/tc-001-step-4.png`
+- Step 2: `./screenshots/{test-id}/02-credentials-entered.png`
+- Step 4: `./screenshots/{test-id}/04-success-message.png`
 
 ---
 
@@ -233,7 +233,7 @@ Test design patterns for comprehensive coverage:
 ### qa-screenshot-management
 Screenshot organization standards:
 - Naming: `{sequence}-{state-description}.png`
-- Directory: `screenshots/{test-id}/TC-001/`
+- Directory: `qa-tests/screenshots/{test-id}/`
 - Always capture: initial state, after actions, errors, success, final
 
 ### qa-element-extraction
