@@ -3,7 +3,10 @@
   "name": "product-forge-marketplace",
   "description": "Comprehensive product development toolkit with PRD management, task tracking, and specialized technical agents",
   "version": "1.0.0",
-  "owner": "jpoutrin",
+  "owner": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
   "plugins": [
     {
       "name": "product-forge",
