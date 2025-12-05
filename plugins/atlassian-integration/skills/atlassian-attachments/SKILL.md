@@ -234,6 +234,31 @@ After uploading, the attachment is in the page's attachment list but **NOT embed
 
 **Key insight:** Markdown image syntax gets automatically converted to Confluence storage format when using the API.
 
+#### CRITICAL: Storage Format for Attachments vs External URLs
+
+When using storage format directly, you MUST use the correct element for referencing attachments:
+
+| Reference Type | Element | Use Case |
+|----------------|---------|----------|
+| Page attachment | `<ri:attachment ri:filename="..."/>` | Files uploaded to the page |
+| External URL | `<ri:url ri:value="..."/>` | External image URLs |
+
+**WRONG - Using ri:url for attachments (images won't display):**
+```xml
+<ac:image ac:src="screenshot.png">
+  <ri:url ri:value="screenshot.png" />
+</ac:image>
+```
+
+**CORRECT - Using ri:attachment for uploaded files:**
+```xml
+<ac:image>
+  <ri:attachment ri:filename="screenshot.png" />
+</ac:image>
+```
+
+The `ri:url` element is for external URLs only. For files uploaded as attachments to the page, you MUST use `ri:attachment` with `ri:filename`.
+
 #### Method 1: Markdown (Recommended)
 
 Use `representation: "wiki"` with Markdown syntax:
@@ -280,23 +305,32 @@ curl -u "${EMAIL}:${API_TOKEN}" \
 
 #### Storage Format Image Options
 
+**IMPORTANT:** Always use `<ri:attachment ri:filename="..."/>` for page attachments, never `<ri:url>`.
+
+**RECOMMENDED for QA screenshots:** Use `ac:width="600"` to prevent images from being too wide and hindering readability:
+
 ```xml
-<!-- Basic image -->
+<!-- RECOMMENDED: Centered image with controlled width (best for QA screenshots) -->
+<ac:image ac:align="center" ac:layout="center" ac:width="600">
+  <ri:attachment ri:filename="screenshot.png"/>
+</ac:image>
+
+<!-- Basic image (attachment) - will be full width, may be too large -->
 <ac:image>
   <ri:attachment ri:filename="screenshot.png"/>
 </ac:image>
 
-<!-- With width -->
-<ac:image ac:width="600">
-  <ri:attachment ri:filename="screenshot.png"/>
+<!-- Element screenshots (smaller width for UI elements) -->
+<ac:image ac:align="center" ac:layout="center" ac:width="400">
+  <ri:attachment ri:filename="button-element.png"/>
 </ac:image>
 
-<!-- With alignment -->
-<ac:image ac:align="center" ac:width="800">
-  <ri:attachment ri:filename="diagram.png"/>
+<!-- Full-width diagram (use sparingly) -->
+<ac:image ac:align="center" ac:layout="center" ac:width="800">
+  <ri:attachment ri:filename="architecture-diagram.png"/>
 </ac:image>
 
-<!-- As thumbnail -->
+<!-- As thumbnail (clickable to expand) -->
 <ac:image ac:thumbnail="true">
   <ri:attachment ri:filename="photo.jpg"/>
 </ac:image>
@@ -305,7 +339,20 @@ curl -u "${EMAIL}:${API_TOKEN}" \
 <ac:image ac:border="true" ac:width="400">
   <ri:attachment ri:filename="ui-mockup.png"/>
 </ac:image>
+
+<!-- External URL (only for images NOT uploaded as attachments) -->
+<ac:image>
+  <ri:url ri:value="https://example.com/external-image.png"/>
+</ac:image>
 ```
+
+**Width Guidelines:**
+| Image Type | Recommended Width | Notes |
+|------------|-------------------|-------|
+| Full page screenshots | `600` | Readable without scrolling |
+| Element screenshots | `300-400` | Small UI components |
+| Architecture diagrams | `800` | Complex diagrams need more space |
+| Thumbnails | Use `ac:thumbnail="true"` | Clickable to expand |
 
 #### Python Example - Upload and Embed
 
@@ -723,6 +770,63 @@ def update_qa_doc_for_confluence(qa_doc_path: str, test_id: str) -> str:
 
     return content
 ```
+
+### Fixing Broken Image References in Existing Pages
+
+If a page was created with `ri:url` instead of `ri:attachment`, images won't display. To fix:
+
+```bash
+#!/bin/bash
+# fix-confluence-image-refs.sh - Fix broken image references in Confluence page
+
+PAGE_ID="$1"
+
+# 1. Get current page content
+curl -s -u "${ATLASSIAN_EMAIL}:${ATLASSIAN_API_TOKEN}" \
+  "https://${ATLASSIAN_DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}?expand=body.storage,version" \
+  > /tmp/page.json
+
+VERSION=$(jq '.version.number' /tmp/page.json)
+TITLE=$(jq -r '.title' /tmp/page.json)
+
+# 2. Extract and fix the content
+jq -r '.body.storage.value' /tmp/page.json > /tmp/content.html
+
+# Fix: Replace ri:url with ri:attachment for local filenames (not full URLs)
+# This converts: <ri:url ri:value="filename.png" />
+# To: <ri:attachment ri:filename="filename.png" />
+sed -i '' 's/<ri:url ri:value="\([^"]*\)" \/>/<ri:attachment ri:filename="\1" \/>/g' /tmp/content.html
+
+# Remove ac:src attribute (not needed with ri:attachment)
+sed -i '' 's/ ac:src="[^"]*"//g' /tmp/content.html
+
+# 3. Update the page
+NEW_VERSION=$((VERSION + 1))
+CONTENT=$(cat /tmp/content.html | jq -Rs .)
+
+curl -s -u "${ATLASSIAN_EMAIL}:${ATLASSIAN_API_TOKEN}" \
+  -X PUT \
+  -H "Content-Type: application/json" \
+  "https://${ATLASSIAN_DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}" \
+  -d "{
+    \"version\": {\"number\": ${NEW_VERSION}},
+    \"title\": \"${TITLE}\",
+    \"type\": \"page\",
+    \"body\": {
+      \"storage\": {
+        \"value\": ${CONTENT},
+        \"representation\": \"storage\"
+      }
+    }
+  }"
+
+echo "Fixed image references in page ${PAGE_ID}"
+```
+
+**Common symptoms of broken image references:**
+- Images show as broken/missing icons
+- Images display with blob URLs like `blob:https://media.staging.atl-paas.net/...`
+- Alt text shows but image doesn't load
 
 ## Jira Attachment Commands
 
