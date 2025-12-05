@@ -132,6 +132,7 @@ For each action:
 - Note the exact element clicked/filled
 - Capture the expected result
 - Take a screenshot if state changes significantly
+- **Selectively capture element screenshots** only when they help testers locate or verify UI components (see `qa-element-extraction` skill)
 
 ### 3. Identify Test Cases
 Group related steps into logical test cases:
@@ -152,7 +153,7 @@ FINAL REVIEW CHECKLIST:
 
 1. LIST all captured screenshots
    $ ls qa-tests/screenshots/{test-id}/
-   $ ls qa-tests/screenshots/{test-id}/elements/
+   $ ls qa-tests/screenshots/{test-id}/elements/  # if any element screenshots were taken
 
 2. SCAN the markdown for image references
    - Look for ![...](./screenshots/...)
@@ -164,7 +165,7 @@ FINAL REVIEW CHECKLIST:
 
 4. ADD missing references if needed:
    - Add "#### Screenshots" section to each test case
-   - Add "## Element Visual Reference" section
+   - Add "## Element Visual Reference" section ONLY if element screenshots exist
    - Use relative paths: ./screenshots/{test-id}/filename.png
 
 5. VERIFY paths are valid
@@ -174,6 +175,9 @@ FINAL REVIEW CHECKLIST:
 6. REPORT completion status:
    ✅ "All X screenshots properly referenced in document"
    ⚠️ "Added Y missing screenshot references"
+
+NOTE: Element screenshots are OPTIONAL - only include them when they
+help testers identify hard-to-locate UI components during execution.
 ```
 
 **Example final document structure:**
@@ -237,10 +241,12 @@ Screenshot organization standards:
 - Always capture: initial state, after actions, errors, success, final
 
 ### qa-element-extraction
-Extract UI elements mentioned in test steps:
-- Scan for **bold** element names in steps
-- Capture targeted screenshots of each element
-- Create element reference table with selectors
+**Selective** element extraction to help testers identify UI components:
+- **Only extract elements that may be hard to locate** during test execution
+- Focus on elements where visual reference aids verification
+- Do NOT systematically capture every element mentioned
+- Use when: element has non-obvious appearance, multiple similar elements exist, or element is dynamically rendered
+- Apply the `qa-element-extraction` skill for extraction methodology
 - Store in `screenshots/{test-id}/elements/`
 
 ### qa-screenshot-validation
