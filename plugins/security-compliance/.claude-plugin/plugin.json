@@ -6,21 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "skills": {
-    "mcp-security": {
-      "description": "5-layer defense architecture for MCP servers, multi-agent systems, and text-to-SQL pipelines",
-      "file": "../skills/mcp-security.md",
-      "triggers": ["mcp security", "agent security", "text-to-sql", "prompt injection", "authorization", "trust boundary"]
-    },
-    "privacy-compliance": {
-      "description": "Privacy regulation compliance for GDPR, CCPA/CPRA, and regional requirements",
-      "file": "../skills/privacy-compliance.md",
-      "triggers": ["gdpr", "ccpa", "cpra", "privacy", "data protection", "personal data", "consent", "dpo"]
-    },
-    "oauth": {
-      "description": "OAuth 2.0 and OpenID Connect implementation with secure flow selection and token management",
-      "file": "../skills/oauth.md",
-      "triggers": ["oauth", "oauth2", "oidc", "openid connect", "jwt", "access token", "refresh token", "pkce"]
-    }
-  }
+  "agents": "./agents/",
+  "skills": "./skills/"
 }

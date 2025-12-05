@@ -9,15 +9,8 @@
   "commands": {
     "commit": {
       "description": "Guided git commit with atomic commit analysis and conventional commit format",
-      "file": "../commands/commit.md",
-      "arguments": "[--all | --staged | --interactive]"
+      "source": "../commands/commit.md"
     }
   },
-  "skills": {
-    "git-commits": {
-      "description": "Atomic commits, conventional commits, and disciplined version control practices",
-      "file": "../skills/git-commits.md",
-      "triggers": ["git commit", "commit message", "atomic commit", "conventional commit", "version control"]
-    }
-  }
+  "skills": "./skills/"
 }

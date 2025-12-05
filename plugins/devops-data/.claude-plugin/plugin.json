@@ -6,31 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "skills": {
-    "aws-cloud": {
-      "description": "AWS cloud services best practices including IAM, EC2, S3, Lambda, RDS, and security",
-      "file": "../skills/aws-cloud.md",
-      "triggers": ["aws", "amazon web services", "ec2", "s3", "lambda", "rds", "iam", "cloudformation", "eks"]
-    },
-    "gcp-cloud": {
-      "description": "Google Cloud Platform best practices including IAM, GCE, Cloud Storage, BigQuery, and security",
-      "file": "../skills/gcp-cloud.md",
-      "triggers": ["gcp", "google cloud", "gce", "cloud storage", "cloud sql", "cloud run", "gke", "bigquery"]
-    },
-    "ansible": {
-      "description": "Ansible automation best practices for playbooks, roles, inventory, and secure configuration",
-      "file": "../skills/ansible.md",
-      "triggers": ["ansible", "playbook", "ansible role", "ansible galaxy", "ansible vault", "inventory"]
-    },
-    "dbt": {
-      "description": "dbt data transformation best practices for modeling, testing, and documentation",
-      "file": "../skills/dbt.md",
-      "triggers": ["dbt", "data build tool", "data transformation", "data modeling", "staging models", "mart models"]
-    },
-    "sqlmesh": {
-      "description": "SQLMesh best practices for virtual environments, incremental models, and CI/CD-friendly transformations",
-      "file": "../skills/sqlmesh.md",
-      "triggers": ["sqlmesh", "sql mesh", "virtual environments", "data transformation", "column-level lineage"]
-    }
-  }
+  "agents": "./agents/",
+  "skills": "./skills/"
 }

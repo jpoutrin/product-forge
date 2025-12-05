@@ -6,16 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "skills": {
-    "python-style": {
-      "description": "Python coding style enforcement with PEP standards, type hints, and modern patterns",
-      "file": "../skills/python-style.md",
-      "triggers": ["python", "django", "fastapi", "celery", "pytest", "pydantic", "async", "type hints"]
-    },
-    "documentation-research": {
-      "description": "Enforces online documentation research before any technical implementation",
-      "file": "../skills/documentation-research.md",
-      "triggers": ["implement", "code", "build", "create", "develop", "technical"]
-    }
-  }
+  "agents": "./agents/",
+  "skills": "./skills/"
 }

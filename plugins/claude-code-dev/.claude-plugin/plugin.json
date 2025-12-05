@@ -5,5 +5,12 @@
   "author": {
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
-  }
+  },
+  "commands": {
+    "install-playwright-mcp": {
+      "description": "Install Playwright MCP server for browser automation in Claude Code",
+      "source": "../commands/install-playwright-mcp.md"
+    }
+  },
+  "skills": "./skills/"
 }

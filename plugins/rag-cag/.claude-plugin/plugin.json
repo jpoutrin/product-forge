@@ -6,16 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "skills": {
-    "rag-cag-security": {
-      "description": "RAG/CAG architecture patterns with multi-tenant security, chunking strategies, and volume-based scaling",
-      "file": "../skills/rag-cag-security.md",
-      "triggers": ["rag", "cag", "retrieval augmented generation", "vector database", "embeddings", "semantic search", "graphrag"]
-    },
-    "chunking-strategies": {
-      "description": "Deep-dive chunking patterns for RAG optimization with document-type-specific strategies",
-      "file": "../skills/chunking-strategies.md",
-      "triggers": ["chunking", "chunk", "text splitting", "document splitting", "semantic chunking", "late chunking"]
-    }
-  }
+  "agents": "./agents/",
+  "skills": "./skills/"
 }

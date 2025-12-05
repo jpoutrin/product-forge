@@ -6,11 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "skills": {
-    "typescript-style": {
-      "description": "TypeScript/JavaScript style enforcement with strict typing, ESLint, and modern patterns",
-      "file": "../skills/typescript-style.md",
-      "triggers": ["typescript", "javascript", "react", "node", "nextjs", "jsx", "tsx", "eslint"]
-    }
-  }
+  "agents": "./agents/",
+  "skills": "./skills/"
 }
