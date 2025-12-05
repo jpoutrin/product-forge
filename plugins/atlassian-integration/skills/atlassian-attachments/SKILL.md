@@ -1,11 +1,251 @@
 ---
 name: atlassian-attachments
-description: Attach documents, screenshots, PDFs, and files to Jira issues and Confluence pages. Use when uploading evidence, documentation, or media to Atlassian products.
+description: Attach documents, screenshots, PDFs, and files to Jira issues and Confluence pages via REST API. Use when uploading evidence, documentation, or media to Atlassian products.
 ---
 
 # Atlassian Attachments Skill
 
-Attach files, screenshots, and documents to Jira issues and Confluence pages.
+Attach files, screenshots, and documents to Jira issues and Confluence pages using the Atlassian REST API.
+
+## Authentication Setup
+
+### API Token (Required)
+
+Generate an API token at: https://id.atlassian.com/manage-profile/security/api-tokens
+
+### Environment Variables
+
+```bash
+export ATLASSIAN_DOMAIN="your-domain"
+export ATLASSIAN_EMAIL="your-email@example.com"
+export ATLASSIAN_API_TOKEN="your-api-token"
+```
+
+### Setup via .envrc (Recommended)
+
+If environment variables are not set, add them to `.envrc` in your project root for automatic loading with [direnv](https://direnv.net/):
+
+```bash
+# .envrc
+export ATLASSIAN_DOMAIN="your-domain"
+export ATLASSIAN_EMAIL="your-email@example.com"
+export ATLASSIAN_API_TOKEN="your-api-token"
+```
+
+Then allow the file:
+```bash
+direnv allow
+```
+
+**Security Note:** Add `.envrc` to `.gitignore` to prevent committing credentials:
+```bash
+echo ".envrc" >> .gitignore
+```
+
+### Check Environment Setup
+
+```bash
+# Verify variables are set
+echo "Domain: ${ATLASSIAN_DOMAIN:-NOT SET}"
+echo "Email: ${ATLASSIAN_EMAIL:-NOT SET}"
+echo "Token: ${ATLASSIAN_API_TOKEN:+SET}"
+```
+
+If any show "NOT SET", prompt the user to configure `.envrc`.
+
+### Base URLs
+
+```
+Jira:       https://{domain}.atlassian.net/rest/api/3
+Confluence: https://{domain}.atlassian.net/wiki/rest/api
+```
+
+## Jira REST API - Upload Attachments
+
+### Endpoint
+
+```
+POST https://{domain}.atlassian.net/rest/api/3/issue/{issueIdOrKey}/attachments
+```
+
+### Required Headers
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Atlassian-Token` | `no-check` | CSRF protection bypass (required) |
+| `Content-Type` | `multipart/form-data` | File upload format |
+
+### cURL Command
+
+```bash
+curl --location --request POST \
+  'https://your-domain.atlassian.net/rest/api/3/issue/PROJ-123/attachments' \
+  -u 'email@example.com:<api_token>' \
+  -H 'X-Atlassian-Token: no-check' \
+  --form 'file=@"./screenshots/bug-evidence.png"'
+```
+
+### Python Example
+
+```python
+import requests
+from requests.auth import HTTPBasicAuth
+
+def upload_jira_attachment(domain, email, api_token, issue_key, file_path):
+    url = f"https://{domain}.atlassian.net/rest/api/3/issue/{issue_key}/attachments"
+
+    auth = HTTPBasicAuth(email, api_token)
+    headers = {
+        "X-Atlassian-Token": "no-check"
+    }
+
+    with open(file_path, 'rb') as file:
+        files = {'file': file}
+        response = requests.post(url, auth=auth, headers=headers, files=files)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"Upload failed: {response.status_code} - {response.text}")
+
+# Usage
+result = upload_jira_attachment(
+    domain="your-domain",
+    email="your-email@example.com",
+    api_token="your-api-token",
+    issue_key="PROJ-123",
+    file_path="./screenshots/bug-evidence.png"
+)
+```
+
+### Bash Script - Multiple Files
+
+```bash
+#!/bin/bash
+DOMAIN="your-domain"
+EMAIL="your-email@example.com"
+API_TOKEN="your-api-token"
+ISSUE_KEY="PROJ-123"
+FILES_DIR="./qa-tests/screenshots/"
+
+for file in "$FILES_DIR"*.png; do
+    echo "Uploading: $file"
+    curl --silent --location --request POST \
+      "https://${DOMAIN}.atlassian.net/rest/api/3/issue/${ISSUE_KEY}/attachments" \
+      -u "${EMAIL}:${API_TOKEN}" \
+      -H "X-Atlassian-Token: no-check" \
+      --form "file=@\"$file\""
+    echo " Done"
+done
+```
+
+## Confluence REST API - Upload Attachments
+
+### Endpoint
+
+```
+POST https://{domain}.atlassian.net/wiki/rest/api/content/{pageId}/child/attachment
+```
+
+### Required Headers
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Atlassian-Token` | `nocheck` | CSRF protection bypass (required) |
+| `Content-Type` | `multipart/form-data` | File upload format |
+
+### cURL Command - Basic Auth
+
+```bash
+curl -u "${USER_EMAIL}:${API_TOKEN}" \
+  -X POST \
+  -H "X-Atlassian-Token: nocheck" \
+  -F "file=@./diagram.png" \
+  -F "comment=Uploaded via REST API" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}/child/attachment"
+```
+
+### cURL Command - Personal Access Token
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer ${PAT_TOKEN}" \
+  -H "X-Atlassian-Token: no-check" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@./document.pdf" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}/child/attachment"
+```
+
+### Python Example
+
+```python
+import requests
+from requests.auth import HTTPBasicAuth
+
+def upload_confluence_attachment(domain, email, api_token, page_id, file_path, comment=""):
+    url = f"https://{domain}.atlassian.net/wiki/rest/api/content/{page_id}/child/attachment"
+
+    auth = HTTPBasicAuth(email, api_token)
+    headers = {
+        "X-Atlassian-Token": "nocheck"
+    }
+
+    with open(file_path, 'rb') as file:
+        files = {'file': file}
+        data = {'comment': comment} if comment else {}
+        response = requests.post(url, auth=auth, headers=headers, files=files, data=data)
+
+    if response.status_code in [200, 201]:
+        return response.json()
+    else:
+        raise Exception(f"Upload failed: {response.status_code} - {response.text}")
+
+# Usage
+result = upload_confluence_attachment(
+    domain="your-domain",
+    email="your-email@example.com",
+    api_token="your-api-token",
+    page_id="123456789",
+    file_path="./docs/architecture.png",
+    comment="Architecture diagram v2"
+)
+```
+
+### Get Page ID by Title
+
+```bash
+# Find page ID from title
+curl -u "${EMAIL}:${API_TOKEN}" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content?title=Page%20Title&spaceKey=SPACE" \
+  | jq '.results[0].id'
+```
+
+### Embed Attachment in Page Content
+
+After uploading, the attachment is in the page's attachment list but NOT embedded in content. To embed it:
+
+```bash
+# 1. Get current page content
+PAGE_CONTENT=$(curl -u "${EMAIL}:${API_TOKEN}" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}?expand=body.storage,version")
+
+# 2. Update page with embedded image
+curl -u "${EMAIL}:${API_TOKEN}" \
+  -X PUT \
+  -H "Content-Type: application/json" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}" \
+  -d '{
+    "version": {"number": NEW_VERSION},
+    "title": "Page Title",
+    "type": "page",
+    "body": {
+      "storage": {
+        "value": "<p>Existing content</p><ac:image><ri:attachment ri:filename=\"diagram.png\"/></ac:image>",
+        "representation": "storage"
+      }
+    }
+  }'
+```
 
 ## Supported File Types
 
@@ -28,73 +268,48 @@ Attach files, screenshots, and documents to Jira issues and Confluence pages.
 | Media | `.mp4`, `.mov`, `.mp3` | 100 MB |
 | Design | `.sketch`, `.fig`, `.psd`, `.ai` | 100 MB |
 
-## Jira Attachment Workflows
+## Workflow Examples
 
-### Attach Screenshot to Issue
+### Attach QA Screenshot to Jira Issue
 
-```
-Prompt: "Attach the screenshot at ./screenshots/bug-evidence.png to PROJ-123"
-
-Steps:
-1. Read the file from local path
-2. Upload to Jira issue PROJ-123
-3. Optionally add comment referencing attachment
-```
-
-### Attach Multiple Files
-
-```
-Prompt: "Attach all PNG files from ./qa-tests/screenshots/ to PROJ-456"
-
-Steps:
-1. List files matching pattern
-2. Upload each file to the issue
-3. Report success/failure for each
+```bash
+# Single screenshot
+curl --location --request POST \
+  "https://${DOMAIN}.atlassian.net/rest/api/3/issue/BUG-456/attachments" \
+  -u "${EMAIL}:${API_TOKEN}" \
+  -H "X-Atlassian-Token: no-check" \
+  --form "file=@./qa-tests/screenshots/QA-20250105-001/error-state.png"
 ```
 
-### Attach with Comment
+### Upload All Test Evidence
 
-```
-Prompt: "Attach error-log.txt to BUG-789 with comment 'Stack trace from production'"
+```bash
+#!/bin/bash
+ISSUE_KEY="$1"
+SCREENSHOT_DIR="$2"
 
-Steps:
-1. Upload file to issue
-2. Add comment mentioning the attachment
-3. Link attachment in comment: [^error-log.txt]
-```
-
-## Confluence Attachment Workflows
-
-### Attach to Page
-
-```
-Prompt: "Attach architecture-diagram.png to the 'System Design' page in TEAM space"
-
-Steps:
-1. Find page by title in space
-2. Upload attachment to page
-3. Return attachment URL for embedding
+for file in "$SCREENSHOT_DIR"/*; do
+    echo "Uploading: $(basename $file)"
+    curl --silent --location --request POST \
+      "https://${DOMAIN}.atlassian.net/rest/api/3/issue/${ISSUE_KEY}/attachments" \
+      -u "${EMAIL}:${API_TOKEN}" \
+      -H "X-Atlassian-Token: no-check" \
+      --form "file=@\"$file\"" > /dev/null
+done
+echo "All files uploaded to ${ISSUE_KEY}"
 ```
 
-### Embed Image in Page
+### Upload Documentation to Confluence Page
 
-```
-Prompt: "Add screenshot.png to the 'QA Results' page and embed it in the content"
-
-Steps:
-1. Upload attachment to page
-2. Update page content with image macro:
-   !screenshot.png|width=800!
-```
-
-### Attach PDF Documentation
-
-```
-Prompt: "Upload api-spec.pdf to the 'API Documentation' page"
-
-Steps:
-1. Upload PDF as attachment
-2. Optionally add view file macro for inline preview
+```bash
+# Upload PDF to specific page
+PAGE_ID="123456789"
+curl -u "${EMAIL}:${API_TOKEN}" \
+  -X POST \
+  -H "X-Atlassian-Token: nocheck" \
+  -F "file=@./docs/api-specification.pdf" \
+  -F "comment=API Spec v3.0" \
+  "https://${DOMAIN}.atlassian.net/wiki/rest/api/content/${PAGE_ID}/child/attachment"
 ```
 
 ## Attachment Naming Conventions
