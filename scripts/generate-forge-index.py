@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate a compact index of all Product Forge agents, skills, and commands.
+Generate a compact index of all Product Forge agents, skills, commands, and processes.
 
 Usage:
     python generate-forge-index.py [--output index.md] [--format md|json]
@@ -9,6 +9,7 @@ This script scans the plugins directory and extracts metadata from:
 - agents/*.md files
 - skills/*/SKILL.md files
 - commands/*.md files
+- processes/*.md files
 
 Supports custom frontmatter fields:
 - short: Brief one-liner description
@@ -23,7 +24,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 # Categories based on plugin names
 PLUGIN_CATEGORIES = {
@@ -139,7 +140,54 @@ def scan_commands(plugins_dir: Path) -> list[dict]:
     return sorted(commands, key=lambda x: (x["category"], x["name"]))
 
 
-def generate_markdown(agents: list, skills: list, commands: list) -> str:
+def scan_processes(plugins_dir: Path) -> list[dict]:
+    """Scan all process documentation files."""
+    processes = []
+    for proc_file in plugins_dir.glob("*/processes/*.md"):
+        try:
+            content = proc_file.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            print(f"Warning: Skipping {proc_file} - encoding error")
+            continue
+        meta = parse_frontmatter(content)
+        plugin_name = proc_file.parent.parent.name
+        proc_name = proc_file.stem
+        category = meta.get("category", PLUGIN_CATEGORIES.get(plugin_name, "Other"))
+
+        # Extract title from first H1 if no frontmatter
+        title = meta.get("title", "")
+        if not title:
+            title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
+            if title_match:
+                title = title_match.group(1).strip()
+            else:
+                title = proc_name.replace("-", " ").title()
+
+        # Extract description from frontmatter or first paragraph
+        description = meta.get("description", "")
+        if not description:
+            # Try to get first paragraph after title
+            para_match = re.search(r"^#.+\n\n(.+?)(?:\n\n|$)", content, re.MULTILINE)
+            if para_match:
+                description = para_match.group(1).strip()[:100]
+                if len(para_match.group(1).strip()) > 100:
+                    description += "..."
+
+        processes.append(
+            {
+                "name": proc_name,
+                "title": title,
+                "short": meta.get("short", ""),
+                "description": description,
+                "when": meta.get("when", ""),
+                "plugin": plugin_name,
+                "category": category,
+            }
+        )
+    return sorted(processes, key=lambda x: (x["category"], x["name"]))
+
+
+def generate_markdown(agents: list, skills: list, commands: list, processes: Optional[list] = None) -> str:
     """Generate compact markdown index."""
     lines = [
         "# Product Forge Index",
@@ -231,15 +279,46 @@ def generate_markdown(agents: list, skills: list, commands: list) -> str:
                 lines.append(f"  - _When: {c['when']}_")
         lines.append("")
 
+    # Add processes section if provided
+    if processes:
+        lines.extend(
+            [
+                "## Processes",
+                "",
+                "Reference documentation for workflows and methodologies.",
+                "",
+            ]
+        )
+
+        # Group processes by category
+        proc_by_cat: dict[str, list] = {}
+        for p in processes:
+            cat = p["category"]
+            if cat not in proc_by_cat:
+                proc_by_cat[cat] = []
+            proc_by_cat[cat].append(p)
+
+        for cat_name in sorted(proc_by_cat.keys()):
+            lines.append(f"### {cat_name}")
+            lines.append("")
+            for p in proc_by_cat[cat_name]:
+                desc = p["short"] if p["short"] else p["description"][:60]
+                if not p["short"] and len(p["description"]) > 60:
+                    desc += "..."
+                lines.append(f"- **{p['title']}** (`{p['name']}.md`) - {desc}")
+                if p["when"]:
+                    lines.append(f"  - _When: {p['when']}_")
+            lines.append("")
+
     return "\n".join(lines)
 
 
-def generate_json(agents: list, skills: list, commands: list) -> str:
+def generate_json(agents: list, skills: list, commands: list, processes: Optional[list] = None) -> str:
     """Generate JSON index."""
-    return json.dumps(
-        {"agents": agents, "skills": skills, "commands": commands},
-        indent=2,
-    )
+    data = {"agents": agents, "skills": skills, "commands": commands}
+    if processes:
+        data["processes"] = processes
+    return json.dumps(data, indent=2)
 
 
 def main():
@@ -285,13 +364,14 @@ def main():
     agents = scan_agents(plugins_dir)
     skills = scan_skills(plugins_dir)
     commands = scan_commands(plugins_dir)
+    processes = scan_processes(plugins_dir)
 
-    print(f"Found: {len(agents)} agents, {len(skills)} skills, {len(commands)} commands")
+    print(f"Found: {len(agents)} agents, {len(skills)} skills, {len(commands)} commands, {len(processes)} processes")
 
     if args.format == "json":
-        output = generate_json(agents, skills, commands)
+        output = generate_json(agents, skills, commands, processes)
     else:
-        output = generate_markdown(agents, skills, commands)
+        output = generate_markdown(agents, skills, commands, processes)
 
     output_path = Path(args.output)
     output_path.write_text(output)
