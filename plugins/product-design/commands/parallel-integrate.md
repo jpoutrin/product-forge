@@ -1,6 +1,6 @@
 ---
 description: Verify integration after parallel agent execution and generate report
-argument-hint: "[--tech django|typescript|go]"
+argument-hint: "[--tech django|typescript|go] [--tech-spec <ts-file>]"
 ---
 
 # parallel-integrate
@@ -10,12 +10,13 @@ argument-hint: "[--tech django|typescript|go]"
 ## Usage
 
 ```bash
-/parallel-integrate [--tech django|typescript|go]
+/parallel-integrate [--tech django|typescript|go] [--tech-spec <ts-file>]
 ```
 
 ## Arguments
 
 - `--tech`: Optional - Technology stack for specific checks (default: auto-detect)
+- `--tech-spec`: Optional - Path to Tech Spec file to validate against
 
 ## Purpose
 
@@ -144,6 +145,46 @@ for task in $(ls .claude/tasks/); do
 done
 ```
 
+### 5b. Tech Spec Compliance Check (if --tech-spec provided)
+
+Validate implementation against Tech Spec design:
+
+**Architecture Alignment**:
+- Compare implemented components against Tech Spec Design Overview
+- Verify component boundaries match spec
+- Check that data flow matches documented architecture
+
+**Data Model Compliance**:
+- Compare implemented models against Tech Spec Data Model section
+- Verify all entities are implemented
+- Check field types and constraints match
+
+**API Compliance**:
+- Compare implemented endpoints against Tech Spec API Specification
+- Verify request/response formats match
+- Check error handling matches spec
+
+**Security Implementation**:
+- Verify security measures from Tech Spec are implemented
+- Check authentication/authorization matches spec
+
+**Report Tech Spec Deviations**:
+```markdown
+## Tech Spec Compliance
+
+| Section | Status | Deviations |
+|---------|--------|------------|
+| Architecture | ✅/⚠️ | [list any deviations] |
+| Data Model | ✅/⚠️ | [list any deviations] |
+| API Spec | ✅/⚠️ | [list any deviations] |
+| Security | ✅/⚠️ | [list any deviations] |
+```
+
+For each deviation:
+- **Acceptable**: Document reason (discovered during implementation)
+- **Needs Fix**: Implementation doesn't match approved design
+- **Update Spec**: Tech Spec should be updated to reflect reality
+
 ### 6. Generate Integration Report
 
 Create `.claude/integration-report.md`:
@@ -153,6 +194,7 @@ Create `.claude/integration-report.md`:
 
 Generated: [date]
 Source PRD: [prd-file]
+Tech Spec: [ts-file] (if provided)
 Tasks Integrated: [count]
 
 ## Summary
@@ -161,6 +203,7 @@ Tasks Integrated: [count]
 |-------|--------|---------|
 | Branch Merge | ✅/❌ | X branches merged |
 | Contract Compliance | ✅/⚠️/❌ | X/Y endpoints match |
+| Tech Spec Compliance | ✅/⚠️/❌ | X deviations (if spec provided) |
 | Boundary Violations | ✅/❌ | X violations found |
 | Tests | ✅/❌ | X passed, Y failed |
 | Type Check | ✅/❌ | X errors |
@@ -188,6 +231,22 @@ Tasks Integrated: [count]
 | Task | File | Issue |
 |------|------|-------|
 | task-003 | apps/users/models.py | Modified (owned by task-001) |
+
+## Tech Spec Compliance (if --tech-spec provided)
+
+| Section | Status | Deviations |
+|---------|--------|------------|
+| Architecture | ✅ | None |
+| Data Model | ⚠️ | Added `updated_at` to User (acceptable) |
+| API Spec | ✅ | None |
+| Security | ✅ | None |
+
+### Deviations Detail
+
+1. **Data Model: User.updated_at**
+   - Type: Acceptable deviation
+   - Reason: Discovered need during implementation
+   - Action: Update Tech Spec to include field
 
 ## Test Results
 
@@ -280,14 +339,17 @@ Next steps:
 ## Example
 
 ```bash
-# Run integration check
-/parallel-integrate
+# Run integration check with Tech Spec validation (recommended)
+/parallel-integrate --tech-spec tech-specs/approved/TS-0042-inventory-system.md
 
-# Specify Django
-/parallel-integrate --tech django
+# Run with Django-specific checks and Tech Spec
+/parallel-integrate --tech django --tech-spec tech-specs/approved/TS-0042-inventory-system.md
+
+# Run without Tech Spec (basic checks only)
+/parallel-integrate
 
 # After fixing issues, re-run
-/parallel-integrate
+/parallel-integrate --tech-spec tech-specs/approved/TS-0042-inventory-system.md
 
 # View report
 cat .claude/integration-report.md
@@ -303,7 +365,9 @@ cat .claude/integration-report.md
 - [ ] Lint passes
 - [ ] No boundary violations
 - [ ] Contract compliance verified
+- [ ] Tech Spec compliance verified (if spec provided)
 - [ ] Integration report generated
+- [ ] Tech Spec updated with deviations (if any)
 
 ## Related Commands
 

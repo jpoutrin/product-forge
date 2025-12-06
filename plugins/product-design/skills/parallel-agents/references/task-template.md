@@ -10,6 +10,9 @@ Use this template for each task in `.claude/tasks/`.
 - **Priority**: P0/P1/P2
 - **Estimated effort**: 1-4 hours
 - **Dependencies**: [task-IDs or "None"]
+- **Tech Spec**: TS-XXXX (if decomposed from Tech Spec)
+- **RFC**: RFC-XXXX (if linked via Tech Spec)
+- **Wave**: [wave number for parallel execution]
 
 ## Scope
 

@@ -1,6 +1,6 @@
 ---
 description: Break PRD into parallel task specs with contracts and dependency waves
-argument-hint: <prd-file> [--output-dir <directory>]
+argument-hint: <prd-file> [--tech-spec <ts-file>] [--output-dir <directory>]
 ---
 
 # parallel-decompose
@@ -10,12 +10,13 @@ argument-hint: <prd-file> [--output-dir <directory>]
 ## Usage
 
 ```bash
-/parallel-decompose <prd-file> [--output-dir <directory>]
+/parallel-decompose <prd-file> [--tech-spec <ts-file>] [--output-dir <directory>]
 ```
 
 ## Arguments
 
 - `<prd-file>`: Required - Path to PRD or FRD file to decompose
+- `--tech-spec`: Optional - Path to Tech Spec file (TS-XXXX) to extract contracts and architecture from
 - `--output-dir`: Optional - Task output directory (default: `.claude/tasks/`)
 
 ## Purpose
@@ -29,10 +30,45 @@ Analyze a PRD and decompose it into independent, parallel-executable task specif
 - Run `/parallel-setup` first
 - Run `/parallel-ready-[tech]` and achieve score ≥80
 - `.claude/` directory structure must exist
+- (Recommended) Tech Spec exists with design decisions and contracts
+
+## Document Flow
+
+```
+PRD (What to build)
+    ↓
+Tech Spec (How to build - optional but recommended)
+    ↓
+/parallel-decompose
+    ↓
+Tasks with boundaries from Tech Spec
+```
 
 ## Execution Instructions for Claude Code
 
 When this command is run, Claude Code should:
+
+### 0. Check for Tech Spec (if --tech-spec provided)
+
+If Tech Spec is provided:
+1. **Read Tech Spec** and extract:
+   - Design Overview → `.claude/architecture.md`
+   - Data Model → `.claude/contracts/types.py`
+   - API Specification → `.claude/contracts/api-schema.yaml`
+   - Component boundaries → Task ownership
+   - RFC link (if any) → Task metadata
+
+2. **Validate Tech Spec status**:
+   - Must be APPROVED or REFERENCE
+   - Warn if DRAFT (not ready for decomposition)
+
+3. **Record linkage**:
+   - Add `tech_spec_ref` to each generated task
+   - Add Tech Spec path to `.claude/architecture.md`
+
+If no Tech Spec provided:
+- Generate contracts from PRD (existing behavior)
+- Warn: "Consider creating a Tech Spec first for better contract definitions"
 
 ### 1. Read and Analyze PRD
 
@@ -45,6 +81,12 @@ Parse the PRD to extract:
 ### 2. Define Contracts First
 
 > "For Contract-driven development to be successful, we need to take an API-first approach, where API providers and consumers collaboratively design and document the API specification first." — InfoQ
+
+**If Tech Spec provided**: Extract contracts directly from Tech Spec sections:
+- **Data Model section** → `types.py`
+- **API Specification section** → `api-schema.yaml`
+
+**If no Tech Spec**: Generate contracts from PRD (existing behavior).
 
 **Update `.claude/contracts/types.py` (or `.ts`)**:
 
@@ -186,6 +228,8 @@ Create task files in `.claude/tasks/`:
 | Wave | 1 |
 | Dependencies | None |
 | Blocks | task-004, task-005, task-006 |
+| Tech Spec | TS-XXXX (if provided) |
+| RFC | RFC-XXXX (if linked via Tech Spec) |
 
 ## Scope
 
@@ -324,11 +368,14 @@ Next steps:
 ## Example
 
 ```bash
-# Decompose a product PRD
+# Decompose PRD with Tech Spec (recommended)
+/parallel-decompose docs/inventory-prd.md --tech-spec tech-specs/approved/TS-0042-inventory-system.md
+
+# Decompose PRD only (generates contracts from PRD)
 /parallel-decompose docs/inventory-prd.md
 
 # Decompose with custom output
-/parallel-decompose docs/auth-frd.md --output-dir ./parallel-tasks/
+/parallel-decompose docs/auth-frd.md --tech-spec tech-specs/approved/TS-0015-auth.md --output-dir ./parallel-tasks/
 
 # After decomposition, generate prompts
 /parallel-prompts
