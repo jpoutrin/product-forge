@@ -34,7 +34,7 @@ project/
 │       ├── manifest.json               # Regeneration metadata
 │       ├── context.md                  # Shared project context (token-efficient)
 │       ├── architecture.md             # System design from Tech Spec
-│       ├── task-graph.md               # Dependency visualization
+│       ├── task-graph.md               # Dependency visualization (Mermaid flowchart)
 │       ├── contracts/
 │       │   ├── types.py (or types.ts)  # Shared domain types
 │       │   └── api-schema.yaml         # OpenAPI specification

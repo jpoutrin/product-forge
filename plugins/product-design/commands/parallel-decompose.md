@@ -318,42 +318,60 @@ BOUNDARY: apps/orders/*, apps/products/*, apps/*/migrations/*
 
 ### 7. Create task-graph.md
 
-Create `$PARALLEL_DIR/task-graph.md`:
+Create `$PARALLEL_DIR/task-graph.md` using **Mermaid flowchart** for dependency visualization:
+
 ```markdown
 # Task Dependency Graph
 
+## Dependency Visualization
+
+```mermaid
+flowchart TB
+    subgraph W1[Wave 1 - parallel]
+        t001[task-001-users<br/>django-expert]
+        t002[task-002-products<br/>django-expert]
+        t003[task-003-shared<br/>fastapi-expert]
+    end
+    subgraph W2[Wave 2 - parallel]
+        t004[task-004-orders<br/>django-expert]
+        t005[task-005-api<br/>fastapi-expert]
+    end
+    subgraph W3[Wave 3 - sequential]
+        t006[task-006-integration<br/>cto-architect]
+    end
+    t001 --> t004
+    t002 --> t004
+    t001 --> t005
+    t002 --> t005
+    t003 --> t005
+    t004 --> t006
+    t005 --> t006
+```
+
 ## Wave Summary
 
-| Wave | Tasks | Can Run In Parallel |
-|------|-------|---------------------|
-| 1 | task-001, task-002, task-003 | Yes (3 agents) |
-| 2 | task-004, task-005 | Yes (2 agents) |
-| 3 | task-006 | Sequential |
-
-## Dependencies
-
-```
-Wave 1 (no dependencies)
-├── task-001-users
-├── task-002-products
-└── task-003-shared
-
-Wave 2 (depends on Wave 1)
-├── task-004-orders (needs: task-001, task-002)
-└── task-005-api (needs: task-001, task-002, task-003)
-
-Wave 3 (sequential)
-└── task-006-integration (needs: all)
-```
+| Wave | Tasks | Parallel Agents |
+|------|-------|-----------------|
+| 1 | task-001, task-002, task-003 | 3 |
+| 2 | task-004, task-005 | 2 |
+| 3 | task-006 | 1 |
 
 ## Critical Path
-task-001 → task-004 → task-006
 
-## Parallelization Stats
+`task-001 → task-004 → task-006` (3 waves)
+
+## Stats
+
 - Total tasks: 6
 - Max parallel agents: 3
 - Waves: 3
 ```
+
+**Mermaid conventions**:
+- `flowchart TB` for top-to-bottom flow
+- `subgraph W{N}[Wave N - parallel/sequential]` groups tasks by wave
+- Node format: `t{NNN}[task-{NNN}-{component}<br/>{agent}]`
+- Edges: `t001 --> t004` for dependencies
 
 ### 8. Generate Prompts
 

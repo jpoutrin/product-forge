@@ -117,7 +117,7 @@ This creates `tech-specs/approved/TS-XXXX-inventory-system.md` with:
 | `scripts/launch-wave-N.sh` | Automation scripts per wave |
 | `scripts/monitor.sh` | Progress monitoring |
 | `architecture.md` | System design |
-| `task-graph.md` | Dependency visualization |
+| `task-graph.md` | Dependency visualization (Mermaid flowchart) |
 
 ### Step 2.3: Contract-First Design
 
@@ -319,7 +319,7 @@ project/
 │       │   ├── launch-wave-2.sh
 │       │   └── monitor.sh
 │       ├── architecture.md             # System design
-│       ├── task-graph.md               # Dependency visualization
+│       ├── task-graph.md               # Dependency visualization (Mermaid flowchart)
 │       └── integration-report.md       # Post-execution report
 ├── tech-specs/
 │   └── approved/TS-0042-inventory-system.md

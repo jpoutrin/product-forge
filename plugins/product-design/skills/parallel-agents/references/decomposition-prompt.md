@@ -138,10 +138,49 @@ Requirements:
 ## 7. Create task-graph.md
 
 Create `$PARALLEL_DIR/task-graph.md` with:
+- **Mermaid flowchart** for dependency visualization
 - Wave summary table
-- ASCII dependency graph
 - Critical path
 - Parallelization stats
+
+**Mermaid format**:
+```markdown
+# Task Dependency Graph
+
+## Dependency Visualization
+
+```mermaid
+flowchart TB
+    subgraph W1[Wave 1 - parallel]
+        t001[task-001-users<br/>django-expert]
+        t002[task-002-products<br/>django-expert]
+        t003[task-003-shared<br/>fastapi-expert]
+    end
+    subgraph W2[Wave 2 - parallel]
+        t004[task-004-orders<br/>django-expert]
+        t005[task-005-api<br/>fastapi-expert]
+    end
+    subgraph W3[Wave 3 - sequential]
+        t006[task-006-integration<br/>cto-architect]
+    end
+    t001 --> t004
+    t002 --> t004
+    t001 --> t005
+    t002 --> t005
+    t003 --> t005
+    t004 --> t006
+    t005 --> t006
+```
+
+## Wave Summary
+...
+```
+
+**Mermaid conventions**:
+- Use `flowchart TB` (top-bottom) for wave hierarchy
+- Group tasks by wave using `subgraph W{N}[Wave N - parallel/sequential]`
+- Node labels: `t{NNN}[task-{NNN}-{component}<br/>{agent}]`
+- Edges: `t001 --> t004` (direct dependency)
 
 ## 8. Generate Prompts
 
