@@ -9,6 +9,27 @@ when: User wants to parallelize development, run multiple agents simultaneously,
 
 Orchestrate massively parallel development by decomposing work into independent tasks that multiple Claude Code instances can execute simultaneously.
 
+## CLI Tool: cpo (Claude Parallel Orchestrator)
+
+The `cpo` CLI tool handles parallel agent execution with git worktree isolation.
+
+### Installation
+
+```bash
+pip install claude-parallel-orchestrator
+# or
+pipx install claude-parallel-orchestrator
+```
+
+### cpo Commands
+
+| Command | Description |
+|---------|-------------|
+| `cpo init <dir> -t <tech-spec> -n <name>` | Initialize parallel directory |
+| `cpo validate <dir>` | Validate manifest and structure |
+| `cpo run <dir>` | Execute parallel agents |
+| `cpo status <dir>` | Check execution status |
+
 ## Workflow Overview
 
 ```
@@ -16,7 +37,7 @@ Orchestrate massively parallel development by decomposing work into independent 
          ↓
 /parallel-decompose   → Per Tech Spec: creates TS-XXXX-slug/ with all artifacts
          ↓
-/parallel-run         → Execute agents with git worktrees (auto-monitors)
+/parallel-run         → Delegates to `cpo run` for execution
          ↓
 /parallel-integrate   → Verify & generate integration report
 ```
@@ -56,29 +77,52 @@ project/
 └── CLAUDE.md                           # Project conventions
 ```
 
-## manifest.json
+## manifest.json (cpo format)
 
-Tracks regeneration metadata for each decomposition:
+The `cpo` tool requires a specific manifest format with wave definitions:
 
 ```json
 {
-  "version": "1.0.0",
-  "created_at": "2025-12-07T14:30:00Z",
-  "tech_spec": {
-    "id": "TS-0042",
-    "title": "inventory-system",
-    "path": "tech-specs/approved/TS-0042-inventory-system.md",
-    "status": "APPROVED"
-  },
-  "sources": {
-    "prd": "docs/prds/inventory-prd.md",
-    "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md"
-  },
-  "technology": "django",
-  "tasks": { "total": 6, "waves": 3, "files": [...] },
-  "integration": { "status": "pending" }
+  "tech_spec_id": "TS-0042",
+  "waves": [
+    {
+      "number": 1,
+      "tasks": [
+        {
+          "id": "task-001-users",
+          "agent": "python-experts:django-expert",
+          "prompt_file": "prompts/task-001.txt"
+        },
+        {
+          "id": "task-002-products",
+          "agent": "python-experts:django-expert",
+          "prompt_file": "prompts/task-002.txt"
+        }
+      ],
+      "validation": "python -c 'from apps.users.models import User'"
+    },
+    {
+      "number": 2,
+      "tasks": [
+        {
+          "id": "task-004-orders",
+          "agent": "python-experts:django-expert",
+          "prompt_file": "prompts/task-004.txt"
+        }
+      ],
+      "validation": "pytest apps/orders/tests/ -v"
+    }
+  ]
 }
 ```
+
+**Key fields:**
+- `tech_spec_id`: Links to Tech Spec for traceability
+- `waves[].number`: Wave execution order (1, 2, 3...)
+- `waves[].tasks[].id`: Unique task identifier
+- `waves[].tasks[].agent`: Agent type (e.g., `python-experts:django-expert`)
+- `waves[].tasks[].prompt_file`: Path to task prompt file
+- `waves[].validation`: Optional command to validate wave completion
 
 ## Phase 1: Setup (One-Time)
 
@@ -157,59 +201,46 @@ See `references/task-template.md` for full specification.
 
 ## Phase 3: Parallel Execution
 
-Execute parallel agents using the `/parallel-run` command:
+Execute parallel agents using the `/parallel-run` command or `cpo` directly:
+
+### Using /parallel-run (delegates to cpo)
 
 ```bash
-# Execute and monitor (default - runs in Claude session)
+# Execute parallel agents
 /parallel-run parallel/TS-0042-inventory-system/
 
-# Preview execution plan only
-/parallel-run parallel/TS-0042-inventory-system/ --dry-run
+# Validate only (no execution)
+/parallel-run parallel/TS-0042-inventory-system/ --validate
 
-# Generate scripts without executing
-/parallel-run parallel/TS-0042-inventory-system/ --generate-only
+# Check status of ongoing/completed execution
+/parallel-run parallel/TS-0042-inventory-system/ --status
 ```
 
-### What `/parallel-run` Does
+### Using cpo directly
 
-1. Validates manifest.json and prompts
+```bash
+# Validate manifest structure
+cpo validate parallel/TS-0042-inventory-system/
+
+# Execute parallel agents
+cpo run parallel/TS-0042-inventory-system/
+
+# Check execution status
+cpo status parallel/TS-0042-inventory-system/
+```
+
+### What `cpo run` Does
+
+1. Validates manifest.json structure and prompts
 2. Creates git worktrees for each task
 3. Launches agents in parallel (respects wave dependencies)
-4. Monitors progress and reports completion
-5. Detects task completion via `.claude-task-complete` marker
-
-### Options
-
-| Flag | Description |
-|------|-------------|
-| `--generate-only` | Generate scripts, don't execute |
-| `--dry-run` | Preview plan without changes |
-| `--wave N` | Run specific wave only |
-| `--max-concurrent N` | Limit parallel agents (default: 3) |
-| `--retry-failed` | Retry failed tasks from previous run |
+4. Monitors progress with live output
+5. Generates logs in `$PARALLEL_DIR/logs/`
+6. Creates report in `$PARALLEL_DIR/report.json`
 
 ### Agent Permissions
 
 Sub-agents run with `--dangerously-skip-permissions` because they're isolated in worktrees.
-
-See `references/claude-code-tools.md` for permission syntax.
-
-### Manual Execution (Alternative)
-
-If you prefer manual control:
-
-```bash
-# Generate scripts only
-/parallel-run parallel/TS-0042-inventory-system/ --generate-only
-
-# Run externally
-./parallel/TS-0042-inventory-system/scripts/run-parallel.sh
-
-# Monitor in another terminal
-./parallel/TS-0042-inventory-system/scripts/monitor-live.sh
-```
-
-See `references/execution-patterns.md` for more patterns.
 
 ## Phase 4: Integration
 
@@ -259,12 +290,20 @@ Output: `parallel/TS-0042-inventory-system/integration-report.md`
 
 ### Execute Agents
 ```bash
-# Execute and monitor (default)
+# Using /parallel-run (delegates to cpo)
 /parallel-run parallel/TS-0042-inventory-system/
 
-# Or generate scripts for manual execution
-/parallel-run parallel/TS-0042-inventory-system/ --generate-only
-./parallel/TS-0042-inventory-system/scripts/run-parallel.sh
+# Using cpo directly
+cpo run parallel/TS-0042-inventory-system/
+```
+
+### Check Status
+```bash
+# Using /parallel-run
+/parallel-run parallel/TS-0042-inventory-system/ --status
+
+# Using cpo directly
+cpo status parallel/TS-0042-inventory-system/
 ```
 
 ### Integration Check
@@ -274,6 +313,7 @@ Output: `parallel/TS-0042-inventory-system/integration-report.md`
 
 ### View Results
 ```bash
+cat parallel/TS-0042-inventory-system/report.json
 cat parallel/TS-0042-inventory-system/integration-report.md
 ```
 
