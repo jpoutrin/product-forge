@@ -34,25 +34,46 @@ Generate ready-to-use prompts for launching multiple Claude Code agents in paral
 
 ## Agent Permissions
 
-Sub-agents need **write permissions** to implement their tasks. The generated scripts use:
+Sub-agents need **write permissions** to implement their tasks.
+
+> **Full Reference**: See [Claude Code Tools Reference](../skills/parallel-agents/references/claude-code-tools.md) for complete tool list and path-specific permissions.
+
+### Option 1: Full Access (Isolated Worktrees)
 
 ```bash
 claude --dangerously-skip-permissions --print "..."
 ```
 
-**Why this is safe**:
+**Why this is safe** in worktree isolation:
 - Each agent runs in an isolated **git worktree**
 - Agents can only modify files in their worktree
 - Main branch is protected until explicit merge
-- Task boundaries are enforced by prompt instructions
 
-**Alternative** - For granular control:
+### Option 2: Path-Scoped Permissions
+
+For granular control, restrict tools to specific directories:
+
 ```bash
-# Allow specific tools only
-claude --allowedTools "Edit,Write,Bash" --print "..."
-
-# Or configure in .claude/settings.json per worktree
+claude \
+  --allowedTools \
+    "Read" \
+    "Write(/apps/users/**)" \
+    "Edit(/apps/users/**)" \
+    "Bash(pytest apps/users/:*)" \
+    "Bash(mypy:*)" \
+    "Glob" \
+    "Grep" \
+  --print "$(cat .claude/prompts/task-001.txt)"
 ```
+
+### Quick Syntax Reference
+
+| Restriction | Syntax |
+|-------------|--------|
+| Allow tool everywhere | `"Edit"` |
+| Restrict to directory | `"Edit(/apps/myapp/**)"` |
+| Restrict bash command | `"Bash(pytest:*)"` |
+| Skip all permissions | `--dangerously-skip-permissions` |
 
 ## Execution Instructions for Claude Code
 
@@ -267,10 +288,12 @@ echo "Wave 1 complete"
 2. Task boundaries are enforced by prompt (files to touch vs. not touch)
 3. Main branch remains protected until explicit merge
 
-For stricter control, use `--allowedTools` with specific paths:
+For stricter control, use path-scoped `--allowedTools`:
 ```bash
-claude --allowedTools "Edit,Write,Bash" --print "..."
+claude --allowedTools "Read" "Edit(/apps/users/**)" "Bash(pytest:*)" --print "..."
 ```
+
+See [Claude Code Tools Reference](../skills/parallel-agents/references/claude-code-tools.md) for full syntax.
 
 ### Monitor Progress
 

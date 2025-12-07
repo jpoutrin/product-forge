@@ -70,11 +70,22 @@ Before parallel execution, establish shared contracts:
 Launch multiple Claude Code instances with isolated scope:
 
 ```bash
-claude "Implement task-001-auth.md.
+claude --dangerously-skip-permissions --print "Implement task-001-auth.md.
         Work only in src/auth/.
         Reference contracts in .claude/contracts/.
         Do not modify files outside your scope."
 ```
+
+### Agent Permissions
+
+Sub-agents need write permissions. Options:
+
+| Strategy | When to Use |
+|----------|-------------|
+| `--dangerously-skip-permissions` | Isolated worktrees (safe) |
+| `--allowedTools "Edit(/src/auth/**)"` | Shared workspace, path-scoped |
+
+See `references/claude-code-tools.md` for full tool list and permission syntax.
 
 ### Isolation Strategies
 
