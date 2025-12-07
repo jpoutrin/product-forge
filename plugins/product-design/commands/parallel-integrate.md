@@ -1,6 +1,6 @@
 ---
 description: Verify integration after parallel agent execution and generate report
-argument-hint: "[--tech django|typescript|go] [--tech-spec <ts-file>]"
+argument-hint: "[--parallel-dir <dir>] [--tech django|typescript|go]"
 ---
 
 # parallel-integrate
@@ -10,13 +10,13 @@ argument-hint: "[--tech django|typescript|go] [--tech-spec <ts-file>]"
 ## Usage
 
 ```bash
-/parallel-integrate [--tech django|typescript|go] [--tech-spec <ts-file>]
+/parallel-integrate [--parallel-dir <dir>] [--tech django|typescript|go]
 ```
 
 ## Arguments
 
+- `--parallel-dir`: Optional - Path to parallel directory (auto-detects if single directory in `parallel/`)
 - `--tech`: Optional - Technology stack for specific checks (default: auto-detect)
-- `--tech-spec`: Optional - Path to Tech Spec file to validate against
 
 ## Purpose
 
@@ -26,11 +26,26 @@ Verify integration after all parallel agents complete their work. Checks contrac
 
 - All parallel tasks completed
 - All feature branches merged to main (or ready to merge)
-- Run after `/parallel-prompts` execution
+- Run after `/parallel-decompose` execution
 
 ## Execution Instructions for Claude Code
 
-When this command is run, Claude Code should:
+### 0. Determine Parallel Directory
+
+**If `--parallel-dir` provided**:
+- Use specified directory (e.g., `parallel/TS-0042-inventory-system`)
+
+**If not provided**:
+- Scan `parallel/` for subdirectories
+- If single directory found, use it
+- If multiple, list and ask user to specify
+- If none, error with guidance
+
+Read `manifest.json` from parallel directory:
+```bash
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+cat "$PARALLEL_DIR/manifest.json"
+```
 
 ### 1. Verify Branch Status
 
@@ -118,15 +133,15 @@ gofmt -d .
 
 ### 4. Contract Compliance Check
 
-For each task in `.claude/tasks/`:
+For each task in `$PARALLEL_DIR/tasks/`:
 
 **API Contract Check**:
-- Compare implemented endpoints against `.claude/contracts/api-schema.yaml`
+- Compare implemented endpoints against `$PARALLEL_DIR/contracts/api-schema.yaml`
 - Verify request/response schemas match
 - Check error formats
 
 **Type Contract Check**:
-- Verify types match `.claude/contracts/types.py` (or `.ts`)
+- Verify types match `$PARALLEL_DIR/contracts/types.py` (or `.ts`)
 - Check for missing fields
 - Verify enum values
 
@@ -134,20 +149,25 @@ For each task in `.claude/tasks/`:
 
 For each task, verify:
 - Files modified are within declared scope
-- No files touched that were in "DO NOT TOUCH" list
+- No files touched that were in "BOUNDARY" list
 - No unauthorized contract modifications
 
 ```bash
 # Check git history for boundary violations
-for task in $(ls .claude/tasks/); do
+for task in $(ls $PARALLEL_DIR/tasks/); do
     echo "Checking $task boundaries..."
     # Compare committed files against task scope
 done
 ```
 
-### 5b. Tech Spec Compliance Check (if --tech-spec provided)
+### 6. Tech Spec Compliance Check
 
-Validate implementation against Tech Spec design:
+Read Tech Spec path from manifest:
+```bash
+TECH_SPEC=$(jq -r '.tech_spec.path' "$PARALLEL_DIR/manifest.json")
+```
+
+If Tech Spec exists, validate implementation:
 
 **Architecture Alignment**:
 - Compare implemented components against Tech Spec Design Overview
@@ -164,37 +184,17 @@ Validate implementation against Tech Spec design:
 - Verify request/response formats match
 - Check error handling matches spec
 
-**Security Implementation**:
-- Verify security measures from Tech Spec are implemented
-- Check authentication/authorization matches spec
+### 7. Generate Integration Report
 
-**Report Tech Spec Deviations**:
-```markdown
-## Tech Spec Compliance
-
-| Section | Status | Deviations |
-|---------|--------|------------|
-| Architecture | ✅/⚠️ | [list any deviations] |
-| Data Model | ✅/⚠️ | [list any deviations] |
-| API Spec | ✅/⚠️ | [list any deviations] |
-| Security | ✅/⚠️ | [list any deviations] |
-```
-
-For each deviation:
-- **Acceptable**: Document reason (discovered during implementation)
-- **Needs Fix**: Implementation doesn't match approved design
-- **Update Spec**: Tech Spec should be updated to reflect reality
-
-### 6. Generate Integration Report
-
-Create `.claude/integration-report.md`:
+Create `$PARALLEL_DIR/integration-report.md`:
 
 ```markdown
 # Integration Report
 
 Generated: [date]
-Source PRD: [prd-file]
-Tech Spec: [ts-file] (if provided)
+Parallel Dir: parallel/TS-0042-inventory-system
+Source PRD: [from manifest.sources.prd]
+Tech Spec: [from manifest.tech_spec.id]
 Tasks Integrated: [count]
 
 ## Summary
@@ -203,7 +203,7 @@ Tasks Integrated: [count]
 |-------|--------|---------|
 | Branch Merge | ✅/❌ | X branches merged |
 | Contract Compliance | ✅/⚠️/❌ | X/Y endpoints match |
-| Tech Spec Compliance | ✅/⚠️/❌ | X deviations (if spec provided) |
+| Tech Spec Compliance | ✅/⚠️/❌ | X deviations |
 | Boundary Violations | ✅/❌ | X violations found |
 | Tests | ✅/❌ | X passed, Y failed |
 | Type Check | ✅/❌ | X errors |
@@ -217,7 +217,6 @@ Tasks Integrated: [count]
 |----------|--------|-------|
 | GET /api/users/ | ✅ | Matches spec |
 | POST /api/users/ | ⚠️ | Missing validation field |
-| GET /api/orders/ | ✅ | Matches spec |
 
 ### Type Definitions
 
@@ -232,21 +231,13 @@ Tasks Integrated: [count]
 |------|------|-------|
 | task-003 | apps/users/models.py | Modified (owned by task-001) |
 
-## Tech Spec Compliance (if --tech-spec provided)
+## Tech Spec Compliance
 
 | Section | Status | Deviations |
 |---------|--------|------------|
 | Architecture | ✅ | None |
-| Data Model | ⚠️ | Added `updated_at` to User (acceptable) |
+| Data Model | ⚠️ | Added `updated_at` to User |
 | API Spec | ✅ | None |
-| Security | ✅ | None |
-
-### Deviations Detail
-
-1. **Data Model: User.updated_at**
-   - Type: Acceptable deviation
-   - Reason: Discovered need during implementation
-   - Action: Update Tech Spec to include field
 
 ## Test Results
 
@@ -254,84 +245,70 @@ Tasks Integrated: [count]
 pytest results:
   Passed: 142
   Failed: 2
-  Skipped: 5
   Coverage: 84%
-
-Failed tests:
-  - test_order_creation_requires_user
-  - test_notification_sends_email
-```
-
-## Migration Status (Django)
-
-```
-Migrations applied:
-  users: 0001_initial, 0002_add_email_verified
-  orders: 0001_initial
-  products: 0001_initial
-
-Merge migrations: None needed
 ```
 
 ## Action Items
 
 ### Must Fix (Blocking)
-1. ❌ Fix failing test: test_order_creation_requires_user
-2. ❌ Resolve boundary violation: task-003 modified users/models.py
+1. ❌ Fix failing tests
 
 ### Should Fix (Non-Blocking)
-1. ⚠️ Add missing validation field to POST /api/users/
-2. ⚠️ Remove extra field from OrderDTO or update contract
-
-### Recommended
-1. 💡 Increase test coverage from 84% to 90%
-2. 💡 Add integration tests for cross-app workflows
+1. ⚠️ Add missing validation field
 
 ## Next Steps
 
 [If all checks pass]:
 1. ✅ Integration complete
 2. Create PR for review
-3. Deploy to staging
-
-[If issues found]:
-1. Fix blocking issues listed above
-2. Re-run /parallel-integrate
-3. Verify all checks pass
 ```
 
-### 7. Report Results
+### 8. Update manifest.json
+
+Update integration status:
+```json
+{
+  "integration": {
+    "status": "completed",
+    "report_path": "integration-report.md",
+    "completed_at": "2025-12-07T18:00:00Z",
+    "checks": {
+      "branch_merge": "passed",
+      "contract_compliance": "warning",
+      "boundary_violations": "passed",
+      "tests": "passed"
+    }
+  }
+}
+```
+
+### 9. Report Results
 
 Output to console:
 ```
-🔄 Integration Verification Complete
+Integration Verification Complete
+
+Parallel Dir: parallel/TS-0042-inventory-system
+Tech Spec: TS-0042-inventory-system
 
 ┌────────────────────┬────────┬─────────────────────────┐
 │ Check              │ Status │ Details                 │
 ├────────────────────┼────────┼─────────────────────────┤
 │ Branch Merge       │ ✅     │ 9 branches merged       │
 │ Contract Compliance│ ⚠️     │ 18/20 endpoints match   │
-│ Boundary Violations│ ❌     │ 1 violation found       │
-│ Tests              │ ❌     │ 142 passed, 2 failed    │
+│ Boundary Violations│ ✅     │ 0 violations            │
+│ Tests              │ ✅     │ 142 passed              │
 │ Type Check         │ ✅     │ 0 errors                │
 │ Lint               │ ✅     │ 0 warnings              │
 └────────────────────┴────────┴─────────────────────────┘
 
-📄 Full report: .claude/integration-report.md
-
-[If issues]:
-⚠️  Issues found - review report and fix before proceeding
-
-Action items:
-1. Fix boundary violation in task-003
-2. Fix 2 failing tests
-3. Update contract for missing validation field
+Full report: parallel/TS-0042-inventory-system/integration-report.md
 
 [If clean]:
 ✅ Integration successful!
 
 Next steps:
-1. Review .claude/integration-report.md
+1. Review report
 2. Create pull request
 3. Deploy to staging
 ```
@@ -339,20 +316,20 @@ Next steps:
 ## Example
 
 ```bash
-# Run integration check with Tech Spec validation (recommended)
-/parallel-integrate --tech-spec tech-specs/approved/TS-0042-inventory-system.md
-
-# Run with Django-specific checks and Tech Spec
-/parallel-integrate --tech django --tech-spec tech-specs/approved/TS-0042-inventory-system.md
-
-# Run without Tech Spec (basic checks only)
+# Auto-detect parallel directory
 /parallel-integrate
 
+# Specify parallel directory
+/parallel-integrate --parallel-dir parallel/TS-0042-inventory-system
+
+# With Django-specific checks
+/parallel-integrate --parallel-dir parallel/TS-0042-inventory-system --tech django
+
 # After fixing issues, re-run
-/parallel-integrate --tech-spec tech-specs/approved/TS-0042-inventory-system.md
+/parallel-integrate
 
 # View report
-cat .claude/integration-report.md
+cat parallel/TS-0042-inventory-system/integration-report.md
 ```
 
 ## Integration Checklist
@@ -365,12 +342,11 @@ cat .claude/integration-report.md
 - [ ] Lint passes
 - [ ] No boundary violations
 - [ ] Contract compliance verified
-- [ ] Tech Spec compliance verified (if spec provided)
+- [ ] Tech Spec compliance verified
 - [ ] Integration report generated
-- [ ] Tech Spec updated with deviations (if any)
+- [ ] manifest.json updated
 
 ## Related Commands
 
-- `/parallel-decompose` - Create tasks
-- `/parallel-prompts` - Generate agent prompts
-- `/parallel-ready-[tech]` - Re-assess if needed
+- `/parallel-setup` - One-time project initialization
+- `/parallel-decompose` - Create tasks and prompts

@@ -1,12 +1,19 @@
 # PRD Decomposition Prompt
 
-Use this prompt to decompose a PRD into parallel tasks:
+Use this prompt when executing `/parallel-decompose`:
 
 ---
 
-Read the PRD in `.claude/prd.md` and perform the following:
+## 0. Determine Output Directory
 
-## 0. Tech Spec Analysis (if provided)
+```bash
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+```
+
+**If Tech Spec provided**: Extract ID and slug from Tech Spec file
+**If --name provided**: Use `parallel/{slug}/`
+
+## 1. Tech Spec Analysis (if provided)
 
 If a Tech Spec (TS-XXXX) is provided:
 
@@ -15,18 +22,13 @@ If a Tech Spec (TS-XXXX) is provided:
    - Warn if DRAFT (not ready for decomposition)
 
 2. **Extract from Tech Spec**:
-   - **Design Overview** → Use for `.claude/architecture.md`
-   - **Data Model** → Use for `.claude/contracts/types.py` or `types.ts`
-   - **API Specification** → Use for `.claude/contracts/api-schema.yaml`
+   - **Design Overview** → Use for `$PARALLEL_DIR/architecture.md`
+   - **Data Model** → Use for `$PARALLEL_DIR/contracts/types.py`
+   - **API Specification** → Use for `$PARALLEL_DIR/contracts/api-schema.yaml`
    - **Component boundaries** → Use for task ownership
    - **RFC link** (if any) → Include in task metadata
 
-3. **Record linkage**:
-   - Add `tech_spec_ref: TS-XXXX` to each generated task
-   - Add `rfc_ref: RFC-XXXX` if Tech Spec links to an RFC
-   - Add Tech Spec path to `.claude/architecture.md`
-
-4. **Skip redundant steps**:
+3. **Skip redundant steps**:
    - If Tech Spec has complete Data Model, skip generating types
    - If Tech Spec has complete API Spec, skip generating api-schema.yaml
    - Focus on task decomposition and boundaries
@@ -36,20 +38,60 @@ If a Tech Spec (TS-XXXX) is provided:
 
 ---
 
-## 1. Architecture Analysis
+## 2. Create manifest.json
 
-Create `.claude/architecture.md` with:
+Create `$PARALLEL_DIR/manifest.json`:
+
+```json
+{
+  "version": "1.0.0",
+  "created_at": "[current timestamp]",
+  "tech_spec": {
+    "id": "TS-XXXX",
+    "title": "[slug]",
+    "path": "[tech spec path]",
+    "status": "APPROVED"
+  },
+  "sources": {
+    "prd": "[prd path]",
+    "tech_spec": "[tech spec path]"
+  },
+  "command": {
+    "name": "parallel-decompose",
+    "args": { ... },
+    "invoked_at": "[current timestamp]"
+  },
+  "technology": "[django|typescript|go]",
+  "tasks": { "total": 0, "waves": 0, "files": [] },
+  "integration": { "status": "pending" }
+}
+```
+
+## 3. Create context.md (Shared Project Context)
+
+Create `$PARALLEL_DIR/context.md` with:
+- Brief project overview from PRD
+- Technology stack
+- Project conventions (from CLAUDE.md if exists)
+- Key directories
+- Contracts location
+
+This file is read once by all agents - keeps token usage low.
+
+## 4. Create Architecture Documentation
+
+Create `$PARALLEL_DIR/architecture.md` with:
 - System overview and component diagram (ASCII or Mermaid)
 - Data flow between components
 - Technology choices and rationale
 - Component boundaries and ownership
 
-## 2. Contract Definition
+## 5. Create Contracts
 
-Create contracts in `.claude/contracts/`:
+Create contracts in `$PARALLEL_DIR/contracts/`:
 
-**types.ts** - Shared TypeScript types:
-- Domain entities
+**types.py** (or types.ts) - Shared types:
+- Domain entities as dataclasses/interfaces
 - API request/response types
 - Shared enums and constants
 
@@ -58,81 +100,134 @@ Create contracts in `.claude/contracts/`:
 - Error response formats
 - Authentication requirements
 
-## 3. Task Decomposition
+## 6. Task Decomposition (Compact Format)
 
-Create task specs in `.claude/tasks/`:
+Create task specs in `$PARALLEL_DIR/tasks/` using compact YAML format:
 
-For each logical component, create a task file following the template in `references/task-template.md`.
+```yaml
+---
+id: task-001
+component: users
+wave: 1
+deps: []
+blocks: [task-004]
+agent: django-expert
+tech_spec: TS-XXXX
+contracts: [contracts/types.py, contracts/api-schema.yaml]
+---
+# task-001: User Management
+
+## Scope
+CREATE: apps/users/*.py
+MODIFY: config/urls.py
+BOUNDARY: apps/orders/*, apps/products/*
+
+## Requirements
+- [Bullet list of requirements]
+
+## Checklist
+- [ ] [Verification items]
+```
 
 Requirements:
 - Each task should be completable in 2-4 hours
 - Tasks should touch separate files/directories
-- Identify and document all dependencies between tasks
-- Flag any tasks that MUST be sequential
+- Use compact YAML frontmatter
+- Include agent recommendation
 
-## 4. Dependency Analysis
+## 7. Create task-graph.md
 
-At the end of architecture.md, include:
-- Task dependency graph (ASCII diagram)
-- Recommended execution order
-- Parallelization opportunities
-- Integration checkpoints
+Create `$PARALLEL_DIR/task-graph.md` with:
+- Wave summary table
+- ASCII dependency graph
+- Critical path
+- Parallelization stats
 
-## 5. CLAUDE.md Conventions
+## 8. Generate Prompts
 
-Create/update CLAUDE.md with project conventions:
-- Code style and formatting rules
-- Error handling patterns
-- Logging conventions
-- Test file organization
-- Naming conventions
+Create `$PARALLEL_DIR/prompts/agent-prompts.md` with launch commands.
+
+Create individual `$PARALLEL_DIR/prompts/task-{NNN}.txt` files:
+```
+Execute task from parallel/TS-XXXX-slug/tasks/task-001.md.
+Read context from parallel/TS-XXXX-slug/context.md first.
+Read contracts from parallel/TS-XXXX-slug/contracts/ before implementing.
+Follow the Scope, Requirements, and Checklist in the task file.
+Do not modify files outside the defined Scope.
+```
+
+## 9. Generate Scripts
+
+Create `$PARALLEL_DIR/scripts/`:
+- `launch-wave-1.sh` - Setup worktrees and launch Wave 1
+- `launch-wave-2.sh` - Launch Wave 2 after Wave 1 completes
+- `monitor.sh` - Check task branch status
+
+## 10. Update manifest.json
+
+Update task counts:
+```json
+{
+  "tasks": {
+    "total": 6,
+    "waves": 3,
+    "files": ["tasks/task-001-users.md", ...]
+  }
+}
+```
 
 ---
 
 ## Expected Output Summary
 
 After decomposition, provide:
+- Output directory: `parallel/TS-XXXX-slug/`
 - Source PRD file
 - Source Tech Spec file (if provided)
-- Source RFC file (if linked via Tech Spec)
 - Total tasks created
-- Maximum parallelization (how many can run simultaneously)
-- Critical path (longest sequential chain)
-- Estimated total effort
+- Wave count
+- Maximum parallelization per wave
+- Critical path
 
 ---
 
-## Example Decomposition
+## Example Output Structure
 
-Given a PRD for a "User Management System" with Tech Spec TS-0042, the output might be:
-
-### Source Documents
-- **PRD**: `docs/user-management-prd.md`
-- **Tech Spec**: `tech-specs/approved/TS-0042-user-management.md`
-- **RFC**: `rfcs/approved/RFC-0018-auth-strategy.md` (linked from Tech Spec)
-
-### Tasks Created
-1. `task-001-contracts.md` - Define shared types and API schema (from Tech Spec)
-2. `task-002-auth.md` - Authentication service (login, logout, JWT)
-3. `task-003-users-api.md` - User CRUD endpoints
-4. `task-004-users-ui.md` - User management UI components
-5. `task-005-db.md` - Database schema and migrations
-6. `task-006-integration.md` - Integration tests and final assembly
-
-Each task includes:
-- `tech_spec_ref: TS-0042`
-- `rfc_ref: RFC-0018` (if linked)
-
-### Dependency Graph
 ```
-task-001 (contracts) --+--> task-002 (auth)     --+
-                       +--> task-003 (users-api) -+--> task-006 (integration)
-                       +--> task-004 (users-ui)  --+
-task-005 (db) ---------------------------------->--+
+parallel/TS-0042-inventory-system/
+├── manifest.json
+├── context.md
+├── architecture.md
+├── task-graph.md
+├── contracts/
+│   ├── types.py
+│   └── api-schema.yaml
+├── tasks/
+│   ├── task-001-users.md
+│   ├── task-002-products.md
+│   ├── task-003-orders.md
+│   └── task-004-api.md
+├── prompts/
+│   ├── agent-prompts.md
+│   ├── task-001.txt
+│   └── task-002.txt
+└── scripts/
+    ├── launch-wave-1.sh
+    └── monitor.sh
 ```
 
-### Summary
-- **Total tasks**: 6
-- **Max parallelization**: 4 (tasks 2, 3, 4, 5 can run simultaneously after task-001)
-- **Critical path**: task-001 -> task-003 -> task-006 (3 sequential steps)
-- **Estimated effort**: 12-18 hours total, 6-8 hours with parallelization
+## Summary Format
+
+```
+Decomposition Complete
+
+Output: parallel/TS-0042-inventory-system/
+Source: docs/inventory-prd.md
+Tech Spec: TS-0042
+
+Tasks: 6
+Waves: 3
+Max parallel: 3
+
+Next: Review tasks, then run scripts/launch-wave-1.sh
+```

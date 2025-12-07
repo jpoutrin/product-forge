@@ -1,6 +1,6 @@
 ---
-description: Break PRD into parallel task specs with contracts and dependency waves
-argument-hint: <prd-file> [--tech-spec <ts-file>] [--output-dir <directory>]
+description: Decompose PRD into parallel tasks with contracts, prompts, and scripts
+argument-hint: <prd-file> --tech-spec <ts-file> [--name <slug>] [--tech django|typescript|go]
 ---
 
 # parallel-decompose
@@ -10,94 +10,139 @@ argument-hint: <prd-file> [--tech-spec <ts-file>] [--output-dir <directory>]
 ## Usage
 
 ```bash
-/parallel-decompose <prd-file> [--tech-spec <ts-file>] [--output-dir <directory>]
+/parallel-decompose <prd-file> --tech-spec <ts-file> [--tech django|typescript|go]
+/parallel-decompose <prd-file> --name <slug> [--tech django|typescript|go]
 ```
 
 ## Arguments
 
 - `<prd-file>`: Required - Path to PRD or FRD file to decompose
-- `--tech-spec`: Optional - Path to Tech Spec file (TS-XXXX) to extract contracts and architecture from
-- `--output-dir`: Optional - Task output directory (default: `.claude/tasks/`)
+- `--tech-spec`: Recommended - Path to Tech Spec file (determines folder name: `TS-XXXX-slug`)
+- `--name`: Fallback - Manual slug if no Tech Spec (creates `parallel/{slug}/`)
+- `--tech`: Optional - Technology stack (default: auto-detect)
 
 ## Purpose
 
-Analyze a PRD and decompose it into independent, parallel-executable task specifications. This is the critical decomposition phase that determines parallelization success.
+Decompose a PRD into independent, parallel-executable task specifications. This all-in-one command:
+1. Creates `parallel/TS-XXXX-slug/` directory
+2. Generates contracts, tasks, prompts, and scripts
+3. Creates manifest.json for regeneration
 
-> "The lead agent analyzes it, develops a strategy, and spawns subagents to explore different aspects simultaneously." — Anthropic Multi-Agent Research
+> Combines former `/parallel-setup` + `/parallel-decompose` + `/parallel-prompts` into one command.
 
 ## Prerequisites
 
-- Run `/parallel-setup` first
-- Run `/parallel-ready-[tech]` and achieve score ≥80
-- `.claude/` directory structure must exist
-- (Recommended) Tech Spec exists with design decisions and contracts
-
-## Document Flow
-
-```
-PRD (What to build)
-    ↓
-Tech Spec (How to build - optional but recommended)
-    ↓
-/parallel-decompose
-    ↓
-Tasks with boundaries from Tech Spec
-```
+- Run `/parallel-setup` once (creates `parallel/` root directory)
+- Tech Spec recommended (provides design decisions and contracts)
 
 ## Execution Instructions for Claude Code
 
-When this command is run, Claude Code should:
+### 0. Determine Output Directory
 
-### 0. Check for Tech Spec (if --tech-spec provided)
+**If `--tech-spec` provided**:
+1. Read Tech Spec file, extract `tech_spec_id` (e.g., `TS-0042`)
+2. Extract slug from title (e.g., `inventory-system`)
+3. Output to: `parallel/TS-0042-inventory-system/`
 
-If Tech Spec is provided:
-1. **Read Tech Spec** and extract:
-   - Design Overview → `.claude/architecture.md`
-   - Data Model → `.claude/contracts/types.py`
-   - API Specification → `.claude/contracts/api-schema.yaml`
-   - Component boundaries → Task ownership
-   - RFC link (if any) → Task metadata
+**If `--name` provided** (fallback):
+1. Use provided slug
+2. Output to: `parallel/{slug}/`
 
-2. **Validate Tech Spec status**:
-   - Must be APPROVED or REFERENCE
-   - Warn if DRAFT (not ready for decomposition)
+**If neither**:
+- Error: "Provide --tech-spec or --name to identify output directory"
 
-3. **Record linkage**:
-   - Add `tech_spec_ref` to each generated task
-   - Add Tech Spec path to `.claude/architecture.md`
+### 1. Create Directory Structure
 
-If no Tech Spec provided:
-- Generate contracts from PRD (existing behavior)
-- Warn: "Consider creating a Tech Spec first for better contract definitions"
+```bash
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+mkdir -p "$PARALLEL_DIR"/{tasks,contracts,prompts,scripts}
+```
 
-### 1. Read and Analyze PRD
+### 2. Create manifest.json
 
-Parse the PRD to extract:
-- **Features/Epics**: Major functional areas
-- **Technical Requirements**: API endpoints, data models, integrations
-- **Dependencies**: What must be built before what
-- **Integration Points**: Where components connect
+Create `$PARALLEL_DIR/manifest.json`:
+```json
+{
+  "version": "1.0.0",
+  "created_at": "2025-12-07T14:30:00Z",
+  "updated_at": "2025-12-07T14:30:00Z",
+  "tech_spec": {
+    "id": "TS-0042",
+    "title": "inventory-system",
+    "path": "tech-specs/approved/TS-0042-inventory-system.md",
+    "status": "APPROVED"
+  },
+  "sources": {
+    "prd": "docs/prds/inventory-prd.md",
+    "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md"
+  },
+  "command": {
+    "name": "parallel-decompose",
+    "args": {
+      "prd": "docs/prds/inventory-prd.md",
+      "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md",
+      "tech": "django"
+    },
+    "invoked_at": "2025-12-07T14:30:00Z"
+  },
+  "technology": "django",
+  "tasks": {
+    "total": 0,
+    "waves": 0,
+    "files": []
+  },
+  "integration": {
+    "status": "pending"
+  }
+}
+```
 
-### 2. Define Contracts First
+### 3. Create context.md (Shared Project Context)
 
-> "For Contract-driven development to be successful, we need to take an API-first approach, where API providers and consumers collaboratively design and document the API specification first." — InfoQ
+Create `$PARALLEL_DIR/context.md` - shared context for all tasks (token-efficient):
+```markdown
+# Project Context
 
-**If Tech Spec provided**: Extract contracts directly from Tech Spec sections:
-- **Data Model section** → `types.py`
-- **API Specification section** → `api-schema.yaml`
+## Overview
+[Brief project description from PRD]
 
-**If no Tech Spec**: Generate contracts from PRD (existing behavior).
+## Technology Stack
+- Backend: Django 5.x / Python 3.12
+- Database: PostgreSQL
+- Testing: pytest, Factory Boy
 
-**Update `.claude/contracts/types.py` (or `.ts`)**:
+## Conventions
+- Follow CLAUDE.md guidelines
+- Use explicit serializer fields (no `__all__`)
+- Type hints required (mypy strict)
+- ruff for linting
 
-Extract shared types from PRD requirements:
+## Key Directories
+- `apps/` - Django applications
+- `config/` - Django settings
+- `tests/` - Integration tests
+
+## Contracts Location
+- Types: `contracts/types.py`
+- API: `contracts/api-schema.yaml`
+```
+
+### 4. Create Contracts
+
+**From Tech Spec** (preferred): Extract Data Model and API sections.
+
+**From PRD** (fallback): Generate types and endpoints.
+
+**Create `$PARALLEL_DIR/contracts/types.py`** (or `.ts`):
 ```python
-# .claude/contracts/types.py
+"""
+Shared domain types for parallel agents.
+DO NOT MODIFY during parallel execution.
+"""
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-# Entities from PRD
 @dataclass(frozen=True)
 class UserDTO:
     id: int
@@ -105,306 +150,299 @@ class UserDTO:
     name: str
     created_at: datetime
 
-@dataclass(frozen=True)
-class OrderDTO:
-    id: int
-    user_id: int
-    total: int
-    status: "OrderStatus"
-
-class OrderStatus(str, Enum):
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
-    SHIPPED = "shipped"
+# ... entities from Tech Spec Data Model
 ```
 
-**Update `.claude/contracts/api-schema.yaml`**:
-
-Define endpoints from PRD:
+**Create `$PARALLEL_DIR/contracts/api-schema.yaml`**:
 ```yaml
 openapi: 3.0.3
 info:
-  title: [Project] API
+  title: Project API
   version: 1.0.0
 
 paths:
   /api/users/:
     get:
-      summary: List users
       operationId: listUsers
       responses:
         '200':
-          description: Success
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserList'
-
-  /api/users/{id}/:
-    get:
-      summary: Get user by ID
-      # ... full spec
+  # ... endpoints from Tech Spec API section
 
 components:
   schemas:
-    User:
-      type: object
-      required: [id, email, name]
-      properties:
-        id: { type: integer }
-        email: { type: string, format: email }
-        name: { type: string }
+    # ... schemas from Tech Spec
 ```
 
-### 3. Identify Task Boundaries
+### 5. Create architecture.md
 
-Analyze PRD to identify natural boundaries:
-
-**For Django projects**:
-- Each Django app = potential task boundary
-- Each API resource = potential task
-- Each feature area = potential task
-
-**Boundary Rules**:
-- Tasks should own specific files/directories
-- No two tasks should modify the same file
-- Dependencies should be one-way (no circular)
-- Target 2-4 hours per task
-
-**Agent Assignment**:
-For each task, assign the appropriate agent based on file scope:
-
-| Task Files | Agent |
-|------------|-------|
-| `apps/*/models.py`, `apps/*/views.py` | `django-expert` |
-| `api/*.py`, `routers/*.py` | `fastapi-expert` |
-| `src/components/*.tsx` | `react-typescript-expert` |
-| `**/test_*.py` | `python-testing-expert` |
-| `*.spec.ts`, `*.test.tsx` | `playwright-testing-expert` |
-| `terraform/`, `docker-compose.yml` | `devops-expert` |
-
-### 4. Create Wave Plan
-
-Organize tasks into waves based on dependencies:
-
-```markdown
-# .claude/task-graph.md
-
-## Dependency Graph
-
-```
-Wave 1 (no dependencies - run in parallel)
-├── task-001-users-app
-├── task-002-products-app
-└── task-003-shared-models
-
-Wave 2 (depends on Wave 1 - run in parallel)
-├── task-004-orders-app (needs users, products)
-├── task-005-api-endpoints (needs all models)
-└── task-006-admin-views (needs all models)
-
-Wave 3 (depends on Wave 2 - run in parallel)
-├── task-007-notifications (needs orders)
-└── task-008-reports (needs all)
-
-Wave 4 (sequential)
-└── task-009-integration-tests (needs everything)
-```
-
-## Parallelization Summary
-
-- **Total tasks**: 9
-- **Parallel waves**: 4
-- **Max concurrent agents**: 3
-- **Critical path**: task-001 → task-004 → task-007 → task-009
-```
-
-### 5. Generate Task Specs
-
-Create task files in `.claude/tasks/`:
-
-**Naming convention**: `task-{NNN}-{component}-{feature}.md`
-
-**Task template**:
-```markdown
-# Task: task-001-users-app
-
-## Metadata
-
-| Field | Value |
-|-------|-------|
-| ID | task-001 |
-| Component | users |
-| Feature | User management |
-| Estimated Effort | 2-4 hours |
-| Wave | 1 |
-| Dependencies | None |
-| Blocks | task-004, task-005, task-006 |
-| Tech Spec | TS-XXXX (if provided) |
-| RFC | RFC-XXXX (if linked via Tech Spec) |
-| Agent | `django-expert` |
-
-## Scope
-
-### Files to Create
-- `apps/users/models.py`
-- `apps/users/serializers.py`
-- `apps/users/views.py`
-- `apps/users/urls.py`
-- `apps/users/tests/test_models.py`
-- `apps/users/tests/test_views.py`
-- `apps/users/tests/factories.py`
-
-### Files to Modify
-- `config/urls.py` (add users URLs)
-
-### Boundary - DO NOT TOUCH
-- `apps/orders/*` — owned by task-004
-- `apps/products/*` — owned by task-002
-- `apps/*/migrations/*` — handle post-integration
-- `.claude/contracts/*` — read-only
-
-## Contracts (Read-Only)
-
-Reference these contracts but do not modify:
-- `.claude/contracts/types.py` — UserDTO definition
-- `.claude/contracts/api-schema.yaml` — /api/users/* endpoints
-
-## Requirements
-
-### Functional
-1. User model with email-based authentication
-2. UserSerializer with explicit fields (no `__all__`)
-3. UserViewSet with list, retrieve, create, update actions
-4. Email uniqueness validation
-
-### Non-Functional
-1. All endpoints typed (request/response)
-2. >80% test coverage for new code
-3. mypy passes with no errors
-4. ruff check passes
-
-## Acceptance Criteria
-
-- [ ] User model matches UserDTO in contracts
-- [ ] API endpoints match OpenAPI spec exactly
-- [ ] All tests pass: `pytest apps/users/`
-- [ ] Type check passes: `mypy apps/users/`
-- [ ] Lint passes: `ruff check apps/users/`
-- [ ] No files modified outside scope
-- [ ] No migrations created (defer to integration)
-
-## Implementation Notes
-
-- Use Factory Boy for test fixtures
-- Follow CLAUDE.md conventions
-- Reference existing patterns in codebase
-```
-
-### 6. Update Architecture Doc
-
-Update `.claude/architecture.md` with component ownership:
-
+Create `$PARALLEL_DIR/architecture.md`:
 ```markdown
 # System Architecture
 
 ## Overview
-[From PRD summary]
+[From Tech Spec Design Overview or PRD summary]
 
 ## Components
 
-| Component | App/Module | Owner Task | Dependencies |
-|-----------|------------|------------|--------------|
-| User Management | apps/users/ | task-001 | None |
-| Product Catalog | apps/products/ | task-002 | None |
-| Order Processing | apps/orders/ | task-004 | task-001, task-002 |
-| API Layer | apps/api/ | task-005 | task-001, task-002, task-003 |
+| Component | Directory | Owner Task | Dependencies |
+|-----------|-----------|------------|--------------|
+| Users | apps/users/ | task-001 | None |
+| Products | apps/products/ | task-002 | None |
+| Orders | apps/orders/ | task-004 | task-001, task-002 |
 
 ## Boundaries
 
-Each task owns specific directories. No cross-boundary modifications allowed during parallel execution.
+Each task owns specific directories. No cross-boundary modifications during parallel execution.
 
 ## Integration Points
 
-Integration happens in Wave 4 after all parallel work completes:
+Integration happens after all parallel work completes:
 1. Migration merge
 2. Integration tests
 3. Contract compliance verification
 ```
 
-### 7. Validate Decomposition
+### 6. Generate Task Files (Compact YAML Format)
 
-Check for issues:
-- [ ] No file ownership conflicts between tasks
-- [ ] No circular dependencies in wave graph
-- [ ] All contract references exist
-- [ ] Each task is 2-4 hours estimated
-- [ ] Dependencies are achievable (no impossible orderings)
+Create tasks in `$PARALLEL_DIR/tasks/`:
 
-### 8. Report Results
+**Naming**: `task-{NNN}-{component}.md`
 
-Output:
+**Compact format** (token-efficient):
+```yaml
+---
+id: task-001
+component: users
+wave: 1
+deps: []
+blocks: [task-004, task-005]
+agent: django-expert
+tech_spec: TS-0042
+contracts: [contracts/types.py, contracts/api-schema.yaml]
+---
+# task-001: User Management
+
+## Scope
+CREATE: apps/users/{models,views,serializers,urls}.py, apps/users/tests/*.py
+MODIFY: config/urls.py
+BOUNDARY: apps/orders/*, apps/products/*, apps/*/migrations/*
+
+## Requirements
+- User model with email authentication
+- UserSerializer with explicit fields
+- UserViewSet (list, retrieve, create, update)
+- Email uniqueness validation
+
+## Checklist
+- [ ] Model matches UserDTO in contracts/types.py
+- [ ] API matches /api/users/* in contracts/api-schema.yaml
+- [ ] pytest apps/users/ passes
+- [ ] mypy apps/users/ passes
+- [ ] ruff check apps/users/ passes
+- [ ] No files modified outside scope
 ```
-📦 PRD Decomposition Complete
 
-Source: docs/user-orders-prd.md
-Tasks Generated: 9
+### 7. Create task-graph.md
 
-Wave Summary:
-┌───────┬─────────┬───────────────────────────────────────────┐
-│ Wave  │ Tasks   │ Description                               │
-├───────┼─────────┼───────────────────────────────────────────┤
-│ 1     │ 3       │ Core models (users, products, shared)     │
-│ 2     │ 3       │ Business logic (orders, API, admin)       │
-│ 3     │ 2       │ Features (notifications, reports)         │
-│ 4     │ 1       │ Integration tests                         │
-└───────┴─────────┴───────────────────────────────────────────┘
+Create `$PARALLEL_DIR/task-graph.md`:
+```markdown
+# Task Dependency Graph
 
-Max Parallel Agents: 3
-Estimated Total Time: 8-12 hours (vs 24-36 sequential)
+## Wave Summary
 
-Files Created:
-✅ .claude/tasks/task-001-users-app.md
-✅ .claude/tasks/task-002-products-app.md
-... (9 tasks total)
-✅ .claude/task-graph.md
-✅ .claude/contracts/types.py (updated)
-✅ .claude/contracts/api-schema.yaml (updated)
-✅ .claude/architecture.md (updated)
+| Wave | Tasks | Can Run In Parallel |
+|------|-------|---------------------|
+| 1 | task-001, task-002, task-003 | Yes (3 agents) |
+| 2 | task-004, task-005 | Yes (2 agents) |
+| 3 | task-006 | Sequential |
+
+## Dependencies
+
+```
+Wave 1 (no dependencies)
+├── task-001-users
+├── task-002-products
+└── task-003-shared
+
+Wave 2 (depends on Wave 1)
+├── task-004-orders (needs: task-001, task-002)
+└── task-005-api (needs: task-001, task-002, task-003)
+
+Wave 3 (sequential)
+└── task-006-integration (needs: all)
+```
+
+## Critical Path
+task-001 → task-004 → task-006
+
+## Parallelization Stats
+- Total tasks: 6
+- Max parallel agents: 3
+- Waves: 3
+```
+
+### 8. Generate Prompts
+
+Create `$PARALLEL_DIR/prompts/agent-prompts.md`:
+```markdown
+# Agent Execution Prompts
+
+Generated: 2025-12-07
+Source PRD: docs/prds/inventory-prd.md
+Tech Spec: TS-0042-inventory-system
+
+## Wave 1 (Run in Parallel)
+
+### task-001-users
+**Agent**: django-expert
+**Launch**:
+```bash
+cd ../workspace-task-001
+claude --dangerously-skip-permissions --print "Execute task from parallel/TS-0042-inventory-system/tasks/task-001-users.md. Read context from parallel/TS-0042-inventory-system/context.md first."
+```
+
+### task-002-products
+**Agent**: django-expert
+**Launch**:
+```bash
+cd ../workspace-task-002
+claude --dangerously-skip-permissions --print "Execute task from parallel/TS-0042-inventory-system/tasks/task-002-products.md. Read context from parallel/TS-0042-inventory-system/context.md first."
+```
+```
+
+Create individual prompt files `$PARALLEL_DIR/prompts/task-{NNN}.txt`:
+```
+Execute task from parallel/TS-0042-inventory-system/tasks/task-001-users.md.
+
+Read context from parallel/TS-0042-inventory-system/context.md first.
+Read contracts from parallel/TS-0042-inventory-system/contracts/ before implementing.
+
+Follow the Scope, Requirements, and Checklist in the task file.
+Do not modify files outside the defined Scope.
+```
+
+### 9. Generate Scripts
+
+**Create `$PARALLEL_DIR/scripts/launch-wave-1.sh`**:
+```bash
+#!/bin/bash
+# Launch Wave 1 agents in parallel
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+
+echo "=== Launching Wave 1 ==="
+
+# Setup worktrees
+git worktree add ../workspace-task-001 -b feature/task-001-users 2>/dev/null || true
+git worktree add ../workspace-task-002 -b feature/task-002-products 2>/dev/null || true
+
+# Launch agents (run these in separate terminals)
+echo "Terminal 1: cd ../workspace-task-001 && claude --dangerously-skip-permissions --print \"\$(cat $PARALLEL_DIR/prompts/task-001.txt)\""
+echo "Terminal 2: cd ../workspace-task-002 && claude --dangerously-skip-permissions --print \"\$(cat $PARALLEL_DIR/prompts/task-002.txt)\""
+```
+
+**Create `$PARALLEL_DIR/scripts/monitor.sh`**:
+```bash
+#!/bin/bash
+# Monitor parallel agent progress
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+
+echo "=== Checking Task Status ==="
+for task in $PARALLEL_DIR/tasks/task-*.md; do
+  name=$(basename "$task" .md)
+  # Check if corresponding branch has commits
+  if git rev-parse --verify "feature/$name" >/dev/null 2>&1; then
+    echo "✅ $name - branch exists"
+  else
+    echo "⏳ $name - not started"
+  fi
+done
+```
+
+### 10. Update manifest.json
+
+Update task counts in manifest:
+```json
+{
+  "tasks": {
+    "total": 6,
+    "waves": 3,
+    "files": [
+      "tasks/task-001-users.md",
+      "tasks/task-002-products.md",
+      ...
+    ]
+  }
+}
+```
+
+### 11. Report Results
+
+```
+Decomposition Complete
+
+Output: parallel/TS-0042-inventory-system/
+Source: docs/prds/inventory-prd.md
+Tech Spec: TS-0042-inventory-system
+
+├── manifest.json           # Regeneration metadata
+├── context.md              # Shared project context
+├── contracts/
+│   ├── types.py            # 5 entities
+│   └── api-schema.yaml     # 12 endpoints
+├── tasks/
+│   ├── task-001-users.md
+│   ├── task-002-products.md
+│   └── ... (6 tasks total)
+├── prompts/
+│   ├── agent-prompts.md    # All launch commands
+│   └── task-*.txt          # Individual prompts
+├── scripts/
+│   ├── launch-wave-1.sh
+│   ├── launch-wave-2.sh
+│   └── monitor.sh
+├── architecture.md
+└── task-graph.md
+
+Summary:
+- Tasks: 6
+- Waves: 3
+- Max parallel agents: 3
 
 Next steps:
-1. Review task specs in .claude/tasks/
-2. Verify contracts are complete
-3. Run /parallel-prompts to generate agent commands
+1. Review tasks in parallel/TS-0042-inventory-system/tasks/
+2. Run ./parallel/TS-0042-inventory-system/scripts/launch-wave-1.sh
+3. After Wave 1 completes, run launch-wave-2.sh
+4. Run /parallel-integrate to verify
 ```
 
 ## Example
 
 ```bash
-# Decompose PRD with Tech Spec (recommended)
-/parallel-decompose docs/inventory-prd.md --tech-spec tech-specs/approved/TS-0042-inventory-system.md
+# With Tech Spec (recommended)
+/parallel-decompose docs/inventory-prd.md --tech-spec tech-specs/approved/TS-0042-inventory.md
 
-# Decompose PRD only (generates contracts from PRD)
-/parallel-decompose docs/inventory-prd.md
+# With technology hint
+/parallel-decompose docs/inventory-prd.md --tech-spec tech-specs/approved/TS-0042-inventory.md --tech django
 
-# Decompose with custom output
-/parallel-decompose docs/auth-frd.md --tech-spec tech-specs/approved/TS-0015-auth.md --output-dir ./parallel-tasks/
-
-# After decomposition, generate prompts
-/parallel-prompts
+# Without Tech Spec (fallback)
+/parallel-decompose docs/auth-frd.md --name user-auth --tech django
 ```
 
 ## Key Principles
 
 1. **Contract-first**: Define types and API schemas before tasks
-2. **Explicit boundaries**: Each task owns specific files
-3. **2-4 hour granularity**: Not too big, not too small
-4. **One-way dependencies**: No circular task dependencies
-5. **Wave organization**: Maximize parallel execution
+2. **Compact tasks**: YAML frontmatter + bullet lists for token efficiency
+3. **Shared context**: `context.md` avoids duplicating project info
+4. **Explicit boundaries**: Each task owns specific files
+5. **2-4 hour granularity**: Not too big, not too small
+6. **Reference prompts**: Point to files instead of embedding content
 
 ## Related Commands
 
-- `/parallel-setup` - Create infrastructure first
-- `/parallel-ready-[tech]` - Verify readiness (score ≥80)
-- `/parallel-prompts` - Generate agent prompts from tasks
+- `/parallel-setup` - One-time project initialization
 - `/parallel-integrate` - Verify integration after execution
+- `/create-tech-spec` - Create Tech Spec before decomposition

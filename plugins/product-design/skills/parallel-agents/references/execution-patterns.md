@@ -1,5 +1,7 @@
 # Parallel Execution Patterns
 
+All patterns assume artifacts are in `parallel/TS-XXXX-slug/`.
+
 ## Pattern 1: Git Worktrees (Recommended)
 
 Each agent gets isolated working directory with shared git history.
@@ -10,7 +12,8 @@ Each agent gets isolated working directory with shared git history.
 #!/bin/bash
 # setup-worktrees.sh
 
-TASKS_DIR=".claude/tasks"
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+TASKS_DIR="$PARALLEL_DIR/tasks"
 WORKSPACE_ROOT="../workspaces"
 
 mkdir -p "$WORKSPACE_ROOT"
@@ -21,9 +24,6 @@ for task_file in "$TASKS_DIR"/*.md; do
 
     echo "Creating worktree for $task_name..."
     git worktree add "$WORKSPACE_ROOT/$task_name" -b "$branch_name"
-
-    # Copy contracts to each workspace
-    cp -r .claude/contracts "$WORKSPACE_ROOT/$task_name/.claude/"
 done
 
 echo "Worktrees ready in $WORKSPACE_ROOT/"
@@ -35,7 +35,8 @@ echo "Worktrees ready in $WORKSPACE_ROOT/"
 #!/bin/bash
 # parallel-execute.sh
 
-TASKS_DIR=".claude/tasks"
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+TASKS_DIR="$PARALLEL_DIR/tasks"
 WORKSPACE_ROOT="../workspaces"
 LOG_DIR="../logs"
 
@@ -48,10 +49,7 @@ for task_file in "$TASKS_DIR"/*.md; do
     (
         cd "$workspace"
         echo "Starting agent for $task_name..."
-        claude --print "Read .claude/tasks/$task_name.md and implement it.
-                       Follow contracts in .claude/contracts/.
-                       Follow conventions in CLAUDE.md.
-                       Stay within your assigned scope." \
+        claude --dangerously-skip-permissions --print "$(cat $PARALLEL_DIR/prompts/$task_name.txt)" \
             > "$LOG_DIR/$task_name.log" 2>&1
         echo "Completed $task_name"
     ) &
@@ -84,14 +82,15 @@ Simpler setup, agents work sequentially but on different branches.
 #!/bin/bash
 # branch-execute.sh
 
-TASKS_DIR=".claude/tasks"
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+TASKS_DIR="$PARALLEL_DIR/tasks"
 
 for task_file in "$TASKS_DIR"/*.md; do
     task_name=$(basename "$task_file" .md)
 
     git checkout -b "feature/$task_name" main
 
-    claude --print "Implement $task_file following .claude/contracts/"
+    claude --dangerously-skip-permissions --print "$(cat $PARALLEL_DIR/prompts/$task_name.txt)"
 
     git add -A && git commit -m "feat: $task_name implementation"
     git checkout main
@@ -106,18 +105,21 @@ No git complexity, pure directory boundaries. Good for parallel execution.
 #!/bin/bash
 # directory-parallel.sh
 
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
+
 # Define task-to-directory mapping
 declare -A TASK_DIRS=(
-    ["task-001-auth"]="src/auth"
-    ["task-002-api"]="src/api"
-    ["task-003-ui"]="src/components"
+    ["task-001-users"]="apps/users"
+    ["task-002-products"]="apps/products"
+    ["task-003-orders"]="apps/orders"
 )
 
 for task in "${!TASK_DIRS[@]}"; do
     dir="${TASK_DIRS[$task]}"
 
     (
-        claude --print "Implement .claude/tasks/$task.md.
+        claude --dangerously-skip-permissions --print "Execute task from $PARALLEL_DIR/tasks/$task.md.
+                       Read context from $PARALLEL_DIR/context.md first.
                        Work ONLY in $dir/.
                        Do NOT touch any other directories."
     ) &
@@ -156,18 +158,28 @@ echo "All branches merged successfully"
 #!/bin/bash
 # monitor.sh
 
+PARALLEL_DIR="parallel/TS-0042-inventory-system"
 LOG_DIR="../logs"
 
 while true; do
     clear
-    echo "=== Agent Status ==="
-    for log in "$LOG_DIR"/*.log; do
-        task=$(basename "$log" .log)
-        lines=$(wc -l < "$log")
-        last=$(tail -1 "$log")
-        echo "$task: $lines lines | $last"
+    echo "=== Agent Status for $PARALLEL_DIR ==="
+    echo ""
+
+    for task in $PARALLEL_DIR/tasks/task-*.md; do
+        name=$(basename "$task" .md)
+        # Check if corresponding branch has commits
+        if git rev-parse --verify "feature/$name" >/dev/null 2>&1; then
+            commits=$(git log --oneline "main..feature/$name" | wc -l | tr -d ' ')
+            echo "✅ $name - $commits commits"
+        else
+            echo "⏳ $name - not started"
+        fi
     done
-    sleep 5
+
+    echo ""
+    echo "Press Ctrl+C to exit"
+    sleep 10
 done
 ```
 
@@ -181,26 +193,34 @@ import { ClaudeAgent } from '@anthropic-ai/claude-agent-sdk';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 
-async function runParallelTasks() {
-  const tasksDir = '.claude/tasks';
+async function runParallelTasks(parallelDir: string) {
+  const tasksDir = join(parallelDir, 'tasks');
+  const contextFile = join(parallelDir, 'context.md');
+
+  const context = await readFile(contextFile, 'utf-8');
   const tasks = await readdir(tasksDir);
 
-  const agents = tasks.map(async (taskFile) => {
-    const taskPath = join(tasksDir, taskFile);
-    const taskContent = await readFile(taskPath, 'utf-8');
+  const agents = tasks
+    .filter(f => f.endsWith('.md'))
+    .map(async (taskFile) => {
+      const taskPath = join(tasksDir, taskFile);
+      const taskContent = await readFile(taskPath, 'utf-8');
 
-    const agent = new ClaudeAgent({
-      systemPrompt: `You are implementing: ${taskFile}
-                     Follow contracts in .claude/contracts/.
-                     Follow conventions in CLAUDE.md.`,
+      const agent = new ClaudeAgent({
+        systemPrompt: `You are implementing a task.
+                       Context: ${context}
+                       Follow contracts in ${parallelDir}/contracts/.`,
+      });
+
+      return agent.run(`Execute this task:\n\n${taskContent}`);
     });
-
-    return agent.run(`Implement this task:\n\n${taskContent}`);
-  });
 
   const results = await Promise.all(agents);
   return results;
 }
+
+// Usage
+runParallelTasks('parallel/TS-0042-inventory-system');
 ```
 
 ## Choosing a Pattern
@@ -215,7 +235,8 @@ async function runParallelTasks() {
 ## Tips for Success
 
 1. **Start small**: Test with 2-3 parallel agents before scaling up
-2. **Monitor logs**: Use the monitoring script to watch progress
+2. **Monitor progress**: Use the monitoring script to watch branches
 3. **Handle failures**: Add retry logic for transient failures
 4. **Resource limits**: Don't overwhelm your machine - limit concurrent agents
-5. **Contract verification**: Run contract compliance checks after each task
+5. **Contract verification**: Run `/parallel-integrate` after tasks complete
+6. **Use prompts**: Reference `$PARALLEL_DIR/prompts/task-NNN.txt` for consistent agent instructions
