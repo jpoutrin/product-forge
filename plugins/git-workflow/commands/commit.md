@@ -19,6 +19,21 @@ commit [--all | --staged | --interactive]
 - `--staged`: Only analyze currently staged changes (default)
 - `--interactive`: Guide through staging changes atomically before committing
 
+## Execution Method
+
+This command delegates to the `commit-expert` agent (Haiku model) for fast, cost-effective execution.
+
+**Delegation**: Use the Task tool with:
+- `subagent_type`: `"git-workflow:commit-expert"`
+- `prompt`: Include the mode (`--staged`, `--all`, or `--interactive`) and current working directory
+
+Example:
+```
+Task(subagent_type="git-workflow:commit-expert", prompt="Run commit in --staged mode in /path/to/repo")
+```
+
+---
+
 ## Execution Instructions for Claude Code
 
 When this command is run, Claude Code should:
