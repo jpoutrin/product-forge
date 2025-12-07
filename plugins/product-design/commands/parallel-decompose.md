@@ -402,19 +402,68 @@ claude --dangerously-skip-permissions --print "Execute task from parallel/TS-004
 ```
 ```
 
-Create individual prompt files `$PARALLEL_DIR/prompts/task-{NNN}.txt`:
+Create individual prompt files `$PARALLEL_DIR/prompts/task-{NNN}.txt` with explicit execution instructions:
+
 ```
-Execute task from parallel/TS-0042-inventory-system/tasks/task-001-users.md.
+TASK-001: User Management
+Agent: django-expert
+Wave: 1 (No dependencies - can start immediately)
 
-Read context from parallel/TS-0042-inventory-system/context.md first.
-Read contracts from parallel/TS-0042-inventory-system/contracts/ before implementing.
+=== OBJECTIVE ===
+Implement user management module with CRUD operations and authentication hooks.
 
-Follow the Scope, Requirements, and Checklist in the task file.
-Do not modify files outside the defined Scope.
+=== CONTEXT ===
+You are implementing the users app for an inventory management system.
+Reference: tech-specs/approved/TS-0042-inventory-system.md (Section: Users Module)
+Contracts: parallel/TS-0042-inventory-system/contracts/
 
-IMPORTANT: Upon successful completion, run: touch .claude-task-complete
-This signals to the orchestrator that this task is done.
+=== FILES TO CREATE ===
+1. apps/users/models.py - User and Profile models
+2. apps/users/views.py - API views
+3. apps/users/tests/test_models.py - Model tests
+
+=== FILES TO MODIFY ===
+1. config/urls.py - Add users app URLs
+
+=== DO NOT MODIFY ===
+- apps/products/* (owned by task-002)
+- apps/orders/* (owned by task-003)
+
+=== IMPLEMENTATION REQUIREMENTS ===
+[Requirements from task spec...]
+
+=== ACCEPTANCE CRITERIA ===
+[ ] All models created with proper fields
+[ ] API endpoints functional
+[ ] Unit tests pass
+[ ] No modifications outside scope
+
+=== EXECUTION INSTRUCTIONS ===
+
+You MUST write code, not just describe it. Follow these steps:
+
+1. **Read first**: Read Tech Spec, Contracts, and existing code in scope
+2. **Implement**: Use Write tool for new files, Edit tool for modifications
+3. **Test**: Run tests to verify implementation
+4. **Commit**: Create atomic commits as you complete each part
+
+IMPORTANT RULES:
+- Do NOT ask for confirmation - proceed with implementation immediately
+- Do NOT just describe what you would do - actually write the code
+- Do NOT modify files listed in "DO NOT MODIFY" section
+- Do NOT skip writing tests
+
+COMPLETION SIGNAL:
+Upon successful completion (all criteria met, tests passing), run:
+  touch .claude-task-complete
 ```
+
+**Critical prompt elements** (must be in every prompt):
+- Explicit "You MUST write code" instruction
+- Tool names (Write, Edit) called out
+- "Do NOT ask for confirmation" directive
+- DO NOT MODIFY boundary enforcement
+- Completion marker instruction
 
 ### 9. Generate Scripts
 

@@ -186,14 +186,68 @@ flowchart TB
 
 Create `$PARALLEL_DIR/prompts/agent-prompts.md` with launch commands.
 
-Create individual `$PARALLEL_DIR/prompts/task-{NNN}.txt` files:
+Create individual `$PARALLEL_DIR/prompts/task-{NNN}.txt` files using this template:
+
 ```
-Execute task from parallel/TS-XXXX-slug/tasks/task-001.md.
-Read context from parallel/TS-XXXX-slug/context.md first.
-Read contracts from parallel/TS-XXXX-slug/contracts/ before implementing.
-Follow the Scope, Requirements, and Checklist in the task file.
-Do not modify files outside the defined Scope.
+TASK-{NNN}: {Title}
+Agent: {recommended-agent}
+Wave: {N} ({dependency-status})
+
+=== OBJECTIVE ===
+{Brief description of what this task accomplishes}
+
+=== CONTEXT ===
+{Domain context and background relevant to this task}
+
+Reference: {tech-spec-path} (Section: {relevant-section})
+Contracts: {contracts-path}
+
+=== FILES TO CREATE ===
+{Numbered list of files to create with descriptions}
+
+=== FILES TO MODIFY ===
+{Numbered list of files to modify with descriptions}
+
+=== DO NOT MODIFY ===
+{List of files/directories outside this task's scope}
+
+=== IMPLEMENTATION REQUIREMENTS ===
+{Detailed requirements extracted from task spec}
+
+=== TEST REQUIREMENTS ===
+{List of required tests}
+
+=== ACCEPTANCE CRITERIA ===
+{Checklist of completion criteria}
+
+=== EXECUTION INSTRUCTIONS ===
+
+You MUST write code, not just describe it. Follow these steps:
+
+1. **Read first**: Read all referenced files (Tech Spec, Contracts, existing code in scope)
+2. **Implement**: Use Write tool to create new files, Edit tool to modify existing files
+3. **Test**: Run tests to verify your implementation works
+4. **Commit**: Create atomic commits with descriptive messages as you complete each part
+
+IMPORTANT RULES:
+- Do NOT ask for confirmation - proceed with implementation immediately
+- Do NOT just describe what you would do - actually do it
+- Do NOT modify files listed in "DO NOT MODIFY" section
+- Do NOT skip writing tests
+
+COMPLETION SIGNAL:
+Upon successful completion (all criteria met, tests passing), run:
+  touch .claude-task-complete
+
+This marker signals to the orchestrator that this task is done.
 ```
+
+**Key elements that MUST be in every prompt**:
+- Explicit "You MUST write code" instruction
+- Tool names (Write, Edit) called out explicitly
+- "Do NOT ask for confirmation" directive
+- Completion marker instruction
+- Clear boundary enforcement (DO NOT MODIFY section)
 
 ## 9. Generate Scripts
 

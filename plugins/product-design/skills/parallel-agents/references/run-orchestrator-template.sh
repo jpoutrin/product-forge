@@ -29,6 +29,7 @@ TASKS_DIR="$PARALLEL_DIR/tasks"
 PROMPTS_DIR="$PARALLEL_DIR/prompts"
 LOG_DIR="$PARALLEL_DIR/logs"
 SCRIPTS_DIR="$PARALLEL_DIR/scripts"
+MASTER_LOG="$LOG_DIR/orchestrator.log"
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -39,10 +40,27 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # --- Logging functions ---
-log() { echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $1"; }
-warn() { echo -e "${YELLOW}[$(date +%H:%M:%S)] WARNING:${NC} $1"; }
-error() { echo -e "${RED}[$(date +%H:%M:%S)] ERROR:${NC} $1"; }
-progress() { echo "[PROGRESS] $1"; }  # Machine-readable for Claude monitoring
+# All logs go to both stdout and master log file
+log() {
+    local msg="[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+    echo -e "${GREEN}${msg}${NC}"
+    echo "$msg" >> "$MASTER_LOG" 2>/dev/null || true
+}
+warn() {
+    local msg="[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: $1"
+    echo -e "${YELLOW}${msg}${NC}"
+    echo "$msg" >> "$MASTER_LOG" 2>/dev/null || true
+}
+error() {
+    local msg="[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: $1"
+    echo -e "${RED}${msg}${NC}"
+    echo "$msg" >> "$MASTER_LOG" 2>/dev/null || true
+}
+progress() {
+    local msg="[PROGRESS] $1"
+    echo "$msg"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $msg" >> "$MASTER_LOG" 2>/dev/null || true
+}
 
 # --- Task tracking ---
 declare -A TASK_STATUS
@@ -67,6 +85,19 @@ declare -A TASK_START_TIME
 setup_directories() {
     log "Setting up directories..."
     mkdir -p "$WORKSPACE_ROOT" "$LOG_DIR"
+
+    # Initialize master log
+    {
+        echo "========================================"
+        echo "Parallel Execution Orchestrator"
+        echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "Parallel Dir: $PARALLEL_DIR"
+        echo "Workspace Root: $WORKSPACE_ROOT"
+        echo "Max Concurrent: $MAX_CONCURRENT"
+        echo "Timeout: ${TIMEOUT_HOURS}h per task"
+        echo "========================================"
+        echo ""
+    } > "$MASTER_LOG"
 }
 
 create_worktree() {
@@ -95,6 +126,7 @@ launch_agent() {
     local worktree_path="$WORKSPACE_ROOT/$task_name"
     local prompt_file="$PROMPTS_DIR/${task_name}.txt"
     local log_file="$LOG_DIR/${task_name}.log"
+    local json_log="$LOG_DIR/${task_name}.json"
 
     if [ ! -f "$prompt_file" ]; then
         error "Prompt file not found: $prompt_file"
@@ -105,20 +137,57 @@ launch_agent() {
     TASK_STATUS[$task_name]="running"
     TASK_START_TIME[$task_name]=$(date +%s)
 
+    # Log task start with metadata
+    {
+        echo "========================================"
+        echo "Task: $task_name"
+        echo "Started: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "Worktree: $worktree_path"
+        echo "Prompt: $prompt_file"
+        echo "========================================"
+        echo ""
+    } > "$log_file"
+
     (
         cd "$worktree_path"
         log "Launching agent for $task_name in $worktree_path..."
 
-        # Run claude with timeout
-        if timeout "${TIMEOUT_SECONDS}s" claude --dangerously-skip-permissions --print "$(cat "$prompt_file")" > "$log_file" 2>&1; then
+        # Run claude with timeout, JSON output for structured logging
+        if timeout "${TIMEOUT_SECONDS}s" claude \
+            --dangerously-skip-permissions \
+            --print \
+            --output-format json \
+            -p "$(cat "$prompt_file")" \
+            >> "$log_file" 2>&1; then
+
             # Create completion marker
             touch .claude-task-complete
 
             # Count commits
             local commits=$(git log --oneline HEAD ^main 2>/dev/null | wc -l | tr -d ' ')
+
+            # Log completion
+            {
+                echo ""
+                echo "========================================"
+                echo "Completed: $(date '+%Y-%m-%d %H:%M:%S')"
+                echo "Commits: $commits"
+                echo "========================================"
+            } >> "$log_file"
+
             progress "wave=$CURRENT_WAVE task=$task_name status=completed commits=$commits"
         else
             local exit_code=$?
+
+            # Log failure
+            {
+                echo ""
+                echo "========================================"
+                echo "FAILED: $(date '+%Y-%m-%d %H:%M:%S')"
+                echo "Exit code: $exit_code"
+                echo "========================================"
+            } >> "$log_file"
+
             if [ $exit_code -eq 124 ]; then
                 progress "wave=$CURRENT_WAVE task=$task_name status=failed error=timeout"
             else
@@ -128,6 +197,7 @@ launch_agent() {
     ) &
 
     TASK_PIDS[$task_name]=$!
+    log "Agent PID ${TASK_PIDS[$task_name]} launched for $task_name (log: $log_file)"
 }
 
 wait_for_tasks() {
@@ -239,7 +309,19 @@ show_summary() {
     done
 
     echo ""
-    echo "Logs available in: $LOG_DIR/"
+    echo "Logs:"
+    echo "  Master log: $MASTER_LOG"
+    echo "  Task logs:"
+    for log_file in "$LOG_DIR"/*.log; do
+        if [ -f "$log_file" ] && [ "$(basename "$log_file")" != "orchestrator.log" ]; then
+            local size=$(du -h "$log_file" 2>/dev/null | cut -f1)
+            echo "    - $(basename "$log_file") ($size)"
+        fi
+    done
+
+    echo ""
+    echo "To view task output:"
+    echo "  cat $LOG_DIR/<task-name>.log"
     echo ""
     echo "Next step: /parallel-integrate --parallel-dir $PARALLEL_DIR"
 }
