@@ -35,7 +35,77 @@ Decompose a PRD into independent, parallel-executable task specifications. This 
 - Run `/parallel-setup` once (creates `parallel/` root directory)
 - Tech Spec recommended (provides design decisions and contracts)
 
-## Execution Instructions for Claude Code
+## Execution Method
+
+This command **delegates to the `cto-architect` agent** (Opus model) for high-quality decomposition.
+
+### Why CTO-Architect?
+
+| Factor | Benefit |
+|--------|---------|
+| **Model** | Uses Opus (best reasoning for architectural decisions) |
+| **Expertise** | Built-in task breakdown workflow (Phase 3) |
+| **Quality** | Expert in architecture, contracts, boundaries |
+| **Skills** | Has RFC + Tech Spec creation capabilities |
+
+### Delegation Instructions
+
+When this command is invoked, Claude Code should:
+
+1. **Parse arguments** to extract PRD path, Tech Spec path, and technology stack
+2. **Determine output directory** (see Step 0 below)
+3. **Spawn the CTO-architect agent** using the Task tool:
+
+```
+Use the Task tool with:
+- subagent_type: devops-data:cto-architect
+- model: opus (inherited from agent definition)
+```
+
+**Delegation prompt for the agent:**
+
+```
+You are decomposing a PRD into parallel-executable tasks for multi-agent development.
+
+**Inputs:**
+- PRD: {prd_file_path}
+- Tech Spec: {tech_spec_path} (or "not provided")
+- Technology: {tech_stack}
+- Output Directory: {parallel_dir}
+
+**Your task:**
+1. Read the PRD and Tech Spec (if provided)
+2. Create the output directory structure: {parallel_dir}/{tasks,contracts,prompts,scripts}
+3. Follow the decomposition process detailed below (Steps 1-11)
+4. Generate all artifacts:
+   - manifest.json (regeneration metadata)
+   - context.md (shared project context)
+   - contracts/ (types.py, api-schema.yaml)
+   - tasks/ (compact YAML format task specs)
+   - prompts/ (agent-prompts.md + individual task-*.txt)
+   - scripts/ (launch-wave-N.sh, monitor.sh)
+   - architecture.md
+   - task-graph.md
+
+**Key requirements:**
+- Use compact YAML task format with frontmatter
+- Create shared context.md for token efficiency
+- Generate launch scripts for each dependency wave
+- Assign appropriate agent types to tasks (django-expert, fastapi-expert, react-typescript-expert, etc.)
+
+**Report back with:**
+- Output directory path
+- Number of tasks created
+- Number of waves
+- Max parallelization per wave
+- Critical path
+```
+
+---
+
+## Decomposition Process (Executed by CTO-Architect)
+
+The following steps are executed by the spawned cto-architect agent:
 
 ### 0. Determine Output Directory
 
