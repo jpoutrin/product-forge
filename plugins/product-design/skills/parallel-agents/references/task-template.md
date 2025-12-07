@@ -13,6 +13,7 @@ Use this template for each task in `.claude/tasks/`.
 - **Tech Spec**: TS-XXXX (if decomposed from Tech Spec)
 - **RFC**: RFC-XXXX (if linked via Tech Spec)
 - **Wave**: [wave number for parallel execution]
+- **Agent**: [recommended agent type for this task]
 
 ## Scope
 
@@ -76,6 +77,21 @@ task-001 (contracts) --+--> task-002 (auth)
 task-005 (db) -----------------------------> task-006 (integration)
 ```
 
+## Agent Type Selection
+
+Select the appropriate agent based on task scope:
+
+| Task Files | Agent | Description |
+|------------|-------|-------------|
+| `apps/*/models.py`, `apps/*/views.py` | `django-expert` | Django models, views, serializers |
+| `api/*.py`, `routers/*.py` | `fastapi-expert` | FastAPI endpoints |
+| `src/components/*.tsx` | `react-typescript-expert` | React components |
+| `**/test_*.py`, `**/tests/*.py` | `python-testing-expert` | Python tests |
+| `*.spec.ts`, `*.test.tsx` | `playwright-testing-expert` | TypeScript/E2E tests |
+| `terraform/`, `docker-compose.yml` | `devops-expert` | Infrastructure |
+| General Python | `fastapi-expert` | Default Python |
+| General TypeScript | `react-typescript-expert` | Default TypeScript |
+
 ## Parallelization Score
 
 Rate each task's parallelization potential:
@@ -96,6 +112,8 @@ Rate each task's parallelization potential:
 - **Priority**: P0
 - **Estimated effort**: 3 hours
 - **Dependencies**: task-001-contracts
+- **Wave**: 2
+- **Agent**: `fastapi-expert`
 
 ## Scope
 

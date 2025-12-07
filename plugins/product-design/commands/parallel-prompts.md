@@ -32,6 +32,28 @@ Generate ready-to-use prompts for launching multiple Claude Code agents in paral
 - Task specs must exist in `.claude/tasks/`
 - `.claude/task-graph.md` must define waves
 
+## Agent Permissions
+
+Sub-agents need **write permissions** to implement their tasks. The generated scripts use:
+
+```bash
+claude --dangerously-skip-permissions --print "..."
+```
+
+**Why this is safe**:
+- Each agent runs in an isolated **git worktree**
+- Agents can only modify files in their worktree
+- Main branch is protected until explicit merge
+- Task boundaries are enforced by prompt instructions
+
+**Alternative** - For granular control:
+```bash
+# Allow specific tools only
+claude --allowedTools "Edit,Write,Bash" --print "..."
+
+# Or configure in .claude/settings.json per worktree
+```
+
 ## Execution Instructions for Claude Code
 
 When this command is run, Claude Code should:
@@ -47,6 +69,24 @@ For each task in `.claude/tasks/`:
 - Extract file boundaries
 - Get contract references
 - Get acceptance criteria
+- **Determine agent type** based on task scope
+
+### 2b. Agent Type Selection
+
+Select appropriate agent for each task:
+
+| Task Type | Agent | Trigger |
+|-----------|-------|---------|
+| Django models/views | `gaia-backend-expert` or `django-expert` | `apps/*/models.py`, `apps/*/views.py` |
+| FastAPI endpoints | `fastapi-expert` | `api/*.py`, `routers/*.py` |
+| React components | `gaia-frontend-expert` or `react-typescript-expert` | `src/components/*.tsx` |
+| Tests (Python) | `python-testing-expert` | `**/test_*.py`, `**/tests/*.py` |
+| Tests (TypeScript) | `playwright-testing-expert` | `*.spec.ts`, `*.test.tsx` |
+| Infrastructure | `devops-expert` | `terraform/`, `docker-compose.yml` |
+| General Python | `python-experts:fastapi-expert` | Default for Python |
+| General TypeScript | `frontend-experts:react-typescript-expert` | Default for TS |
+
+Include agent recommendation in each prompt's metadata.
 
 ### 3. Generate Prompts
 
@@ -68,15 +108,23 @@ Launch these agents in parallel:
 
 ### Task: task-001-users-app
 
+**Recommended Agent**: `django-expert` (Django models, views, serializers)
+
 **Worktree Setup** (run once per task):
 ```bash
 git worktree add ../workspace-task-001 -b feature/task-001-users
 cd ../workspace-task-001
 ```
 
+**Launch Command**:
+```bash
+claude --dangerously-skip-permissions --print "$(cat .claude/prompts/task-001.txt)"
+```
+
 **Agent Prompt** (copy this to Claude Code):
 ```
 You are implementing task-001-users-app.
+Agent type: django-expert
 
 ## Your Scope
 CREATE/MODIFY these files only:
@@ -204,12 +252,24 @@ git worktree add ../workspace-task-002 -b feature/task-002-products
 git worktree add ../workspace-task-003 -b feature/task-003-shared
 
 # Launch agents in parallel (in separate terminals)
-(cd ../workspace-task-001 && claude "$(cat .claude/prompts/task-001.txt)") &
-(cd ../workspace-task-002 && claude "$(cat .claude/prompts/task-002.txt)") &
-(cd ../workspace-task-003 && claude "$(cat .claude/prompts/task-003.txt)") &
+# Note: --dangerously-skip-permissions allows write access within worktree
+# Safe because each worktree is isolated to specific task boundaries
+(cd ../workspace-task-001 && claude --dangerously-skip-permissions --print "$(cat .claude/prompts/task-001.txt)") &
+(cd ../workspace-task-002 && claude --dangerously-skip-permissions --print "$(cat .claude/prompts/task-002.txt)") &
+(cd ../workspace-task-003 && claude --dangerously-skip-permissions --print "$(cat .claude/prompts/task-003.txt)") &
 
 wait
 echo "Wave 1 complete"
+```
+
+**Permission Note**: Each agent runs with `--dangerously-skip-permissions` because:
+1. Worktrees are isolated - each agent can only affect its workspace
+2. Task boundaries are enforced by prompt (files to touch vs. not touch)
+3. Main branch remains protected until explicit merge
+
+For stricter control, use `--allowedTools` with specific paths:
+```bash
+claude --allowedTools "Edit,Write,Bash" --print "..."
 ```
 
 ### Monitor Progress

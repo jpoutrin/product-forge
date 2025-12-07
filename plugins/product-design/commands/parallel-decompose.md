@@ -171,6 +171,18 @@ Analyze PRD to identify natural boundaries:
 - Dependencies should be one-way (no circular)
 - Target 2-4 hours per task
 
+**Agent Assignment**:
+For each task, assign the appropriate agent based on file scope:
+
+| Task Files | Agent |
+|------------|-------|
+| `apps/*/models.py`, `apps/*/views.py` | `django-expert` |
+| `api/*.py`, `routers/*.py` | `fastapi-expert` |
+| `src/components/*.tsx` | `react-typescript-expert` |
+| `**/test_*.py` | `python-testing-expert` |
+| `*.spec.ts`, `*.test.tsx` | `playwright-testing-expert` |
+| `terraform/`, `docker-compose.yml` | `devops-expert` |
+
 ### 4. Create Wave Plan
 
 Organize tasks into waves based on dependencies:
@@ -230,6 +242,7 @@ Create task files in `.claude/tasks/`:
 | Blocks | task-004, task-005, task-006 |
 | Tech Spec | TS-XXXX (if provided) |
 | RFC | RFC-XXXX (if linked via Tech Spec) |
+| Agent | `django-expert` |
 
 ## Scope
 
