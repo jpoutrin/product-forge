@@ -51,6 +51,8 @@ for task_file in "$TASKS_DIR"/*.md; do
         echo "Starting agent for $task_name..."
         claude --dangerously-skip-permissions --print "$(cat $PARALLEL_DIR/prompts/$task_name.txt)" \
             > "$LOG_DIR/$task_name.log" 2>&1
+        # Create completion marker
+        touch .claude-task-complete
         echo "Completed $task_name"
     ) &
 done
@@ -58,6 +60,8 @@ done
 wait
 echo "All agents complete. Logs in $LOG_DIR/"
 ```
+
+> **Note**: The `.claude-task-complete` marker file signals task completion to orchestrators like `/parallel-run`.
 
 ### Cleanup Script
 
@@ -232,11 +236,26 @@ runParallelTasks('parallel/TS-0042-inventory-system');
 | Directory Isolation | Clear component boundaries | Medium | True parallel |
 | SDK Programmatic | Custom orchestration, CI/CD | High | True parallel |
 
+## Completion Detection
+
+All patterns should create a `.claude-task-complete` marker file upon task completion:
+
+```bash
+# At end of agent execution
+touch .claude-task-complete
+```
+
+This enables:
+- `/parallel-run` to detect task completion
+- Monitoring scripts to report status
+- Wave coordination (wait for all tasks before next wave)
+
 ## Tips for Success
 
 1. **Start small**: Test with 2-3 parallel agents before scaling up
-2. **Monitor progress**: Use the monitoring script to watch branches
-3. **Handle failures**: Add retry logic for transient failures
-4. **Resource limits**: Don't overwhelm your machine - limit concurrent agents
-5. **Contract verification**: Run `/parallel-integrate` after tasks complete
-6. **Use prompts**: Reference `$PARALLEL_DIR/prompts/task-NNN.txt` for consistent agent instructions
+2. **Use /parallel-run**: Preferred method for automated orchestration
+3. **Monitor progress**: Use the monitoring script to watch branches
+4. **Handle failures**: Use `--retry-failed` flag to retry failed tasks
+5. **Resource limits**: Don't overwhelm your machine - limit concurrent agents
+6. **Contract verification**: Run `/parallel-integrate` after tasks complete
+7. **Use prompts**: Reference `$PARALLEL_DIR/prompts/task-NNN.txt` for consistent agent instructions

@@ -36,7 +36,14 @@ Parallel agent development is a methodology for breaking down large development 
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │                        EXECUTION                                 │
-│  Run generated scripts → [Parallel Agents] → /parallel-integrate │
+│  /parallel-run parallel/TS-XXXX-slug/                            │
+│  Creates worktrees, launches agents, monitors progress           │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                       INTEGRATION                                │
+│  /parallel-integrate --parallel-dir parallel/TS-XXXX-slug/       │
+│  Verifies contracts, boundaries, tests                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -200,63 +207,72 @@ task-003-shared  ───► task-006-tests  ──►
 
 **Goal**: Run multiple Claude Code agents in parallel with isolated workspaces.
 
-### Step 3.1: Create Isolated Workspaces
+### Step 3.1: Execute with /parallel-run (Recommended)
 
-**Git Worktrees (Recommended)**:
+The `/parallel-run` command handles everything automatically:
+
 ```bash
-git worktree add ../workspace-task-001 -b feature/task-001-users
-git worktree add ../workspace-task-002 -b feature/task-002-products
-git worktree add ../workspace-task-003 -b feature/task-003-shared
+# Execute and monitor (default behavior)
+/parallel-run parallel/TS-0042-inventory-system/
 ```
 
-Each workspace gets:
-- Own filesystem
-- Own git branch
-- Shared contracts (read-only)
-- Same CLAUDE.md
+This command will:
+1. **Validate** the parallel directory and manifest.json
+2. **Create git worktrees** for each task (e.g., `../workspaces/task-001/`)
+3. **Launch agents** in parallel (respecting wave dependencies)
+4. **Monitor progress** and report completion
+5. **Detect task completion** via `.claude-task-complete` marker
 
-### Step 3.2: Launch Agents
+### Step 3.2: Options
 
-**Using generated scripts**:
+| Flag | Description |
+|------|-------------|
+| `--generate-only` | Generate scripts without executing |
+| `--dry-run` | Preview execution plan only |
+| `--wave N` | Run specific wave only |
+| `--max-concurrent N` | Limit parallel agents (default: 3) |
+| `--retry-failed` | Retry failed tasks from previous run |
+
 ```bash
-./parallel/TS-0042-inventory-system/scripts/launch-wave-1.sh
+# Preview what will happen
+/parallel-run parallel/TS-0042-inventory-system/ --dry-run
+
+# Run only wave 1
+/parallel-run parallel/TS-0042-inventory-system/ --wave 1
+
+# Limit to 2 concurrent agents
+/parallel-run parallel/TS-0042-inventory-system/ --max-concurrent 2
 ```
 
-**Or manually** in multiple terminals:
+### Step 3.3: Manual Execution (Alternative)
+
+If you prefer manual control over the process:
 
 ```bash
-# Terminal 1
-cd ../workspace-task-001
+# Generate scripts only
+/parallel-run parallel/TS-0042-inventory-system/ --generate-only
+
+# Run the generated orchestrator in a terminal
+./parallel/TS-0042-inventory-system/scripts/run-parallel.sh
+
+# Monitor in another terminal
+./parallel/TS-0042-inventory-system/scripts/monitor-live.sh
+```
+
+**Manual worktree setup** (if not using /parallel-run):
+```bash
+git worktree add ../workspaces/task-001 -b feature/task-001-users
+cd ../workspaces/task-001
 claude --dangerously-skip-permissions --print "$(cat parallel/TS-0042-inventory-system/prompts/task-001.txt)"
-
-# Terminal 2
-cd ../workspace-task-002
-claude --dangerously-skip-permissions --print "$(cat parallel/TS-0042-inventory-system/prompts/task-002.txt)"
-
-# Terminal 3
-cd ../workspace-task-003
-claude --dangerously-skip-permissions --print "$(cat parallel/TS-0042-inventory-system/prompts/task-003.txt)"
 ```
 
-### Step 3.3: Monitor Progress
+### Step 3.4: Task Completion Detection
 
-```bash
-./parallel/TS-0042-inventory-system/scripts/monitor.sh
+Agents signal completion by creating a `.claude-task-complete` marker file. The orchestrator checks for this marker to determine when tasks finish.
+
+The generated prompts include:
 ```
-
-### Step 3.4: Merge Results
-
-After all Wave N agents complete:
-
-```bash
-# Merge branches
-git checkout main
-git merge feature/task-001-users
-git merge feature/task-002-products
-git merge feature/task-003-shared
-
-# Then launch Wave N+1
-./parallel/TS-0042-inventory-system/scripts/launch-wave-2.sh
+Upon successful completion, run: touch .claude-task-complete
 ```
 
 ---
@@ -287,6 +303,7 @@ git merge feature/task-003-shared
 |---------|-------|---------|
 | `/parallel-setup` | 1 | One-time: create parallel/ directory |
 | `/parallel-decompose <prd> --tech-spec <ts>` | 2 | Per-spec: create TS-XXXX-slug/ with all artifacts |
+| `/parallel-run <parallel-dir>` | 3 | Execute and monitor parallel agents |
 | `/parallel-integrate [--parallel-dir]` | 4 | Verify integration after execution |
 | `/create-tech-spec` | (Pre) | Create Tech Spec before decomposition |
 
@@ -315,9 +332,10 @@ project/
 │       │   ├── agent-prompts.md        # All launch commands
 │       │   └── task-*.txt              # Individual prompts
 │       ├── scripts/
+│       │   ├── run-parallel.sh          # Main orchestrator (from /parallel-run)
 │       │   ├── launch-wave-1.sh
 │       │   ├── launch-wave-2.sh
-│       │   └── monitor.sh
+│       │   └── monitor-live.sh
 │       ├── architecture.md             # System design
 │       ├── task-graph.md               # Dependency visualization (Mermaid flowchart)
 │       └── integration-report.md       # Post-execution report

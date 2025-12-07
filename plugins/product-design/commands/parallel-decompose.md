@@ -411,6 +411,9 @@ Read contracts from parallel/TS-0042-inventory-system/contracts/ before implemen
 
 Follow the Scope, Requirements, and Checklist in the task file.
 Do not modify files outside the defined Scope.
+
+IMPORTANT: Upon successful completion, run: touch .claude-task-complete
+This signals to the orchestrator that this task is done.
 ```
 
 ### 9. Generate Scripts
@@ -532,5 +535,6 @@ Next steps:
 ## Related Commands
 
 - `/parallel-setup` - One-time project initialization
+- `/parallel-run` - Execute and monitor parallel agents
 - `/parallel-integrate` - Verify integration after execution
 - `/create-tech-spec` - Create Tech Spec before decomposition

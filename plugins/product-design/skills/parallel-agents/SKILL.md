@@ -16,7 +16,7 @@ Orchestrate massively parallel development by decomposing work into independent 
          ↓
 /parallel-decompose   → Per Tech Spec: creates TS-XXXX-slug/ with all artifacts
          ↓
-[Run Claude agents in parallel using generated scripts]
+/parallel-run         → Execute agents with git worktrees (auto-monitors)
          ↓
 /parallel-integrate   → Verify & generate integration report
 ```
@@ -46,9 +46,10 @@ project/
 │       │   ├── agent-prompts.md        # All launch commands
 │       │   └── task-*.txt              # Individual agent prompts
 │       ├── scripts/
+│       │   ├── run-parallel.sh         # Main orchestrator (from /parallel-run)
 │       │   ├── launch-wave-1.sh
 │       │   ├── launch-wave-2.sh
-│       │   └── monitor.sh
+│       │   └── monitor-live.sh
 │       └── integration-report.md       # Post-execution report
 ├── tech-specs/                         # Source Tech Specs
 │   └── approved/TS-XXXX-slug.md
@@ -156,50 +157,59 @@ See `references/task-template.md` for full specification.
 
 ## Phase 3: Parallel Execution
 
-Launch multiple Claude Code instances with isolated scope.
+Execute parallel agents using the `/parallel-run` command:
+
+```bash
+# Execute and monitor (default - runs in Claude session)
+/parallel-run parallel/TS-0042-inventory-system/
+
+# Preview execution plan only
+/parallel-run parallel/TS-0042-inventory-system/ --dry-run
+
+# Generate scripts without executing
+/parallel-run parallel/TS-0042-inventory-system/ --generate-only
+```
+
+### What `/parallel-run` Does
+
+1. Validates manifest.json and prompts
+2. Creates git worktrees for each task
+3. Launches agents in parallel (respects wave dependencies)
+4. Monitors progress and reports completion
+5. Detects task completion via `.claude-task-complete` marker
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--generate-only` | Generate scripts, don't execute |
+| `--dry-run` | Preview plan without changes |
+| `--wave N` | Run specific wave only |
+| `--max-concurrent N` | Limit parallel agents (default: 3) |
+| `--retry-failed` | Retry failed tasks from previous run |
 
 ### Agent Permissions
 
-Sub-agents need write permissions:
+Sub-agents run with `--dangerously-skip-permissions` because they're isolated in worktrees.
 
-| Strategy | When to Use |
-|----------|-------------|
-| `--dangerously-skip-permissions` | Isolated worktrees (safe) |
-| `--allowedTools "Edit(/src/auth/**)"` | Shared workspace, path-scoped |
+See `references/claude-code-tools.md` for permission syntax.
 
-See `references/claude-code-tools.md` for full tool list and permission syntax.
+### Manual Execution (Alternative)
 
-### Isolation Strategies
-
-**Git worktrees** (recommended):
-```bash
-git worktree add ../workspace-task-001 -b feature/task-001-users
-```
-
-**Directory boundaries**: Assign each agent to specific directories.
-
-**Branch-per-task**: Each agent on dedicated branch.
-
-See `references/execution-patterns.md` for automation scripts.
-
-### Launching Agents
-
-Use generated scripts:
+If you prefer manual control:
 
 ```bash
-# Run the launch script
-./parallel/TS-0042-inventory-system/scripts/launch-wave-1.sh
+# Generate scripts only
+/parallel-run parallel/TS-0042-inventory-system/ --generate-only
 
-# Or manually in separate terminals
-cd ../workspace-task-001
-claude --dangerously-skip-permissions --print "$(cat parallel/TS-0042-inventory-system/prompts/task-001.txt)"
+# Run externally
+./parallel/TS-0042-inventory-system/scripts/run-parallel.sh
+
+# Monitor in another terminal
+./parallel/TS-0042-inventory-system/scripts/monitor-live.sh
 ```
 
-### Monitor Progress
-
-```bash
-./parallel/TS-0042-inventory-system/scripts/monitor.sh
-```
+See `references/execution-patterns.md` for more patterns.
 
 ## Phase 4: Integration
 
@@ -247,15 +257,14 @@ Output: `parallel/TS-0042-inventory-system/integration-report.md`
 /parallel-decompose docs/prd.md --tech-spec tech-specs/approved/TS-0042-inventory.md
 ```
 
-### Launch Agents
+### Execute Agents
 ```bash
-# Using generated scripts
-./parallel/TS-0042-inventory-system/scripts/launch-wave-1.sh
+# Execute and monitor (default)
+/parallel-run parallel/TS-0042-inventory-system/
 
-# Or with git worktrees
-git worktree add ../workspace-task-001 -b feature/task-001
-cd ../workspace-task-001
-claude --dangerously-skip-permissions --print "$(cat parallel/TS-0042-inventory-system/prompts/task-001.txt)"
+# Or generate scripts for manual execution
+/parallel-run parallel/TS-0042-inventory-system/ --generate-only
+./parallel/TS-0042-inventory-system/scripts/run-parallel.sh
 ```
 
 ### Integration Check
@@ -274,5 +283,6 @@ cat parallel/TS-0042-inventory-system/integration-report.md
 |---------|---------|
 | `/parallel-setup` | One-time project initialization |
 | `/parallel-decompose` | Per-spec decomposition with prompts |
+| `/parallel-run` | Execute and monitor parallel agents |
 | `/parallel-integrate` | Post-execution verification |
 | `/create-tech-spec` | Create Tech Spec before decomposition |
