@@ -192,11 +192,14 @@ BOUNDARY: apps/orders/*, apps/products/*
 Set `validation_passed: true` ONLY if all acceptance criteria are met and tests pass.
 ```
 
+**CRITICAL**: The "## Output Format (REQUIRED)" section MUST be in every task file. The prompt generator extracts this section to include in the final agent prompts. Without it, agents will not know to provide JSON output.
+
 Requirements:
 - Each task should be completable in 2-4 hours
 - Tasks should touch separate files/directories
 - Use compact YAML frontmatter
 - Include agent recommendation
+- **MUST include "## Output Format (REQUIRED)" section in every task file**
 
 ## 7. Create task-graph.md
 
