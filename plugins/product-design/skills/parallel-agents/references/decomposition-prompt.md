@@ -127,6 +127,27 @@ BOUNDARY: apps/orders/*, apps/products/*
 
 ## Checklist
 - [ ] [Verification items]
+
+## Output Format (REQUIRED)
+
+⚠️ **CRITICAL**: You MUST end your response with a JSON summary block.
+
+```json
+{
+  "task_completed": boolean,
+  "validation_passed": boolean,
+  "files_created": [string],
+  "files_modified": [string],
+  "tests_run": integer,
+  "tests_passed": integer,
+  "tests_failed": integer,
+  "summary": string,
+  "full_log": string,
+  "error_message": string | null
+}
+```
+
+Set `validation_passed: true` ONLY if all acceptance criteria are met and tests pass.
 ```
 
 Requirements:
