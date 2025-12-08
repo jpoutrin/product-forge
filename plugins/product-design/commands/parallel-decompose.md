@@ -254,6 +254,41 @@ Create `$PARALLEL_DIR/architecture.md`:
 ## Overview
 [From Tech Spec Design Overview or PRD summary]
 
+## Component Diagram
+
+```mermaid
+graph TB
+    Client["Client/Frontend"]
+    Gateway["API Gateway"]
+
+    subgraph Users["Users Service<br/>(task-001)"]
+        UserAPI["User API<br/>/api/users/"]
+        UserDB["User DB<br/>schemas"]
+    end
+
+    subgraph Products["Products Service<br/>(task-002)"]
+        ProductAPI["Product API<br/>/api/products/"]
+        ProductDB["Product DB<br/>schemas"]
+    end
+
+    subgraph Orders["Orders Service<br/>(task-004)"]
+        OrderAPI["Order API<br/>/api/orders/"]
+        OrderDB["Order DB<br/>schemas"]
+    end
+
+    Client --> Gateway
+    Gateway --> UserAPI
+    Gateway --> ProductAPI
+    Gateway --> OrderAPI
+
+    UserAPI --> UserDB
+    ProductAPI --> ProductDB
+    OrderAPI --> OrderDB
+
+    OrderAPI -.->|depends on| UserAPI
+    OrderAPI -.->|depends on| ProductAPI
+```
+
 ## Components
 
 | Component | Directory | Owner Task | Dependencies |
@@ -269,9 +304,11 @@ Each task owns specific directories. No cross-boundary modifications during para
 ## Integration Points
 
 Integration happens after all parallel work completes:
+
 1. Migration merge
 2. Integration tests
 3. Contract compliance verification
+
 ```
 
 ### 6. Generate Task Files (Compact YAML Format)

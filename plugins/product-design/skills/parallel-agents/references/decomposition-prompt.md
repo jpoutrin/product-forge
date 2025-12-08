@@ -81,10 +81,52 @@ This file is read once by all agents - keeps token usage low.
 ## 4. Create Architecture Documentation
 
 Create `$PARALLEL_DIR/architecture.md` with:
-- System overview and component diagram (ASCII or Mermaid)
+- System overview
+- **Component diagram** (Mermaid graph showing services, APIs, and dependencies)
 - Data flow between components
 - Technology choices and rationale
-- Component boundaries and ownership
+- Component boundaries and ownership (which task owns each component)
+
+**Component Diagram Example**:
+```mermaid
+graph TB
+    Client["Client/Frontend"]
+    Gateway["API Gateway"]
+
+    subgraph Users["Users Service<br/>(task-001)"]
+        UserAPI["User API<br/>/api/users/"]
+        UserDB["User DB<br/>schemas"]
+    end
+
+    subgraph Products["Products Service<br/>(task-002)"]
+        ProductAPI["Product API<br/>/api/products/"]
+        ProductDB["Product DB<br/>schemas"]
+    end
+
+    subgraph Orders["Orders Service<br/>(task-004)"]
+        OrderAPI["Order API<br/>/api/orders/"]
+        OrderDB["Order DB<br/>schemas"]
+    end
+
+    Client --> Gateway
+    Gateway --> UserAPI
+    Gateway --> ProductAPI
+    Gateway --> OrderAPI
+
+    UserAPI --> UserDB
+    ProductAPI --> ProductDB
+    OrderAPI --> OrderDB
+
+    OrderAPI -.->|depends on| UserAPI
+    OrderAPI -.->|depends on| ProductAPI
+```
+
+**Mermaid conventions**:
+- Use `subgraph` to group components by service/task
+- Include task number in service label for ownership clarity
+- Use solid arrows (`-->`) for direct communication/dependencies
+- Use dotted arrows (`-.->`) for weak/indirect dependencies
+- Include API endpoints and database schemas for clarity
 
 ## 5. Create Contracts
 
