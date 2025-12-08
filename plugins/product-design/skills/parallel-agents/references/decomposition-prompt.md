@@ -250,11 +250,33 @@ You MUST write code, not just describe it. Follow these steps:
 3. **Test**: Run tests to verify your implementation works
 4. **Commit**: Create atomic commits with descriptive messages as you complete each part
 
-IMPORTANT RULES:
+=== IMPORTANT RULES ===
+
 - Do NOT ask for confirmation - proceed with implementation immediately
 - Do NOT just describe what you would do - actually do it
 - Do NOT modify files listed in "DO NOT MODIFY" section
 - Do NOT skip writing tests
+
+=== OUTPUT FORMAT (REQUIRED) ===
+
+⚠️ **CRITICAL**: You MUST end your response with a JSON summary block.
+
+```json
+{
+  "task_completed": boolean,
+  "validation_passed": boolean,
+  "files_created": [string],
+  "files_modified": [string],
+  "tests_run": integer,
+  "tests_passed": integer,
+  "tests_failed": integer,
+  "summary": string,
+  "full_log": string,
+  "error_message": string | null
+}
+```
+
+Set `validation_passed: true` ONLY if all acceptance criteria are met and tests pass.
 
 COMPLETION SIGNAL:
 Upon successful completion (all criteria met, tests passing), run:
@@ -267,28 +289,9 @@ This marker signals to the orchestrator that this task is done.
 - Explicit "You MUST write code" instruction
 - Tool names (Write, Edit) called out explicitly
 - "Do NOT ask for confirmation" directive
+- **OUTPUT FORMAT (REQUIRED) section** with JSON schema
 - Completion marker instruction
 - Clear boundary enforcement (DO NOT MODIFY section)
-
-## 9. Generate Scripts
-
-Create `$PARALLEL_DIR/scripts/`:
-- `launch-wave-1.sh` - Setup worktrees and launch Wave 1
-- `launch-wave-2.sh` - Launch Wave 2 after Wave 1 completes
-- `monitor.sh` - Check task branch status
-
-## 10. Update manifest.json
-
-Update task counts:
-```json
-{
-  "tasks": {
-    "total": 6,
-    "waves": 3,
-    "files": ["tasks/task-001-users.md", ...]
-  }
-}
-```
 
 ---
 
@@ -321,13 +324,10 @@ parallel/TS-0042-inventory-system/
 │   ├── task-002-products.md
 │   ├── task-003-orders.md
 │   └── task-004-api.md
-├── prompts/
-│   ├── agent-prompts.md
-│   ├── task-001.txt
-│   └── task-002.txt
-└── scripts/
-    ├── launch-wave-1.sh
-    └── monitor.sh
+└── prompts/
+    ├── agent-prompts.md
+    ├── task-001.txt
+    └── task-002.txt
 ```
 
 ## Summary Format
@@ -343,5 +343,5 @@ Tasks: 6
 Waves: 3
 Max parallel: 3
 
-Next: Review tasks, then run scripts/launch-wave-1.sh
+Next: Review tasks, then run cpo run [THE TASKS FOLDER] to execute the work.
 ```
