@@ -160,6 +160,7 @@ Requirements:
 
 Create `$PARALLEL_DIR/task-graph.md` with:
 - **Mermaid flowchart** for dependency visualization
+- **Mermaid Gantt chart** for execution timeline
 - Wave summary table
 - Critical path
 - Parallelization stats
@@ -194,14 +195,44 @@ flowchart TB
 ```
 
 ## Wave Summary
-...
+
+| Wave | Tasks | Parallel Agents |
+|------|-------|-----------------|
+| 1 | task-001, task-002, task-003 | 3 |
+| 2 | task-004, task-005 | 2 |
+| 3 | task-006 | 1 |
+
+## Wave Execution Order
+
+```mermaid
+gantt
+    title Parallel Task Execution Timeline
+    dateFormat YYYY-MM-DD
+
+    section Wave 1
+    task-001-users :t001, 2025-12-08, 4h
+    task-002-products :t002, 2025-12-08, 4h
+    task-003-shared :t003, 2025-12-08, 3h
+
+    section Wave 2
+    task-004-orders :crit, t004, after t001, 3h
+    task-005-api :crit, t005, after t002, 4h
+
+    section Wave 3
+    task-006-integration :crit, t006, after t004, 2h
+```
 ```
 
 **Mermaid conventions**:
-- Use `flowchart TB` (top-bottom) for wave hierarchy
-- Group tasks by wave using `subgraph W{N}[Wave N - parallel/sequential]`
-- Node labels: `t{NNN}[task-{NNN}-{component}<br/>{agent}]`
-- Edges: `t001 --> t004` (direct dependency)
+- **Flowchart**: Use `flowchart TB` (top-bottom) for dependencies
+  - Group tasks by wave using `subgraph W{N}[Wave N - parallel/sequential]`
+  - Node labels: `t{NNN}[task-{NNN}-{component}<br/>{agent}]`
+  - Edges: `t001 --> t004` (direct dependency)
+- **Gantt chart**: Use task IDs (t001, t002, etc.) as identifiers
+  - Parallel Wave 1 tasks start at same date
+  - Wave 2+ tasks use `after {taskId}` to show dependencies
+  - Critical path tasks (with `crit` keyword) are highlighted
+  - Duration estimates are approximate (2-4 hours per task)
 
 ## 8. Generate Prompts
 

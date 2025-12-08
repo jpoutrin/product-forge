@@ -354,6 +354,26 @@ flowchart TB
 | 2 | task-004, task-005 | 2 |
 | 3 | task-006 | 1 |
 
+## Wave Execution Order
+
+```mermaid
+gantt
+    title Parallel Task Execution Timeline
+    dateFormat YYYY-MM-DD
+
+    section Wave 1
+    task-001-users :t001, 2025-12-08, 4h
+    task-002-products :t002, 2025-12-08, 4h
+    task-003-shared :t003, 2025-12-08, 3h
+
+    section Wave 2
+    task-004-orders :crit, t004, after t001, 3h
+    task-005-api :crit, t005, after t002, 4h
+
+    section Wave 3
+    task-006-integration :crit, t006, after t004, 2h
+```
+
 ## Critical Path
 
 `task-001 → task-004 → task-006` (3 waves)
