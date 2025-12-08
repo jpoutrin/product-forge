@@ -75,22 +75,20 @@ You are decomposing a PRD into parallel-executable tasks for multi-agent develop
 
 **Your task:**
 1. Read the PRD and Tech Spec (if provided)
-2. Create the output directory structure: {parallel_dir}/{tasks,contracts,prompts,scripts}
-3. Follow the decomposition process detailed below (Steps 1-11)
+2. Create the output directory structure: {parallel_dir}/{tasks,contracts,prompts}
+3. Follow the decomposition process detailed below (Steps 1-10)
 4. Generate all artifacts:
    - manifest.json (regeneration metadata)
    - context.md (shared project context)
    - contracts/ (types.py, api-schema.yaml)
    - tasks/ (compact YAML format task specs)
    - prompts/ (agent-prompts.md + individual task-*.txt)
-   - scripts/ (launch-wave-N.sh, monitor.sh)
    - architecture.md
    - task-graph.md
 
 **Key requirements:**
 - Use compact YAML task format with frontmatter
 - Create shared context.md for token efficiency
-- Generate launch scripts for each dependency wave
 - Assign appropriate agent types to tasks (django-expert, fastapi-expert, react-typescript-expert, etc.)
 
 **Report back with:**
@@ -465,44 +463,7 @@ Upon successful completion (all criteria met, tests passing), run:
 - DO NOT MODIFY boundary enforcement
 - Completion marker instruction
 
-### 9. Generate Scripts
-
-**Create `$PARALLEL_DIR/scripts/launch-wave-1.sh`**:
-```bash
-#!/bin/bash
-# Launch Wave 1 agents in parallel
-PARALLEL_DIR="parallel/TS-0042-inventory-system"
-
-echo "=== Launching Wave 1 ==="
-
-# Setup worktrees
-git worktree add ../workspace-task-001 -b feature/task-001-users 2>/dev/null || true
-git worktree add ../workspace-task-002 -b feature/task-002-products 2>/dev/null || true
-
-# Launch agents (run these in separate terminals)
-echo "Terminal 1: cd ../workspace-task-001 && claude --dangerously-skip-permissions --print \"\$(cat $PARALLEL_DIR/prompts/task-001.txt)\""
-echo "Terminal 2: cd ../workspace-task-002 && claude --dangerously-skip-permissions --print \"\$(cat $PARALLEL_DIR/prompts/task-002.txt)\""
-```
-
-**Create `$PARALLEL_DIR/scripts/monitor.sh`**:
-```bash
-#!/bin/bash
-# Monitor parallel agent progress
-PARALLEL_DIR="parallel/TS-0042-inventory-system"
-
-echo "=== Checking Task Status ==="
-for task in $PARALLEL_DIR/tasks/task-*.md; do
-  name=$(basename "$task" .md)
-  # Check if corresponding branch has commits
-  if git rev-parse --verify "feature/$name" >/dev/null 2>&1; then
-    echo "✅ $name - branch exists"
-  else
-    echo "⏳ $name - not started"
-  fi
-done
-```
-
-### 10. Update manifest.json
+### 9. Update manifest.json
 
 Update task counts in manifest:
 ```json
@@ -519,7 +480,7 @@ Update task counts in manifest:
 }
 ```
 
-### 11. Report Results
+### 10. Report Results
 
 ```
 Decomposition Complete
@@ -540,10 +501,6 @@ Tech Spec: TS-0042-inventory-system
 ├── prompts/
 │   ├── agent-prompts.md    # All launch commands
 │   └── task-*.txt          # Individual prompts
-├── scripts/
-│   ├── launch-wave-1.sh
-│   ├── launch-wave-2.sh
-│   └── monitor.sh
 ├── architecture.md
 └── task-graph.md
 
@@ -554,9 +511,8 @@ Summary:
 
 Next steps:
 1. Review tasks in parallel/TS-0042-inventory-system/tasks/
-2. Run ./parallel/TS-0042-inventory-system/scripts/launch-wave-1.sh
-3. After Wave 1 completes, run launch-wave-2.sh
-4. Run /parallel-integrate to verify
+2. Run `cpo run parallel/TS-0042-inventory-system/tasks` to execute all tasks
+3. Run `/parallel-integrate` to verify
 ```
 
 ## Example
