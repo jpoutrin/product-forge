@@ -131,36 +131,65 @@ mkdir -p "$PARALLEL_DIR"/{tasks,contracts,prompts,scripts}
 Create `$PARALLEL_DIR/manifest.json`:
 ```json
 {
-  "version": "1.0.0",
-  "created_at": "2025-12-07T14:30:00Z",
-  "updated_at": "2025-12-07T14:30:00Z",
-  "tech_spec": {
-    "id": "TS-0042",
-    "title": "inventory-system",
-    "path": "tech-specs/approved/TS-0042-inventory-system.md",
-    "status": "APPROVED"
-  },
-  "sources": {
-    "prd": "docs/prds/inventory-prd.md",
-    "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md"
-  },
-  "command": {
-    "name": "parallel-decompose",
-    "args": {
-      "prd": "docs/prds/inventory-prd.md",
-      "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md",
-      "tech": "django"
-    },
-    "invoked_at": "2025-12-07T14:30:00Z"
-  },
+  "tech_spec_id": "TS-0042",
+  "name": "inventory-system",
   "technology": "django",
-  "tasks": {
-    "total": 0,
-    "waves": 0,
-    "files": []
-  },
-  "integration": {
-    "status": "pending"
+  "waves": [
+    {
+      "number": 1,
+      "tasks": [
+        {
+          "id": "task-001",
+          "component": "users",
+          "agent": "python-experts:django-expert"
+        },
+        {
+          "id": "task-002",
+          "component": "products",
+          "agent": "python-experts:django-expert"
+        },
+        {
+          "id": "task-003",
+          "component": "shared",
+          "agent": "python-experts:fastapi-expert"
+        }
+      ],
+      "validation": "pytest apps/users/ && pytest apps/products/ && mypy apps/users/ apps/products/"
+    },
+    {
+      "number": 2,
+      "tasks": [
+        {
+          "id": "task-004",
+          "component": "orders",
+          "agent": "python-experts:django-expert"
+        },
+        {
+          "id": "task-005",
+          "component": "api",
+          "agent": "python-experts:fastapi-expert"
+        }
+      ],
+      "validation": "pytest apps/orders/ && mypy apps/orders/"
+    },
+    {
+      "number": 3,
+      "tasks": [
+        {
+          "id": "task-006",
+          "component": "integration",
+          "agent": "devops-data:cto-architect"
+        }
+      ],
+      "validation": "pytest integration/ && ruff check . && mypy ."
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-07T14:30:00Z",
+    "sources": {
+      "prd": "docs/prds/inventory-prd.md",
+      "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md"
+    }
   }
 }
 ```
@@ -522,17 +551,35 @@ Upon successful completion (all criteria met, tests passing), run:
 
 ### 9. Update manifest.json
 
-Update task counts in manifest:
+Update manifest with final task list and validation commands (already created in step 2, update wave structure with actual tasks):
 ```json
 {
-  "tasks": {
-    "total": 6,
-    "waves": 3,
-    "files": [
-      "tasks/task-001-users.md",
-      "tasks/task-002-products.md",
-      ...
-    ]
+  "tech_spec_id": "TS-0042",
+  "name": "inventory-system",
+  "technology": "django",
+  "waves": [
+    {
+      "number": 1,
+      "tasks": [
+        {"id": "task-001", "component": "users", "agent": "python-experts:django-expert"},
+        {"id": "task-002", "component": "products", "agent": "python-experts:django-expert"}
+      ],
+      "validation": "pytest apps/users/ && pytest apps/products/ && mypy apps/users/ apps/products/"
+    },
+    {
+      "number": 2,
+      "tasks": [
+        {"id": "task-003", "component": "orders", "agent": "python-experts:django-expert"}
+      ],
+      "validation": "pytest apps/orders/ && mypy apps/orders/"
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-12-07T14:30:00Z",
+    "sources": {
+      "prd": "docs/prds/inventory-prd.md",
+      "tech_spec": "tech-specs/approved/TS-0042-inventory-system.md"
+    }
   }
 }
 ```
