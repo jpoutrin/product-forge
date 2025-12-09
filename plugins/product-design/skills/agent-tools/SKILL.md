@@ -1,8 +1,13 @@
+---
+name: agent-tools
+short: Claude Code tool permissions reference
+description: Reference for configuring tool permissions when launching Claude Code agents. Use when setting up --allowedTools flags, restricting file access, or configuring agent permissions.
+when: User wants to configure agent permissions, restrict tool access, set up --allowedTools flags, or understand Claude Code CLI tool restrictions
+---
+
 # Claude Code Tools Reference
 
-Reference for configuring tool permissions when launching parallel Claude Code agents.
-
----
+Configure tool permissions when launching parallel Claude Code agents.
 
 ## Available Tools
 
@@ -21,23 +26,19 @@ Reference for configuring tool permissions when launching parallel Claude Code a
 | `NotebookEdit` | Edit Jupyter notebooks | Data science |
 | `mcp__<server>` | MCP server tools | External integrations |
 
----
-
 ## CLI Syntax
 
-**Basic format** - each tool is a separate quoted argument:
+Each tool is a separate quoted argument:
 
 ```bash
 claude --allowedTools "Tool1" "Tool2" "Tool3(...)" --print "prompt"
 ```
 
-**Example with multiple tools:**
+Example with multiple tools:
 
 ```bash
 claude --allowedTools "Read" "Edit" "Bash(pytest:*)" --print "implement feature"
 ```
-
----
 
 ## Path-Specific Restrictions
 
@@ -68,8 +69,6 @@ claude --allowedTools "Read" "Edit(/apps/users/**)" "Edit(/tests/**)" --print ".
 claude --allowedTools "Edit(//tmp/scratch.txt)" --print "..."
 ```
 
----
-
 ## Bash Command Restrictions
 
 Restrict which shell commands can be executed using prefix matching.
@@ -80,7 +79,7 @@ Restrict which shell commands can be executed using prefix matching.
 Bash(command:*)
 ```
 
-The `:*` wildcard only works at the **END** of patterns (prefix matching, not regex).
+The `:*` wildcard only works at the **END** of patterns (prefix matching).
 
 ### Pattern Examples
 
@@ -101,11 +100,9 @@ claude --allowedTools "Bash(pytest:*)" "Bash(mypy:*)" "Bash(ruff:*)" "Read" --pr
 
 ### Security Note
 
-Claude Code prevents bypass via shell operators (`&&`, `;`, `||`). However, be aware that:
-- Different command invocations may bypass patterns (e.g., `python -m pytest` vs `pytest`)
+Claude Code prevents bypass via shell operators (`&&`, `;`, `||`). Be aware:
+- Different invocations may bypass patterns (`python -m pytest` vs `pytest`)
 - For URL restrictions, prefer `WebFetch(domain:...)` over `Bash(curl:*)`
-
----
 
 ## WebFetch Domain Restrictions
 
@@ -114,8 +111,6 @@ Restrict web fetches to specific domains:
 ```bash
 claude --allowedTools "WebFetch(domain:github.com)" "WebFetch(domain:docs.python.org)" --print "..."
 ```
-
----
 
 ## MCP Tool Restrictions
 
@@ -133,8 +128,6 @@ claude --allowedTools "mcp__puppeteer__puppeteer_navigate" --print "..."
 
 **Note:** MCP permissions do NOT support wildcards (`*`).
 
----
-
 ## Recommended Configurations
 
 ### By Task Type
@@ -149,14 +142,14 @@ claude --allowedTools "mcp__puppeteer__puppeteer_navigate" --print "..."
 
 ### For Parallel Development
 
-When using git worktrees for isolation, `--dangerously-skip-permissions` is safe because:
+When using git worktrees for isolation, `--dangerously-skip-permissions` is safe:
 - Each agent runs in an isolated worktree
 - Agents can only affect files in their workspace
 - Main branch remains protected until explicit merge
 
 ```bash
 # Safe in isolated worktree
-claude --dangerously-skip-permissions --print "$(cat .claude/prompts/task-001.txt)"
+claude --dangerously-skip-permissions --print "$(cat prompts/task-001.txt)"
 ```
 
 ### For Granular Control
@@ -173,10 +166,8 @@ claude \
     "Bash(mypy apps/users/:*)" \
     "Glob" \
     "Grep" \
-  --print "$(cat .claude/prompts/task-001.txt)"
+  --print "$(cat prompts/task-001.txt)"
 ```
-
----
 
 ## Complete Examples
 
@@ -223,8 +214,6 @@ claude \
   --print "Analyze codebase and suggest improvements"
 ```
 
----
-
 ## Quick Reference
 
 | Restriction Type | Syntax |
@@ -237,3 +226,35 @@ claude \
 | Allow MCP server | `"mcp__puppeteer"` |
 | Allow specific MCP tool | `"mcp__puppeteer__puppeteer_navigate"` |
 | Skip all permissions | `--dangerously-skip-permissions` |
+
+## Common Patterns
+
+### Task-Scoped Permissions
+
+Match permissions to task boundaries:
+
+```bash
+# Task owns apps/users/
+--allowedTools "Edit(/apps/users/**)" "Write(/apps/users/**)"
+
+# Task owns apps/orders/
+--allowedTools "Edit(/apps/orders/**)" "Write(/apps/orders/**)"
+```
+
+### Test Commands Only
+
+```bash
+--allowedTools "Read" "Bash(pytest:*)" "Bash(npm test:*)" "Bash(go test:*)"
+```
+
+### Documentation Writer
+
+```bash
+--allowedTools "Read" "Write(/docs/**)" "Edit(/docs/**)" "WebFetch" "WebSearch"
+```
+
+### Infrastructure Agent
+
+```bash
+--allowedTools "Read" "Edit(/terraform/**)" "Edit(/docker-compose.yml)" "Bash(terraform:*)" "Bash(docker:*)"
+```
