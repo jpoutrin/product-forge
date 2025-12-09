@@ -293,6 +293,7 @@ Next: Run `cpo run parallel/TS-0042-inventory-system/` to execute
 | Command | Purpose |
 |---------|---------|
 | `/parallel-setup` | One-time project initialization |
+| `/parallel-validate-prompts` | Validate prompts have required sections |
 | `/parallel-run` | Execute parallel agents via cpo |
 | `/parallel-integrate` | Post-execution verification |
 | `/create-tech-spec` | Create Tech Spec before decomposition |

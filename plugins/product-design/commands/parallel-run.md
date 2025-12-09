@@ -231,6 +231,7 @@ Check `$PARALLEL_DIR/report.json` for execution summary.
 
 - `/parallel-setup` - One-time project initialization
 - `/parallel-decompose` - Create tasks and prompts (run before this)
+- `/parallel-validate-prompts` - Validate prompts have required sections
 - `/parallel-integrate` - Verify integration (run after this)
 
 ## cpo CLI Reference
