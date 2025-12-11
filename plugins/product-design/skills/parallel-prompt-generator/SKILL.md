@@ -25,10 +25,9 @@ Every generated prompt file MUST include ALL of these sections (see Step 4 for f
 | `=== ACCEPTANCE CRITERIA ===` | Checklist | YES |
 | `=== EXECUTION INSTRUCTIONS ===` | How to implement | **MANDATORY** |
 | `=== IMPORTANT RULES ===` | Constraints | **MANDATORY** |
-| `=== OUTPUT FORMAT (REQUIRED) ===` | JSON output block | **MANDATORY** |
 | `=== COMPLETION SIGNAL ===` | touch .claude-task-complete | **MANDATORY** |
 
-**DO NOT generate prompts without the EXECUTION INSTRUCTIONS, IMPORTANT RULES, OUTPUT FORMAT, and COMPLETION SIGNAL sections.**
+**DO NOT generate prompts without the EXECUTION INSTRUCTIONS, IMPORTANT RULES, and COMPLETION SIGNAL sections.**
 
 ## When to Use
 
@@ -169,27 +168,6 @@ You MUST write code, not just describe it. Follow these steps:
 - Do NOT deviate from contract interfaces
 - STOP if you encounter blocking issues and report in output
 
-=== OUTPUT FORMAT (REQUIRED) ===
-
-You MUST end your response with this JSON summary block:
-
-```json
-{
-  "task_completed": boolean,
-  "validation_passed": boolean,
-  "files_created": [string],
-  "files_modified": [string],
-  "tests_run": integer,
-  "tests_passed": integer,
-  "tests_failed": integer,
-  "summary": string,
-  "full_log": string,
-  "error_message": string | null
-}
-```
-
-Set `validation_passed: true` ONLY if ALL acceptance criteria are met.
-
 === COMPLETION SIGNAL ===
 
 Upon successful completion, run: touch .claude-task-complete
@@ -311,14 +289,14 @@ After generating prompts, verify EACH prompt file contains:
 # Quick validation - each prompt should have these markers
 for f in prompts/task-*.txt; do
   echo "=== $f ==="
-  grep -c "=== OUTPUT FORMAT" "$f" || echo "MISSING: OUTPUT FORMAT"
   grep -c "=== EXECUTION INSTRUCTIONS" "$f" || echo "MISSING: EXECUTION INSTRUCTIONS"
   grep -c "=== COMPLETION SIGNAL" "$f" || echo "MISSING: COMPLETION SIGNAL"
-  grep -c '"task_completed"' "$f" || echo "MISSING: JSON block"
 done
 ```
 
 **If any prompt is missing these sections, regenerate it using the exact template from Step 4.**
+
+Note: Output format and JSON summary blocks are managed via system prompt by the external execution tool, not included in generated prompts.
 
 ## Related Skills
 

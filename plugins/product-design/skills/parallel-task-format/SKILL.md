@@ -62,16 +62,32 @@ BOUNDARY: apps/orders/*, apps/products/*, apps/*/migrations/*
 Use compact notation with three directives:
 
 ### CREATE
-Files to create (use glob patterns):
+Files to create (use glob patterns). **A file can only be in CREATE for ONE task.**
 ```
 CREATE: apps/users/{models,views,serializers,urls}.py, apps/users/tests/*.py
 ```
 
 ### MODIFY
-Existing files to modify:
+Existing files to modify. Use **scoped syntax** for parallel modifications:
+
+**Unscoped** (whole file - only ONE task per wave can use this):
 ```
 MODIFY: config/urls.py, config/settings.py
 ```
+
+**Scoped** (specific section - multiple tasks in same wave can modify different scopes):
+```
+MODIFY: apps/users/models.py::User.save          # Owns User.save method
+MODIFY: apps/users/models.py::User.clean         # Different task owns User.clean
+MODIFY: apps/users/views.py::UserViewSet         # Owns entire class
+MODIFY: config/urls.py::urlpatterns              # Owns urlpatterns list
+```
+
+**Scoped syntax rules:**
+- `file.py::ClassName` - owns entire class
+- `file.py::function_name` - owns entire function
+- `file.py::ClassName.method` - owns specific method
+- Scopes must NOT overlap (no nesting like `::Class` and `::Class.method` in same wave)
 
 ### BOUNDARY
 Files NOT to touch (owned by other tasks):
@@ -188,6 +204,6 @@ Before using tasks:
 
 ## Output Format
 
-The Output Format JSON block is **not included in task files**. It's a static template that the `parallel-prompt-generator` skill automatically adds to every generated prompt.
+The Output Format JSON block is **not included in task files or generated prompts**. It's managed via system prompt by the external execution tool (`cpo` orchestrator).
 
-See the `parallel-prompt-generator` skill for the complete prompt template including the Output Format section.
+This ensures consistent JSON output format across all agents without duplicating the schema in every prompt.
