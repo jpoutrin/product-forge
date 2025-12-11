@@ -278,6 +278,76 @@ Max parallel: 3
 Next: Run cpo run parallel/TS-0042-inventory-system/
 ```
 
+## File Ownership Rules (CRITICAL)
+
+**Merge conflicts happen when parallel tasks touch the same lines. Follow these rules:**
+
+### Rule 1: CREATE is Exclusive
+
+A file can appear in CREATE for **exactly one task** across all waves.
+
+```yaml
+# task-001 (Wave 1)
+CREATE: rag/core/acl.py      # Only task-001 can create this
+
+# task-002 (Wave 1) - WRONG
+CREATE: rag/core/acl.py      # CONFLICT - already created by task-001
+```
+
+### Rule 2: MODIFY Requires Scoped Ownership
+
+Multiple tasks CAN modify the same file in the same wave **only if** each task owns distinct sections (functions, classes, methods).
+
+**Scoped MODIFY syntax:**
+```yaml
+MODIFY: path/file.py::ClassName           # Owns entire class
+MODIFY: path/file.py::function_name       # Owns entire function
+MODIFY: path/file.py::ClassName.method    # Owns specific method
+```
+
+**Parallel MODIFY - ALLOWED (different scopes):**
+```yaml
+# Wave 2 - OK, different functions
+task-003: MODIFY: rag/core/acl.py::to_sql_conditions
+task-004: MODIFY: rag/core/acl.py::to_mongo_conditions
+```
+
+**Parallel MODIFY - NOT ALLOWED (overlapping scopes):**
+```yaml
+# Wave 2 - CONFLICT, same scope or unscoped
+task-003: MODIFY: rag/core/acl.py
+task-004: MODIFY: rag/core/acl.py
+
+# Wave 2 - CONFLICT, nested scopes
+task-003: MODIFY: rag/core/acl.py::ACLFilterSpec
+task-004: MODIFY: rag/core/acl.py::ACLFilterSpec.validate
+```
+
+### Rule 3: File Ownership Matrix
+
+Build this matrix before generating tasks:
+
+| File | CREATE | MODIFY (scoped) | Wave |
+|------|--------|-----------------|------|
+| `rag/core/acl.py` | task-001 | - | W1 |
+| `rag/core/acl.py::to_sql_conditions` | - | task-003 | W2 |
+| `rag/core/acl.py::to_mongo_conditions` | - | task-004 | W2 |
+| `rag/core/interfaces.py` | task-003 | - | W2 |
+
+### Validation Rules
+
+```
+1. COUNT(tasks where file F in CREATE) <= 1
+
+2. For parallel tasks (same wave):
+   - If MODIFY is unscoped (no ::), only ONE task can touch file F
+   - If MODIFY is scoped (has ::), scopes must NOT overlap
+
+3. Scopes overlap if:
+   - Same scope (both ::ClassName)
+   - One contains other (::ClassName vs ::ClassName.method)
+```
+
 ## Validation Checklist
 
 Before finalizing:
@@ -285,7 +355,10 @@ Before finalizing:
 - [ ] No circular dependencies
 - [ ] Wave ordering valid
 - [ ] 2-4 hour task granularity
-- [ ] File independence between tasks
+- [ ] **Each file has at most ONE task with CREATE**
+- [ ] **Parallel MODIFY uses scoped syntax (file::function)**
+- [ ] **No overlapping scopes in same wave**
+- [ ] **File ownership matrix documented**
 - [ ] BOUNDARY section in every task
 - [ ] Output Format section in every task (see `parallel-task-format` skill)
 - [ ] Agent assigned to every task
