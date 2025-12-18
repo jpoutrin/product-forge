@@ -1,0 +1,23 @@
+{
+  "name": "typescript-experts",
+  "version": "1.0.0",
+  "description": "TypeScript development with FastMCP server building and modern TypeScript patterns",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "agents": [
+    "./agents/fastmcp-ts-expert.md"
+  ],
+  "commands": [
+    "./commands/create-mcp-server.md",
+    "./commands/add-mcp-tool.md",
+    "./commands/add-mcp-resource.md",
+    "./commands/add-mcp-prompt.md",
+    "./commands/setup-mcp-auth.md"
+  ],
+  "skills": [
+    "./skills/fastmcp/SKILL.md",
+    "./skills/zod/SKILL.md"
+  ]
+}
