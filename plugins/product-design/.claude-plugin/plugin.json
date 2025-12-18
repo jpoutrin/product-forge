@@ -14,7 +14,8 @@
     "./agents/qa-tester.md",
     "./agents/task-executor.md",
     "./agents/ui-product-expert.md",
-    "./agents/ux-expert.md"
+    "./agents/ux-expert.md",
+    "./agents/web-debugger.md"
   ],
   "mcpServers": "./.mcp.json"
 }
