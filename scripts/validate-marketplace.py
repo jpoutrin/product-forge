@@ -4,6 +4,7 @@
 import json
 import sys
 from pathlib import Path
+from typing import Optional
 
 try:
     import jsonschema
@@ -16,7 +17,7 @@ SCHEMA_URL = "https://anthropic.com/claude-code/marketplace.schema.json"
 MARKETPLACE_PATH = Path(__file__).parent.parent / ".claude-plugin" / "marketplace.json"
 
 
-def fetch_schema() -> dict:
+def fetch_schema() -> Optional[dict]:
     """Fetch the JSON schema from Anthropic."""
     try:
         response = requests.get(SCHEMA_URL, timeout=10)
@@ -28,7 +29,7 @@ def fetch_schema() -> dict:
         return None
 
 
-def validate_marketplace(marketplace_path: Path, schema: dict | None) -> bool:
+def validate_marketplace(marketplace_path: Path, schema) -> bool:
     """Validate the marketplace.json file."""
     try:
         with open(marketplace_path) as f:
