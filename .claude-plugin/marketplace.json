@@ -27,6 +27,12 @@
       "category": "development"
     },
     {
+      "name": "typescript-experts",
+      "description": "TypeScript development with FastMCP server building and modern TypeScript patterns",
+      "source": "./plugins/typescript-experts",
+      "category": "development"
+    },
+    {
       "name": "security-compliance",
       "description": "Security and privacy expertise with MCP security, OAuth, and GDPR/CCPA compliance",
       "source": "./plugins/security-compliance",
