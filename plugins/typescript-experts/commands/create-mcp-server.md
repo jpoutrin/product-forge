@@ -197,7 +197,7 @@ export function registerTools(server: FastMCP) {
       name: z.string().describe("Name to greet"),
     }),
     execute: async (args) => {
-      return `Hello, ${args.name}!`;
+      return "Hello, " + args.name + "!";
     },
   });
 }

@@ -166,7 +166,7 @@ server.addTool({
     const { {{parameterNames}} } = args;
 
     // TODO: Implement tool logic
-    return `Processed: ${JSON.stringify(args)}`;
+    return "Processed: " + JSON.stringify(args);
   },
 });
 ```
@@ -213,7 +213,7 @@ server.addTool({
       await reportProgress({ progress: i, total });
 
       // TODO: Process each item
-      results.push(`Processed: ${args.items[i]}`);
+      results.push("Processed: " + args.items[i]);
     }
 
     await reportProgress({ progress: total, total });
@@ -262,7 +262,7 @@ server.addTool({
   },
   execute: async (args, { session }) => {
     // Tool is only executed if canAccess returns true
-    return `Welcome, ${session.id}`;
+    return "Welcome, " + session.id;
   },
 });
 ```

@@ -179,7 +179,7 @@ server.addPrompt({
     },
   ],
   load: async (args) => {
-    return `{{promptTemplate}}`.replace("{{{argName}}}", args.{{argName}});
+    return "{{promptTemplate}}".replace("{{{argName}}}", args.{{argName}});
   },
 });
 ```
@@ -202,7 +202,7 @@ server.addPrompt({
   load: async (args) => {
     const { {{argumentNames}} } = args;
 
-    return `{{promptTemplate}}`;
+    return "{{promptTemplate}}";
   },
 });
 ```
@@ -222,7 +222,7 @@ server.addPrompt({
     },
   ],
   load: async (args) => {
-    return `Process the following in ${args.{{argName}}} format:\n\n{content}`;
+    return "Process the following in " + args.{{argName}} + " format:\n\n{content}";
   },
 });
 ```
@@ -250,7 +250,7 @@ server.addPrompt({
   ],
   load: async (args) => {
     const data = await loadData(args.{{argName}});
-    return `Analyze the following data:\n\n${JSON.stringify(data, null, 2)}`;
+    return "Analyze the following data:\n\n" + JSON.stringify(data, null, 2);
   },
 });
 ```
@@ -276,19 +276,14 @@ server.addPrompt({
   ],
   load: async (args) => {
     const typeHint = args.type
-      ? `Use commit type: ${args.type}`
+      ? "Use commit type: " + args.type
       : "Choose appropriate commit type (feat, fix, docs, etc.)";
 
-    return `Generate a concise Git commit message following conventional commits format.
-
-${typeHint}
-
-Changes:
-${args.changes}
-
-Format: <type>(<optional scope>): <description>
-
-Keep the description under 72 characters.`;
+    return "Generate a concise Git commit message following conventional commits format.\n\n" +
+      typeHint + "\n\n" +
+      "Changes:\n" + args.changes + "\n\n" +
+      "Format: <type>(<optional scope>): <description>\n\n" +
+      "Keep the description under 72 characters.";
   },
 });
 ```
@@ -322,21 +317,15 @@ server.addPrompt({
     const lang = args.language || "the detected language";
     const focus = args.focus || "all aspects";
 
-    return `Review the following ${lang} code, focusing on ${focus}.
-
-Provide feedback on:
-1. Code quality and best practices
-2. Potential bugs or edge cases
-3. Performance considerations
-4. Security issues (if applicable)
-5. Suggestions for improvement
-
-Code:
-\`\`\`
-${args.code}
-\`\`\`
-
-Format your response with clear sections and specific line references where applicable.`;
+    return "Review the following " + lang + " code, focusing on " + focus + ".\n\n" +
+      "Provide feedback on:\n" +
+      "1. Code quality and best practices\n" +
+      "2. Potential bugs or edge cases\n" +
+      "3. Performance considerations\n" +
+      "4. Security issues (if applicable)\n" +
+      "5. Suggestions for improvement\n\n" +
+      "Code:\n```\n" + args.code + "\n```\n\n" +
+      "Format your response with clear sections and specific line references where applicable.";
   },
 });
 ```
@@ -373,13 +362,11 @@ server.addPrompt({
     }[args.length || "brief"];
 
     const audienceNote = args.audience
-      ? `Write for: ${args.audience}`
+      ? "Write for: " + args.audience
       : "";
 
-    return `${style}. ${audienceNote}
-
-Content to summarize:
-${args.content}`;
+    return style + ". " + audienceNote + "\n\n" +
+      "Content to summarize:\n" + args.content;
   },
 });
 ```
@@ -404,7 +391,7 @@ server.addPrompt({
         role: "user",
         content: {
           type: "text",
-          text: `Context: ${args.context}`,
+          text: "Context: " + args.context,
         },
       },
       {

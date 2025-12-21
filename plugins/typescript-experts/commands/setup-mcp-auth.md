@@ -259,7 +259,7 @@ server.addTool({
   description: "Admin-only dashboard access",
   canAccess: (auth) => auth?.role === "admin",
   execute: async (args, { session }) => {
-    return `Welcome admin ${session.userId}`;
+    return "Welcome admin " + session.userId;
   },
 });
 
@@ -327,7 +327,7 @@ server.addTool({
   name: "whoami",
   description: "Get current user info",
   execute: async (args, { session }) => {
-    return `Logged in as: ${session.name} (${session.email})`;
+    return "Logged in as: " + session.name + " (" + session.email + ")";
   },
 });
 ```
@@ -496,7 +496,7 @@ server.addTool({
   description: "Access request headers",
   execute: async (args, { session }) => {
     const userAgent = session.headers["user-agent"] || "Unknown";
-    return `User-Agent: ${userAgent}`;
+    return "User-Agent: " + userAgent;
   },
 });
 ```

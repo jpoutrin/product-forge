@@ -348,7 +348,7 @@ server.addPrompt({
     },
   ],
   load: async (args) => {
-    return `Generate a concise commit message:\n\n${args.changes}`;
+    return "Generate a concise commit message:\n\n" + args.changes;
   },
 });
 ```
@@ -360,7 +360,7 @@ server.addPrompt({
   name: "countryPoem",
   description: "Writes a poem about a country",
   load: async ({ name }) => {
-    return `Write a poem about ${name}!`;
+    return "Write a poem about " + name + "!";
   },
   arguments: [
     {
@@ -385,7 +385,7 @@ server.addPrompt({
   name: "countryPoem",
   description: "Writes a poem about a country",
   load: async ({ name }) => {
-    return `Write a poem about ${name}!`;
+    return "Write a poem about " + name + "!";
   },
   arguments: [
     {
@@ -423,7 +423,7 @@ const server = new FastMCP({
 server.addTool({
   name: "sayHello",
   execute: async (args, { session }) => {
-    return `Hello, ${session.id}!`;
+    return "Hello, " + session.id + "!";
   },
 });
 ```
@@ -501,7 +501,7 @@ server.addTool({
     const newCounter = counter + 1;
     sessionCounters.set(context.sessionId, newCounter);
 
-    return `Counter: ${newCounter}`;
+    return "Counter: " + newCounter;
   },
 });
 ```

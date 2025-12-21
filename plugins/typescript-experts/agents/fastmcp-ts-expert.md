@@ -142,7 +142,7 @@ server.addTool({
     name: z.string().describe("Name to greet"),
   }),
   execute: async (args) => {
-    return `Hello, ${args.name}!`;
+    return "Hello, " + args.name + "!";
   },
 });
 
@@ -166,7 +166,7 @@ server.addTool({
       await reportProgress({ progress: i, total: args.items.length });
 
       // Process item
-      results.push(`Processed: ${args.items[i]}`);
+      results.push("Processed: " + args.items[i]);
     }
 
     await reportProgress({ progress: args.items.length, total: args.items.length });
@@ -221,7 +221,7 @@ server.addTool({
       throw new UserError("Invalid email format. Please provide a valid email address.");
     }
 
-    return `Email ${args.email} is valid`;
+    return "Email " + args.email + " is valid";
   },
 });
 ```
@@ -275,13 +275,9 @@ server.addPrompt({
   ],
   load: async (args) => {
     const lang = args.language || "the detected language";
-    return `Review the following ${lang} code:
-
-\`\`\`
-${args.code}
-\`\`\`
-
-Provide feedback on code quality, potential bugs, and improvements.`;
+    return "Review the following " + lang + " code:\n\n" +
+      "```\n" + args.code + "\n```\n\n" +
+      "Provide feedback on code quality, potential bugs, and improvements.";
   },
 });
 ```
@@ -319,7 +315,7 @@ server.addTool({
   description: "Admin-only action",
   canAccess: (auth) => auth?.role === "admin",
   execute: async (args, { session }) => {
-    return `Admin ${session.userId} performed action`;
+    return "Admin " + session.userId + " performed action";
   },
 });
 ```
