@@ -95,12 +95,26 @@ You are analyzing a Tech Spec to design a parallel task decomposition.
 4. Design wave structure and dependencies
 5. Define contract interfaces (types and API schemas)
 6. Assign appropriate agents to each task
+7. Identify ALL dependencies required by tasks:
+   - Analyze imports in Tech Spec code examples
+   - Include test dependencies (pytest, pytest-asyncio, etc.)
+   - Aggregate unique dependencies across all tasks
+   - Separate into: add (new), upgrade (existing), add_dev (dev-only)
 
 **Return a JSON design document:**
 ```json
 {
   "output_dir": "{parallel_dir}",
-  "manifest": { ... },
+  "manifest": {
+    "dependencies": {
+      "python": {
+        "add": ["pydantic>=2.0", "sqlalchemy>=2.0"],
+        "upgrade": [],
+        "remove": [],
+        "add_dev": ["pytest>=7.0", "pytest-asyncio>=0.21"]
+      }
+    }
+  },
   "tasks": [
     {
       "id": "task-001",
@@ -166,13 +180,37 @@ Write the following files based on this design specification.
 - For prompt files (prompts/*.txt): invoke `parallel-prompt-generator` skill
   - **IMPORTANT**: The prompt template in this skill includes mandatory sections:
     - `=== EXECUTION INSTRUCTIONS ===`
-    - `=== IMPORTANT RULES ===`
-    - `=== OUTPUT FORMAT (REQUIRED) ===` with JSON block
+    - `=== IMPORTANT RULES ===` (includes CONTRACTS ARE DESIGN DOCUMENTS directive)
     - `=== COMPLETION SIGNAL ===`
   - You MUST include ALL sections from the skill template in every generated prompt
 
+**FOR PROMPT GENERATION (Agent 5) - VERBATIM COPY REQUIREMENTS:**
+1. Read `context.md` completely - include ALL content in === CONTEXT === section (do not summarize)
+2. For each task file in `tasks/`:
+   a. Parse YAML frontmatter (id, agent, wave, deps, contracts)
+   b. Extract Scope section (CREATE, MODIFY, BOUNDARY) - copy exactly
+   c. Extract Requirements section - COPY EVERY bullet point EXACTLY as written
+   d. Extract Checklist section - COPY EVERY item EXACTLY as written
+3. Match exact field names from contracts (e.g., use `principal_id` not `user_id`)
+4. Include the CONTRACTS DESIGN DOCUMENTS directive from the skill template
+
+**DO NOT (for prompt generation):**
+- Summarize or paraphrase requirements
+- Change field names or types
+- Omit any checklist items
+- Shorten the context
+
 Write all files now using the exact templates from the skills. Do not ask for confirmation.
 ~~~
+
+**Post-Generation Validation (by main agent):**
+
+After Phase 2 agents complete, verify each generated prompt:
+- [ ] Requirements in prompt match task file exactly (field names, types)
+- [ ] All checklist items from task appear in prompt
+- [ ] Full context.md is included (line count should match)
+- [ ] CONTRACTS DESIGN DOCUMENTS directive present in IMPORTANT RULES
+- [ ] No references to importing from parallel/ directory
 
 ### Why Two Phases?
 
@@ -226,6 +264,14 @@ Uses `cpo` format (see `parallel-agents` skill for details):
   "name": "inventory-system",
   "technology": "python",
   "python_version": "3.11",
+  "dependencies": {
+    "python": {
+      "add": ["pydantic>=2.0", "sqlalchemy[asyncio]>=2.0"],
+      "upgrade": [],
+      "remove": [],
+      "add_dev": ["pytest>=7.0", "pytest-asyncio>=0.21"]
+    }
+  },
   "waves": [
     {
       "number": 1,
@@ -245,6 +291,19 @@ Uses `cpo` format (see `parallel-agents` skill for details):
   }
 }
 ```
+
+### Dependencies Section
+
+The `dependencies` section is installed before any task execution begins:
+
+| Field | Description |
+|-------|-------------|
+| `python.add` | Packages to add (if not present) |
+| `python.upgrade` | Packages to upgrade to specified version |
+| `python.remove` | Packages to remove from project |
+| `python.add_dev` | Dev-only packages to add |
+
+Operations execute in order: remove → upgrade → add → add_dev. Changes are committed to the feature branch before task execution starts.
 
 ## Example
 

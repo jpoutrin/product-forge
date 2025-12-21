@@ -132,6 +132,14 @@ Checks contract compliance, boundary compliance, runs tests, generates report.
   "name": "inventory-system",
   "technology": "python",
   "python_version": "3.11",
+  "dependencies": {
+    "python": {
+      "add": ["pydantic>=2.0", "sqlalchemy[asyncio]>=2.0"],
+      "upgrade": [],
+      "remove": [],
+      "add_dev": ["pytest>=7.0", "pytest-asyncio>=0.21"]
+    }
+  },
   "waves": [
     {
       "number": 1,
@@ -158,6 +166,47 @@ Checks contract compliance, boundary compliance, runs tests, generates report.
   }
 }
 ```
+
+### Dependencies Section
+
+The optional `dependencies` section declares packages to install before task execution. This prevents race conditions where parallel tasks try to modify `pyproject.toml` simultaneously.
+
+```json
+{
+  "dependencies": {
+    "python": {
+      "add": ["pydantic>=2.0"],
+      "upgrade": ["requests>=2.28"],
+      "remove": ["deprecated-lib"],
+      "add_dev": ["pytest>=7.0"]
+    }
+  }
+}
+```
+
+| Field | Description | uv Command |
+|-------|-------------|------------|
+| `add` | Packages to add (if not present) | `uv add <packages>` |
+| `upgrade` | Packages to upgrade to specified version | `uv add --upgrade <packages>` |
+| `remove` | Packages to remove from project | `uv remove <packages>` |
+| `add_dev` | Dev-only packages to add | `uv add --dev <packages>` |
+
+**Execution order:** remove → upgrade → add → add_dev
+
+**Commit strategy:** Dependencies are installed and committed to the feature branch before any task execution begins. This ensures all parallel tasks have access to the same dependencies without conflicts.
+
+**Minimal example** (add only):
+```json
+{
+  "dependencies": {
+    "python": {
+      "add": ["pydantic>=2.0"]
+    }
+  }
+}
+```
+
+All fields are optional. Omit sections you don't need.
 
 ## Best Practices
 

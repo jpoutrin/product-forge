@@ -116,6 +116,14 @@ Note: The Output Format section is **not** in task files. It's a **static templa
 
 ## Step 4: Generate Individual Prompts
 
+**CRITICAL: Copy content EXACTLY from task files. Do not summarize or rewrite.**
+
+When generating prompts:
+1. Include FULL context.md content (do not summarize - include every line)
+2. COPY the ## Requirements section VERBATIM - every bullet point, every field name, every type
+3. COPY the ## Checklist section VERBATIM - every item exactly as written
+4. Match exact field names from contracts (e.g., use `principal_id` not `user_id`)
+
 Create `prompts/task-NNN.txt` using this template:
 
 ```
@@ -167,6 +175,14 @@ You MUST write code, not just describe it. Follow these steps:
 - Do NOT skip writing tests
 - Do NOT deviate from contract interfaces
 - STOP if you encounter blocking issues and report in output
+
+**CRITICAL - CONTRACTS ARE DESIGN DOCUMENTS:**
+- Contracts in `parallel/` are DESIGN SPECIFICATIONS ONLY
+- READ them to understand the interface you must implement
+- RECREATE the types/interfaces in your actual project code
+- NEVER import from `parallel/` directory
+- NEVER use sys.path manipulation to access parallel/ files
+- The `parallel/` directory is NOT part of the deployed codebase
 
 === COMPLETION SIGNAL ===
 
