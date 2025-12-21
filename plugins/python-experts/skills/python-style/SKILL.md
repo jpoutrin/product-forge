@@ -1,6 +1,6 @@
 ---
 name: python-style
-description: Automatic enforcement of Python coding style, PEP standards, type hints, and modern Python patterns. Use when writing Python code to ensure consistency with PEP 8, proper type hints, Google-style docstrings, and modern Python 3.11+ idioms.
+description: Automatic enforcement of Python coding style, PEP standards, type hints, and modern Python patterns. Use when writing Python code to ensure consistency with PEP 8, proper type hints, Google-style docstrings, modern Python 3.11+ idioms, and merge-friendly patterns for parallel multi-agent development.
 ---
 
 # Python Style Best Practices Skill
@@ -63,3 +63,78 @@ class UserData(TypedDict):
 - Magic numbers/strings without constants
 - Non-expressive variable names (`d`, `temp`, `x`)
 - Vague function names (`process`, `handle`, `do_stuff`)
+
+## Merge-Friendly Patterns (for Parallel Development)
+
+When multiple agents modify the same module, follow these patterns to enable automatic merge resolution by semantic merge tools (mergiraf).
+
+### Always Run Ruff Before Commit
+
+```bash
+uv run ruff format .
+uv run ruff check --fix .
+```
+
+This ensures imports are consistently ordered, enabling clean merges.
+
+### `__all__` Must Be Alphabetical
+
+Enable **RUF022** in ruff to enforce this automatically:
+
+```toml
+[tool.ruff.lint]
+select = [
+    # ... other rules
+    "RUF022", # unsorted-dunder-all (enforces alphabetical __all__)
+]
+```
+
+```python
+# CORRECT - alphabetical, one per line, no comments
+__all__ = [
+    "ACLFilterSpec",
+    "Chunk",
+    "ChunkerInterface",
+    "Document",
+    "QueryACLContext",
+    "Visibility",
+]
+
+# WRONG - grouped by category (causes merge conflicts)
+__all__ = [
+    # Types
+    "Chunk",
+    "Document",
+    # Interfaces
+    "ChunkerInterface",
+]
+```
+
+### No Comments Inside Lists
+
+Comments inside `__all__`, import groups, or other lists break deterministic ordering and cause merge conflicts. Keep comments outside:
+
+```python
+# ACL and schema types exported for public API
+__all__ = [
+    "ACLFilterSpec",
+    "Chunk",
+    "Document",
+]
+```
+
+### When Adding to Shared Files (`__init__.py`, etc.)
+
+1. Add new exports in **alphabetical position**
+2. Never reorder existing exports
+3. Run `ruff format` immediately after changes
+4. Avoid adding section comments
+
+### Why This Matters
+
+Semantic merge tools like mergiraf can automatically resolve conflicts when:
+- Both branches add items to the same list in alphabetical order
+- No comments or groupings change the structure
+- Formatting is consistent (via ruff)
+
+Without these patterns, parallel agents adding exports to the same `__init__.py` will create conflicts requiring manual resolution.
