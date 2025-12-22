@@ -1,0 +1,161 @@
+# Agent-to-Skills Mapping
+#
+# Defines which skills are recommended for each agent type.
+# Skills are invoked at the start of agent execution to load best practices.
+#
+# Format:
+#   plugin:agent-name:
+#     skills: [skill-name, skill-name]
+#
+# Skills listed WITHOUT plugin prefix are resolved from the same plugin as the agent.
+# Skills listed WITH plugin prefix (e.g., python-experts:python-style) are explicit.
+
+agents:
+  # Python Experts
+  python-experts:django-expert:
+    skills:
+      - python-experts:python-style
+      - python-experts:django-dev
+      - python-experts:django-api
+      - python-experts:documentation-research
+    description: Django web application development
+
+  python-experts:fastapi-expert:
+    skills:
+      - python-experts:python-style
+      - python-experts:documentation-research
+    description: FastAPI high-performance async APIs
+
+  python-experts:fastmcp-expert:
+    skills:
+      - python-experts:python-style
+      - python-experts:documentation-research
+    description: FastMCP Python server development
+
+  python-experts:celery-expert:
+    skills:
+      - python-experts:python-style
+      - python-experts:documentation-research
+    description: Celery distributed task queues
+
+  python-experts:python-testing-expert:
+    skills:
+      - python-experts:python-style
+    description: Python testing with pytest
+
+  # Frontend Experts
+  frontend-experts:react-typescript-expert:
+    skills:
+      - frontend-experts:typescript-style
+      - typescript-experts:zod
+    description: React TypeScript development
+
+  frontend-experts:playwright-testing-expert:
+    skills:
+      - frontend-experts:typescript-style
+    description: Playwright E2E testing
+
+  # TypeScript Experts
+  typescript-experts:fastmcp-ts-expert:
+    skills:
+      - frontend-experts:typescript-style
+      - typescript-experts:fastmcp
+      - typescript-experts:zod
+    description: FastMCP TypeScript server development
+
+  # DevOps/Data
+  devops-data:devops-expert:
+    skills:
+      - devops-data:ansible
+      - devops-data:aws-cloud
+      - devops-data:gcp-cloud
+      - devops-data:direnv
+      - devops-data:portman
+    description: DevOps and infrastructure
+
+  devops-data:data-engineering-expert:
+    skills:
+      - python-experts:python-style
+      - devops-data:dbt
+      - devops-data:sqlmesh
+    description: Data engineering pipelines
+
+  devops-data:cto-architect:
+    skills:
+      - devops-data:rfc-specification
+      - devops-data:technical-specification
+    description: Architecture and design decisions
+
+  # Security/Compliance
+  security-compliance:mcp-security-expert:
+    skills:
+      - security-compliance:mcp-security
+      - security-compliance:oauth
+    description: MCP pipeline security
+
+  security-compliance:dpo-expert:
+    skills:
+      - security-compliance:privacy-compliance
+    description: Data protection and privacy compliance
+
+  # RAG/CAG
+  rag-cag:rag-cag-expert:
+    skills:
+      - rag-cag:chunking-strategies
+      - rag-cag:rag-cag-security
+    description: RAG/CAG systems
+
+  # Product Design
+  product-design:qa-tester:
+    skills:
+      - product-design:qa-testing-methodology
+      - product-design:qa-test-management
+      - product-design:qa-screenshot-management
+      - product-design:qa-element-extraction
+    description: QA testing with browser automation
+
+  product-design:web-debugger:
+    skills:
+      - product-design:console-debugging
+      - product-design:network-inspection
+    description: Web debugging with Chrome DevTools
+
+  product-design:ui-product-expert:
+    skills:
+      - product-design:design-system
+    description: UI design and component systems
+
+  product-design:ux-expert:
+    skills: []
+    description: UX research and interaction design
+
+  product-design:marketing-expert:
+    skills: []
+    description: Brand strategy and go-to-market planning
+
+  product-design:prd-orchestrator:
+    skills:
+      - product-design:prd-management
+    description: PRD lifecycle management
+
+  product-design:product-architect:
+    skills:
+      - product-design:product-strategy
+      - product-design:prd-management
+    description: Product development guidance
+
+  product-design:task-executor:
+    skills:
+      - product-design:task-orchestration
+    description: Task implementation with documentation-first approach
+
+  # Git Workflow
+  git-workflow:commit-expert:
+    skills:
+      - git-workflow:git-commits
+    description: Git commit analysis and conventional commits
+
+  git-workflow:rebase-expert:
+    skills:
+      - git-workflow:git-commits
+    description: Git rebase with conflict resolution
