@@ -38,6 +38,7 @@ Every prompt file MUST contain these sections (see `parallel-prompt-generator` s
 
 | Section | Marker | Purpose |
 |---------|--------|---------|
+| **Skills** | `=== REQUIRED SKILLS ===` | Skills to invoke at start |
 | Context | `=== CONTEXT ===` | Shared project context |
 | Objective | `=== OBJECTIVE ===` | Task goal |
 | Contracts | `=== CONTRACTS ===` | Contract file references |
@@ -90,6 +91,7 @@ For each `prompts/task-*.txt` file, check for required markers:
 
 ```python
 REQUIRED_SECTIONS = [
+    ("REQUIRED SKILLS", "=== REQUIRED SKILLS ==="),
     ("CONTEXT", "=== CONTEXT ==="),
     ("OBJECTIVE", "=== OBJECTIVE ==="),
     ("CONTRACTS", "=== CONTRACTS ==="),
@@ -153,6 +155,7 @@ Directory: parallel/TS-0042-inventory/
 Prompts found: 5
 
 === task-001.txt ===
+  [✓] REQUIRED SKILLS
   [✓] CONTEXT
   [✓] OBJECTIVE
   [✓] CONTRACTS
@@ -169,6 +172,7 @@ Prompts found: 5
   Status: PASS
 
 === task-003.txt ===
+  [✗] REQUIRED SKILLS
   [✓] CONTEXT
   [✓] OBJECTIVE
   [✓] CONTRACTS

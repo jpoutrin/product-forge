@@ -100,6 +100,10 @@ You are analyzing a Tech Spec to design a parallel task decomposition.
    - Include test dependencies (pytest, pytest-asyncio, etc.)
    - Aggregate unique dependencies across all tasks
    - Separate into: add (new), upgrade (existing), add_dev (dev-only)
+8. Resolve skills for each task:
+   - Reference `parallel-agents/agent-skills-mapping.yaml`
+   - Look up the agent assigned to each task
+   - Include the skills list in the task specification
 
 **Return a JSON design document:**
 ```json
@@ -121,6 +125,7 @@ You are analyzing a Tech Spec to design a parallel task decomposition.
       "component": "users",
       "wave": 1,
       "agent": "python-experts:django-expert",
+      "skills": ["python-experts:python-style", "python-experts:django-dev", "python-experts:django-api", "python-experts:documentation-research"],
       "scope": { "create": [...], "modify": [...], "boundary": [...] },
       "requirements": [...],
       "checklist": [...]
@@ -153,10 +158,15 @@ Use the Task tool with:
 | Agent 1 | `manifest.json`, `context.md` |
 | Agent 2 | `contracts/types.py`, `contracts/api-schema.yaml` |
 | Agent 3 | `architecture.md`, `task-graph.md` |
-| Agent 4 | `tasks/*.md` (all task files) |
-| Agent 5 | `prompts/*.txt` (all prompt files) |
+| Agent 4 | `tasks/*.md` (all task files, including `skills` in YAML frontmatter) |
+| Agent 5 | `prompts/*.txt` (all prompt files, with `=== REQUIRED SKILLS ===` section) |
 
 Each agent receives the relevant section from Phase 1's JSON output.
+
+**IMPORTANT - Skills placement:**
+- `skills` are written to **task files** (tasks/*.md) by Agent 4 in YAML frontmatter
+- `skills` are written to **prompt files** (prompts/*.txt) by Agent 5 in `=== REQUIRED SKILLS ===` section
+- `skills` are **NOT** written to manifest.json - manifest only contains `id` and `agent` per task
 
 **Phase 2 Prompt Template (per agent):**
 
@@ -176,23 +186,30 @@ Write the following files based on this design specification.
 
 **Required skill invocations by file type:**
 - For task files (tasks/*.md): invoke `parallel-task-format` skill
+  - **Include `skills` in YAML frontmatter** - list of skills the agent needs to invoke
 - For manifest.json: invoke `parallel-agents` skill
+  - **DO NOT include `skills` in manifest.json** - only `id` and `agent` per task
 - For prompt files (prompts/*.txt): invoke `parallel-prompt-generator` skill
   - **IMPORTANT**: The prompt template in this skill includes mandatory sections:
     - `=== EXECUTION INSTRUCTIONS ===`
     - `=== IMPORTANT RULES ===` (includes CONTRACTS ARE DESIGN DOCUMENTS directive)
+    - `=== REQUIRED SKILLS ===` (list of skills the agent must invoke)
     - `=== COMPLETION SIGNAL ===`
   - You MUST include ALL sections from the skill template in every generated prompt
 
 **FOR PROMPT GENERATION (Agent 5) - VERBATIM COPY REQUIREMENTS:**
 1. Read `context.md` completely - include ALL content in === CONTEXT === section (do not summarize)
 2. For each task file in `tasks/`:
-   a. Parse YAML frontmatter (id, agent, wave, deps, contracts)
+   a. Parse YAML frontmatter (id, agent, wave, deps, contracts, **skills**)
    b. Extract Scope section (CREATE, MODIFY, BOUNDARY) - copy exactly
    c. Extract Requirements section - COPY EVERY bullet point EXACTLY as written
    d. Extract Checklist section - COPY EVERY item EXACTLY as written
 3. Match exact field names from contracts (e.g., use `principal_id` not `user_id`)
 4. Include the CONTRACTS DESIGN DOCUMENTS directive from the skill template
+5. Include === REQUIRED SKILLS === section in every prompt:
+   - Get skills from the task file's `skills` field in YAML frontmatter
+   - List each skill as a bullet: `- plugin:skill-name`
+   - Include invocation syntax: `skill: "plugin:skill-name"`
 
 **DO NOT (for prompt generation):**
 - Summarize or paraphrase requirements
@@ -206,6 +223,7 @@ Write all files now using the exact templates from the skills. Do not ask for co
 **Post-Generation Validation (by main agent):**
 
 After Phase 2 agents complete, verify each generated prompt:
+- [ ] `=== REQUIRED SKILLS ===` section present with skills list
 - [ ] Requirements in prompt match task file exactly (field names, types)
 - [ ] All checklist items from task appear in prompt
 - [ ] Full context.md is included (line count should match)
@@ -291,6 +309,10 @@ Uses `cpo` format (see `parallel-agents` skill for details):
   }
 }
 ```
+
+**Note:** `skills` are intentionally NOT in manifest.json. The manifest is for `cpo` orchestration only. Skills are stored in:
+- Task files (`tasks/*.md`) - YAML frontmatter `skills` field
+- Prompt files (`prompts/*.txt`) - `=== REQUIRED SKILLS ===` section
 
 ### Dependencies Section
 

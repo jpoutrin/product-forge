@@ -15,6 +15,7 @@ Every generated prompt file MUST include ALL of these sections (see Step 4 for f
 
 | Section | Purpose | Required |
 |---------|---------|----------|
+| `=== REQUIRED SKILLS ===` | Skills to invoke at start | YES |
 | `=== CONTEXT ===` | Shared project context | YES |
 | `=== OBJECTIVE ===` | Task goal | YES |
 | `=== CONTRACTS ===` | Contract file references | YES |
@@ -112,6 +113,12 @@ For each `tasks/task-NNN-*.md`:
    - `## Requirements` -> Implementation requirements
    - `## Checklist` -> Acceptance criteria
 
+3. **Resolve skills for each task**:
+   - Read `parallel-agents/agent-skills-mapping.yaml` for agent-to-skills mapping
+   - Look up the agent from task frontmatter (e.g., `python-experts:django-expert`)
+   - Get the skills list for that agent
+   - Format as full skill names: `plugin:skill-name`
+
 Note: The Output Format section is **not** in task files. It's a **static template** that the prompt generator always includes in generated prompts.
 
 ## Step 4: Generate Individual Prompts
@@ -131,6 +138,12 @@ TASK-{id}: {title}
 Agent: {agent}
 Wave: {wave}
 Dependencies: {deps or "None"}
+
+=== REQUIRED SKILLS ===
+Before starting implementation, invoke these skills to load best practices:
+{list of skills from agent-skills-mapping.yaml, formatted as bullets}
+
+Invoke skills using: skill: "plugin:skill-name"
 
 === CONTEXT ===
 {contents of context.md}
@@ -164,9 +177,13 @@ You MUST write code, not just describe it. Follow these steps:
 1. **Read contracts first**: Read all files in contracts/ to understand interfaces
 2. **Read existing code**: If modifying files, read them first
 3. **Implement**: Use Write/Edit tools to create/modify code
-4. **Test**: Run tests to verify implementation
+4. **Test & Fix Loop**:
+   - Run tests for your implementation
+   - If ANY test fails, FIX the issue and rerun tests
+   - REPEAT until ALL tests pass
+   - Do NOT proceed to step 5 until tests pass
 5. **Lint**: Run linters (ruff, mypy, eslint as appropriate)
-6. **Commit**: Create atomic commit with conventional format
+6. **Commit**: Create atomic commit with conventional format (only after tests pass)
 
 === IMPORTANT RULES ===
 
@@ -174,6 +191,8 @@ You MUST write code, not just describe it. Follow these steps:
 - Do NOT modify files listed in DO NOT MODIFY section
 - Do NOT skip writing tests
 - Do NOT deviate from contract interfaces
+- Do NOT commit or signal completion until ALL tests pass
+- If tests fail, you MUST fix the issues and keep running until they pass
 - STOP if you encounter blocking issues and report in output
 
 **CRITICAL - CONTRACTS ARE DESIGN DOCUMENTS:**
@@ -186,7 +205,12 @@ You MUST write code, not just describe it. Follow these steps:
 
 === COMPLETION SIGNAL ===
 
-Upon successful completion, run: touch .claude-task-complete
+Upon successful completion (ALL tests passing), run: touch .claude-task-complete
+
+CRITICAL: Only signal completion if:
+- All tests pass (pytest exits with 0)
+- All linting passes
+- Code is committed
 ```
 
 ## Step 5: Create agent-prompts.md
@@ -305,6 +329,7 @@ After generating prompts, verify EACH prompt file contains:
 # Quick validation - each prompt should have these markers
 for f in prompts/task-*.txt; do
   echo "=== $f ==="
+  grep -c "=== REQUIRED SKILLS ===" "$f" || echo "MISSING: REQUIRED SKILLS"
   grep -c "=== EXECUTION INSTRUCTIONS" "$f" || echo "MISSING: EXECUTION INSTRUCTIONS"
   grep -c "=== COMPLETION SIGNAL" "$f" || echo "MISSING: COMPLETION SIGNAL"
 done
@@ -321,4 +346,8 @@ Note: Output format and JSON summary blocks are managed via system prompt by the
 | `parallel-decompose` | Creates tasks/ that this skill reads |
 | `parallel-task-format` | Defines the task YAML format parsed here |
 | `parallel-execution` | Consumes the prompts/ this skill generates |
-| `parallel-agents` | Overall workflow context |
+| `parallel-agents` | Overall workflow context + agent-skills-mapping.yaml |
+
+## Reference Files
+
+- `parallel-agents/agent-skills-mapping.yaml` - Maps agents to their recommended skills

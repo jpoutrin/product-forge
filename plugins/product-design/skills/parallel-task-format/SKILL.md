@@ -19,6 +19,7 @@ wave: 1
 deps: []
 blocks: [task-004, task-005]
 agent: python-experts:django-expert
+skills: [python-experts:python-style, python-experts:django-dev, python-experts:django-api]
 tech_spec: TS-0042
 contracts: [contracts/types.py, contracts/api-schema.yaml]
 ---
@@ -54,8 +55,11 @@ BOUNDARY: apps/orders/*, apps/products/*, apps/*/migrations/*
 | `deps` | Yes | Task IDs this depends on (empty list `[]` if none) |
 | `blocks` | No | Task IDs this blocks (optional) |
 | `agent` | Yes | Recommended agent type |
+| `skills` | Yes | Skills the agent should invoke (list from agent-skills-mapping.yaml) |
 | `tech_spec` | No | Tech Spec ID (if applicable) |
 | `contracts` | Yes | Contract files to reference (relative paths) |
+
+**Note:** `skills` are stored in task files so prompt generation can include them in `=== REQUIRED SKILLS ===` sections. They are NOT stored in manifest.json.
 
 ## Scope Section Format
 
@@ -196,6 +200,7 @@ Before using tasks:
 
 - [ ] Every task has unique `id`
 - [ ] Every task has `agent` assigned
+- [ ] Every task has `skills` list (from agent-skills-mapping.yaml)
 - [ ] Every task has `contracts` referenced
 - [ ] Every task has BOUNDARY section
 - [ ] No circular dependencies in `deps`
