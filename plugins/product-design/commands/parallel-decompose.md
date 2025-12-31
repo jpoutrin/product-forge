@@ -100,7 +100,14 @@ You are analyzing a Tech Spec to design a parallel task decomposition.
    - Include test dependencies (pytest, pytest-asyncio, etc.)
    - Aggregate unique dependencies across all tasks
    - Separate into: add (new), upgrade (existing), add_dev (dev-only)
-8. Resolve skills for each task:
+8. Align dependency versions (invoke `dependency-alignment` skill):
+   - Detect project ecosystem (Python/Node.js) from project files
+   - For Python: Use `uv pip compile --dry-run` to resolve each dependency
+   - For Node.js: Use `npm view <pkg>@"<range>" version --json`
+   - Resolve to pinned versions compatible with existing project dependencies
+   - Auto-resolve conflicts to compatible versions
+   - Output pinned versions (e.g., `pydantic==2.5.3`, `zod@3.22.4`)
+9. Resolve skills for each task:
    - Reference `parallel-agents/agent-skills-mapping.yaml`
    - Look up the agent assigned to each task
    - Include the skills list in the task specification
@@ -112,10 +119,10 @@ You are analyzing a Tech Spec to design a parallel task decomposition.
   "manifest": {
     "dependencies": {
       "python": {
-        "add": ["pydantic>=2.0", "sqlalchemy>=2.0"],
+        "add": ["pydantic==2.5.3", "sqlalchemy==2.0.25"],
         "upgrade": [],
         "remove": [],
-        "add_dev": ["pytest>=7.0", "pytest-asyncio>=0.21"]
+        "add_dev": ["pytest==7.4.3", "pytest-asyncio==0.21.1"]
       }
     }
   },

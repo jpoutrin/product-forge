@@ -134,10 +134,10 @@ Checks contract compliance, boundary compliance, runs tests, generates report.
   "python_version": "3.11",
   "dependencies": {
     "python": {
-      "add": ["pydantic>=2.0", "sqlalchemy[asyncio]>=2.0"],
+      "add": ["pydantic==2.5.3", "sqlalchemy[asyncio]==2.0.25"],
       "upgrade": [],
       "remove": [],
-      "add_dev": ["pytest>=7.0", "pytest-asyncio>=0.21"]
+      "add_dev": ["pytest==7.4.3", "pytest-asyncio==0.21.1"]
     }
   },
   "waves": [
@@ -169,16 +169,16 @@ Checks contract compliance, boundary compliance, runs tests, generates report.
 
 ### Dependencies Section
 
-The optional `dependencies` section declares packages to install before task execution. This prevents race conditions where parallel tasks try to modify `pyproject.toml` simultaneously.
+The `dependencies` section declares packages to install before task execution. Versions are **pinned** (resolved during `parallel-decompose` using the `dependency-alignment` skill) to ensure reproducibility and avoid conflicts between parallel agents.
 
 ```json
 {
   "dependencies": {
     "python": {
-      "add": ["pydantic>=2.0"],
-      "upgrade": ["requests>=2.28"],
+      "add": ["pydantic==2.5.3"],
+      "upgrade": ["requests==2.31.0"],
       "remove": ["deprecated-lib"],
-      "add_dev": ["pytest>=7.0"]
+      "add_dev": ["pytest==7.4.3"]
     }
   }
 }
@@ -200,13 +200,13 @@ The optional `dependencies` section declares packages to install before task exe
 {
   "dependencies": {
     "python": {
-      "add": ["pydantic>=2.0"]
+      "add": ["pydantic==2.5.3"]
     }
   }
 }
 ```
 
-All fields are optional. Omit sections you don't need.
+All fields are optional. Omit sections you don't need (except versions must be pinned).
 
 ## Best Practices
 
