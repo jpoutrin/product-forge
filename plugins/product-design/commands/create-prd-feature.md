@@ -21,7 +21,7 @@ create-prd-feature <feature-name>
 
 When this command is run, Claude Code should:
 
-1. Read the FRD template from `claude_settings/python/shared/templates/prd-feature-template.md`
+1. Read the FRD template from `plugins/product-design/templates/frd-template.md`
 2. Start an interactive session optimized for feature-level requirements
 3. Focus on gathering technical details needed for implementation
 4. Generate actionable tasks and clear specifications

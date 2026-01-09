@@ -77,6 +77,31 @@ Review and sync captured feedback to Product Forge. Provides statistics, interac
 /sync-feedback --export     # Export to GitHub issues
 ```
 
+### /propose-project-learning
+Retrospect on the current session and propose learnings for the project's CLAUDE.md. Identifies conventions, preferences, and rules that should be documented.
+
+**Usage**:
+```bash
+/propose-project-learning        # Analyze and propose
+/propose-project-learning --save # Save to ~/.claude/learnings/
+```
+
+**Captures**: Code conventions, architecture decisions, tool preferences, project-specific rules, workflow preferences.
+
+### /propose-forge-improvement
+Retrospect on the current session and propose improvements to Product Forge. First checks if existing components (skills, commands, agents, docs) should be improved, otherwise suggests new ones.
+
+**Usage**:
+```bash
+/propose-forge-improvement        # Analyze and propose
+/propose-forge-improvement --save # Save to ~/.claude/learnings/
+```
+
+**Flow**:
+1. Analyze session for Product Forge usage
+2. Check if existing component can be improved
+3. If not, suggest new skill/command/agent
+
 ## Feedback System
 
 The plugin includes a feedback capture system that:
