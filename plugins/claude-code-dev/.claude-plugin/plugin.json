@@ -6,5 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "commands": "./commands/"
+  "commands": "./commands/",
+  "hooks": "./hooks/hooks.json"
 }
