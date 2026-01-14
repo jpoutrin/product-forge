@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -n --arg tmux_location \"$WS_TMUX_LOCATION\" --arg tmux_session_name \"$WS_TMUX_SESSION_NAME\" --arg tmux_window_name \"$WS_TMUX_WINDOW_NAME\" --arg project \"$(basename \"$PWD\")\" --arg cwd \"$PWD\" --arg hook_event_name \"Stop\" --arg session_id \"$CLAUDE_SESSION_ID\" '{tmux_location: $tmux_location, tmux_session_name: $tmux_session_name, tmux_window_name: $tmux_window_name, project: $project, cwd: $cwd, hook_event_name: $hook_event_name, session_id: $session_id}' | curl -s -X POST -H 'Content-Type: application/json' -d @- http://localhost:9000/hooks/claude-notify"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -n --arg tmux_location \"$WS_TMUX_LOCATION\" --arg tmux_session_name \"$WS_TMUX_SESSION_NAME\" --arg tmux_window_name \"$WS_TMUX_WINDOW_NAME\" --arg project \"$(basename \"$PWD\")\" --arg cwd \"$PWD\" --arg hook_event_name \"Notification\" --arg session_id \"$CLAUDE_SESSION_ID\" '{tmux_location: $tmux_location, tmux_session_name: $tmux_session_name, tmux_window_name: $tmux_window_name, project: $project, cwd: $cwd, hook_event_name: $hook_event_name, session_id: $session_id}' | curl -s -X POST -H 'Content-Type: application/json' -d @- http://localhost:9000/hooks/claude-notify"
+          }
+        ]
+      }
+    ]
+  }
+}

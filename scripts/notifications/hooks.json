@@ -1,0 +1,62 @@
+[
+  {
+    "id": "go-tmux",
+    "execute-command": "__BIN_DIR__/go-tmux.sh",
+    "command-working-directory": "__BIN_DIR__",
+    "pass-arguments-to-command": [
+      {
+        "source": "url",
+        "name": "tmux_location"
+      }
+    ],
+    "trigger-rule": {
+      "match": {
+        "type": "value",
+        "value": "",
+        "parameter": {
+          "source": "url",
+          "name": "tmux_location"
+        }
+      }
+    }
+  },
+  {
+    "id": "claude-notify",
+    "execute-command": "__BIN_DIR__/notify-claude.sh",
+    "command-working-directory": "__BIN_DIR__",
+    "pass-arguments-to-command": [
+      {
+        "source": "payload",
+        "name": "tmux_location"
+      },
+      {
+        "source": "payload",
+        "name": "tmux_session_name"
+      },
+      {
+        "source": "payload",
+        "name": "tmux_window_name"
+      },
+      {
+        "source": "payload",
+        "name": "project"
+      },
+      {
+        "source": "payload",
+        "name": "cwd"
+      },
+      {
+        "source": "payload",
+        "name": "transcript_path"
+      },
+      {
+        "source": "payload",
+        "name": "hook_event_name"
+      },
+      {
+        "source": "payload",
+        "name": "session_id"
+      }
+    ]
+  }
+]
