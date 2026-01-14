@@ -15,6 +15,7 @@ agents:
   python-experts:django-expert:
     skills:
       - python-experts:python-style
+      - python-experts:python-code-review
       - python-experts:django-dev
       - python-experts:django-api
       - python-experts:documentation-research
@@ -23,42 +24,49 @@ agents:
   python-experts:fastapi-expert:
     skills:
       - python-experts:python-style
+      - python-experts:python-code-review
       - python-experts:documentation-research
     description: FastAPI high-performance async APIs
 
   python-experts:fastmcp-expert:
     skills:
       - python-experts:python-style
+      - python-experts:python-code-review
       - python-experts:documentation-research
     description: FastMCP Python server development
 
   python-experts:celery-expert:
     skills:
       - python-experts:python-style
+      - python-experts:python-code-review
       - python-experts:documentation-research
     description: Celery distributed task queues
 
   python-experts:python-testing-expert:
     skills:
       - python-experts:python-style
+      - python-experts:python-code-review
     description: Python testing with pytest
 
   # Frontend Experts
   frontend-experts:react-typescript-expert:
     skills:
       - frontend-experts:typescript-style
+      - frontend-experts:typescript-code-review
       - typescript-experts:zod
     description: React TypeScript development
 
   frontend-experts:playwright-testing-expert:
     skills:
       - frontend-experts:typescript-style
+      - frontend-experts:typescript-code-review
     description: Playwright E2E testing
 
   # TypeScript Experts
   typescript-experts:fastmcp-ts-expert:
     skills:
       - frontend-experts:typescript-style
+      - frontend-experts:typescript-code-review
       - typescript-experts:fastmcp
       - typescript-experts:zod
     description: FastMCP TypeScript server development
@@ -159,3 +167,8 @@ agents:
     skills:
       - git-workflow:git-commits
     description: Git rebase with conflict resolution
+
+  git-workflow:code-review-expert:
+    skills:
+      - git-workflow:git-commits
+    description: Code review orchestrator with dynamic specialist delegation
