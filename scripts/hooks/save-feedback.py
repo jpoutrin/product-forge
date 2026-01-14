@@ -19,6 +19,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 
 # === CONFIGURATION ===
@@ -57,7 +58,7 @@ def ensure_learnings_dir() -> None:
         }, indent=2))
 
 
-def get_git_remote_url(cwd: str) -> str | None:
+def get_git_remote_url(cwd: str) -> Optional[str]:
     """Extract the git remote URL from a directory."""
     try:
         result = subprocess.run(
@@ -108,7 +109,7 @@ def save_feedback_item(
     project_slug: str,
     session_id: str,
     cwd: str
-) -> Path | None:
+) -> Optional[Path]:
     """Save a single feedback item to the appropriate directory."""
     feedback_type = item.get("type", "improvement")
     if feedback_type not in FEEDBACK_TYPES:
