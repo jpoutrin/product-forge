@@ -110,16 +110,23 @@ else
 fi
 echo ""
 
-# Check Claude hooks
-echo "Claude Hooks:"
-if [ -f "$HOME/.claude/settings.json" ]; then
-    if grep -q "claude-notify" "$HOME/.claude/settings.json" 2>/dev/null; then
-        echo "  ✅ Notification hooks configured"
+# Check Claude hooks via webhook log
+echo "Claude Hooks (check log for activity):"
+LOG_FILE="$HOME/Library/Logs/claude-webhook/webhook.log"
+if [ -f "$LOG_FILE" ]; then
+    RECENT_LINES=$(tail -5 "$LOG_FILE" 2>/dev/null)
+    if [ -n "$RECENT_LINES" ]; then
+        echo "  Recent webhook log entries:"
+        echo "$RECENT_LINES" | sed 's/^/    /'
     else
-        echo "  ❌ Notification hooks not configured"
+        echo "  ⚠️  Log file exists but is empty"
     fi
+    echo ""
+    echo "  To verify hooks are working, trigger a Claude stop event"
+    echo "  and check: tail -f ~/Library/Logs/claude-webhook/webhook.log"
 else
-    echo "  ❌ ~/.claude/settings.json not found"
+    echo "  ⚠️  No log file yet at ~/Library/Logs/claude-webhook/webhook.log"
+    echo "  Log will be created when first notification is received"
 fi
 ```
 

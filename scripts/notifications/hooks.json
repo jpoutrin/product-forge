@@ -8,17 +8,7 @@
         "source": "url",
         "name": "tmux_location"
       }
-    ],
-    "trigger-rule": {
-      "match": {
-        "type": "value",
-        "value": "",
-        "parameter": {
-          "source": "url",
-          "name": "tmux_location"
-        }
-      }
-    }
+    ]
   },
   {
     "id": "claude-notify",

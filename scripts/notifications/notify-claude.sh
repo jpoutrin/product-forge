@@ -23,6 +23,10 @@ TRANSCRIPT="${6:-}"
 HOOK_EVENT="${7:-Notification}"
 SESSION_ID="${8:-}"
 
+# Optional sender app (set NOTIFICATION_SENDER to customize which app icon appears)
+# If not set, notifications appear from terminal-notifier itself
+SENDER="${NOTIFICATION_SENDER:-}"
+
 # Determine notification message based on hook event
 if [ "$HOOK_EVENT" = "Stop" ]; then
     STATUS="done"
@@ -37,15 +41,21 @@ if [ "$PROJECT" = "unknown" ] || [ -z "$PROJECT" ]; then
     PROJECT=$(basename "$CWD")
 fi
 
-# Generate the notification
-/opt/homebrew/bin/terminal-notifier \
+# Build sender argument only if SENDER is set
+SENDER_ARG=""
+if [ -n "$SENDER" ]; then
+    SENDER_ARG="-sender $SENDER"
+fi
+
+# Generate the notification (run in background to avoid blocking)
+terminal-notifier \
     -title "Claude Code - $SESSION_NAME" \
     -subtitle "Claude is $STATUS" \
     -message "Project: $PROJECT (window: $WINDOW_NAME)" \
     -execute "/usr/bin/curl -s -X POST 'http://localhost:9000/hooks/go-tmux?tmux_location=$TMUX_LOCATION'" \
     -sound "$SOUND" \
     -group "claude-$SESSION_ID" \
-    -sender "com.googlecode.iterm2"
+    $SENDER_ARG &
 
 # Log for debugging (optional - comment out in production)
 # echo "$(date '+%Y-%m-%d %H:%M:%S') - Notification sent: $HOOK_EVENT for $PROJECT in $SESSION_NAME:$WINDOW_NAME" >> /tmp/claude-notifications.log
