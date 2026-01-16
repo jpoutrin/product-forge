@@ -1,0 +1,20 @@
+Analyze these user messages from a Claude Code session. Identify actionable feedback for improving the Product Forge toolkit.
+
+USER MESSAGES:
+"""
+{messages}
+"""
+
+Look for:
+1. Corrections the user made ("no, use X", "that's wrong")
+2. Preferences expressed ("always use", "never do", "prefer")
+3. Bug reports or issues mentioned
+4. Ideas or suggestions for new features
+5. Patterns that could become reusable skills
+
+Respond with ONLY valid JSON (no markdown, no explanation):
+{"feedback": [
+  {"type": "improvement|skill-idea|command-idea|bug-report|pattern", "title": "Short title", "description": "What was identified", "target": "plugin/component if known"}
+]}
+
+If no actionable feedback found, respond: {"feedback": []}
