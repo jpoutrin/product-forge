@@ -1,6 +1,6 @@
 ---
 description: Review and sync captured feedback to Product Forge
-argument-hint: "[--status] [--review] [--export]"
+argument-hint: "[--status] [--process] [--review] [--export]"
 ---
 
 # Sync Feedback
@@ -10,8 +10,8 @@ Review feedback captured from your Claude Code sessions and sync to Product Forg
 ## Usage
 
 ```bash
-/sync-feedback              # Interactive review mode (default)
-/sync-feedback --status     # Show statistics only
+/sync-feedback              # Show status (default)
+/sync-feedback --process    # Process captured sessions with LLM analysis
 /sync-feedback --review     # Review pending feedback
 /sync-feedback --export     # Export to GitHub issues format
 ```
@@ -21,6 +21,7 @@ Review feedback captured from your Claude Code sessions and sync to Product Forg
 | Option | Description |
 |--------|-------------|
 | `--status` | Show feedback statistics across all projects |
+| `--process` | Process captured sessions with LLM to extract feedback |
 | `--review` | Interactive review of pending feedback items |
 | `--export` | Export reviewed feedback to GitHub issue format |
 
@@ -46,14 +47,41 @@ All feedback is stored in `~/.claude/learnings/`:
 
 ```
 1. Enable hooks → /enable-feedback-hooks
-2. Work normally → Feedback captured at session end
-3. Review       → /sync-feedback --review
-4. Submit       → /sync-feedback --export → Create GitHub issue
+2. Work normally → Sessions captured on exit (fast, no LLM)
+3. Process      → /sync-feedback --process (LLM analyzes sessions)
+4. Review       → /sync-feedback --review
+5. Submit       → /sync-feedback --export → Create GitHub issue
 ```
 
 ## Execution Instructions
 
 When the user runs this command:
+
+### Process Mode (--process)
+
+1. **Run the process-sessions script**:
+   ```bash
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/process-sessions.py --all
+   ```
+
+2. **The script will**:
+   - Find all unprocessed sessions in `~/.claude/learnings/sessions/`
+   - For each session, read the transcript and extract user messages
+   - Call `claude -p` to analyze messages for feedback
+   - Save extracted feedback items to appropriate directories
+   - Mark sessions as processed
+
+3. **Display results**:
+   ```
+   Processing sessions...
+   [process-sessions] Processing session abc12345 for project 'product-forge'
+   [process-sessions]   Saved: improvement-add-validation.md
+   [process-sessions]   Saved: skill-idea-log-checker.md
+
+   Processed 3 sessions, found 5 feedback items
+
+   Run /sync-feedback --review to review extracted feedback.
+   ```
 
 ### Status Mode (--status or default with no pending items)
 

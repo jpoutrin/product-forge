@@ -6,18 +6,13 @@
         "matcher": "",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Analyze this session for Product Forge feedback. Identify:\n1. Improvements to existing skills/commands/agents\n2. New skill/command ideas\n3. Bug reports\n4. Reusable patterns\n\nRespond JSON: {\"ok\": true, \"feedback\": [{\"type\": \"improvement|skill-idea|command-idea|bug-report|pattern\", \"title\": \"...\", \"description\": \"...\", \"target\": \"plugin/component\"}]} or {\"ok\": true, \"feedback\": []}",
-            "timeout": 60
+            "type": "command",
+            "command": "$HOME/bin/claude-hook-notify.sh Stop"
           },
           {
             "type": "command",
             "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/save-feedback.py",
             "timeout": 10
-          },
-          {
-            "type": "command",
-            "command": "$HOME/bin/claude-hook-notify.sh Stop"
           }
         ]
       }
