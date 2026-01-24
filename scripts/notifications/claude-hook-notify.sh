@@ -10,10 +10,14 @@ if [ -n "$TMUX" ]; then
   TMUX_LOCATION=$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null)
   TMUX_SESSION=$(tmux display-message -p '#{session_name}' 2>/dev/null)
   TMUX_WINDOW=$(tmux display-message -p '#{window_name}' 2>/dev/null)
-else
-  TMUX_LOCATION="${WS_TMUX_LOCATION:-unknown}"
+elif [ -n "$WS_TMUX_LOCATION" ]; then
+  # Fallback to env vars set by tmux-env.sh
+  TMUX_LOCATION="$WS_TMUX_LOCATION"
   TMUX_SESSION="${WS_TMUX_SESSION_NAME:-unknown}"
   TMUX_WINDOW="${WS_TMUX_WINDOW_NAME:-unknown}"
+else
+  # Not in tmux and no env vars set - skip notification
+  exit 0
 fi
 
 # Build payload
