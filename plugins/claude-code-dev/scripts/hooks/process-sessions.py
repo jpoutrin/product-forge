@@ -123,7 +123,7 @@ def load_prompt_template() -> str:
     if prompt_file.exists():
         return prompt_file.read_text()
 
-    # Fallback inline prompt
+    # Fallback inline prompt (braces doubled for str.format compatibility)
     return '''Analyze these user messages from a Claude Code session. Identify actionable feedback.
 
 USER MESSAGES:
@@ -131,8 +131,8 @@ USER MESSAGES:
 {messages}
 """
 
-Respond with JSON: {"feedback": [{"type": "improvement|skill-idea|command-idea|bug-report|pattern", "title": "...", "description": "...", "target": "..."}]}
-If none found: {"feedback": []}'''
+Respond with JSON: {{"feedback": [{{"type": "improvement|skill-idea|command-idea|bug-report|pattern", "title": "...", "description": "...", "target": "..."}}]}}
+If none found: {{"feedback": []}}'''
 
 
 def analyze_with_claude(user_messages: str) -> List[dict]:
@@ -163,13 +163,15 @@ def analyze_with_claude(user_messages: str) -> List[dict]:
             wrapper = json.loads(output)
             if "result" in wrapper:
                 inner = wrapper["result"]
-                inner = re.sub(r'^```(?:json)?\s*', '', inner)
-                inner = re.sub(r'\s*```$', '', inner)
+                # Strip markdown code fences (handles both actual and escaped newlines)
+                inner = re.sub(r'^```(?:json)?[\s\\n]*', '', inner)
+                inner = re.sub(r'[\s\\n]*```$', '', inner)
                 inner = inner.strip()
                 data = json.loads(inner)
             elif "feedback" in wrapper:
                 data = wrapper
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            log(f"JSON parse error: {e}, inner={inner[:100] if 'inner' in dir() else 'N/A'}")
             pass
 
         if data:
@@ -366,5 +368,7 @@ if __name__ == "__main__":
         print("\nInterrupted")
         sys.exit(1)
     except Exception as e:
+        import traceback
         log(f"Error: {e}")
+        traceback.print_exc()
         sys.exit(1)

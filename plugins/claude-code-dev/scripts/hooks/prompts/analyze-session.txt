@@ -1,20 +1,35 @@
-Analyze these user messages from a Claude Code session. Identify actionable feedback for improving the Product Forge toolkit.
+Analyze these user messages from a Claude Code session. Extract GENERALIZABLE and ADDRESSABLE feedback for improving the Product Forge toolkit.
 
 USER MESSAGES:
 """
 {messages}
 """
 
+CRITICAL RULES:
+1. GENERALIZE project-specific requests into reusable patterns
+   - BAD: "generate consent screen demo page" (too specific)
+   - GOOD: "Demo page generator - create static preview pages from designs for layout validation"
+
+2. Extract the UNDERLYING NEED, not the literal request
+   - BAD: "fix the login bug in my app"
+   - GOOD: "Auth flow debugging skill - diagnose common authentication issues"
+
+3. Only include ADDRESSABLE items that Product Forge could implement
+   - Skip project-specific bugs, one-off tasks, or domain-specific features
+   - Focus on patterns, workflows, and tools that help ANY developer
+
+4. Give DESCRIPTIVE titles (never "User Suggestion" or "User Request")
+
 Look for:
-1. Corrections the user made ("no, use X", "that's wrong")
-2. Preferences expressed ("always use", "never do", "prefer")
-3. Bug reports or issues mentioned
-4. Ideas or suggestions for new features
-5. Patterns that could become reusable skills
+1. Corrections ("no, use X", "that's wrong") → reveals best practices
+2. Preferences ("always", "never", "prefer") → coding style patterns
+3. Repeated frustrations → missing skills or workflows
+4. Novel approaches → potential new patterns
+5. Tool requests → command or skill ideas
 
 Respond with ONLY valid JSON (no markdown, no explanation):
-{"feedback": [
-  {"type": "improvement|skill-idea|command-idea|bug-report|pattern", "title": "Short title", "description": "What was identified", "target": "plugin/component if known"}
-]}
+{{"feedback": [
+  {{"type": "improvement|skill-idea|command-idea|bug-report|pattern", "title": "Descriptive 3-7 word title", "description": "Generalized description of the underlying need and how it could help any developer", "target": "plugin/component if applicable"}}
+]}}
 
-If no actionable feedback found, respond: {"feedback": []}
+If nothing generalizable found, respond: {{"feedback": []}}
