@@ -1,6 +1,7 @@
 ---
 name: python-style
-description: Automatic enforcement of Python coding style, PEP standards, type hints, and modern Python patterns. Use when writing Python code to ensure consistency with PEP 8, proper type hints, Google-style docstrings, modern Python 3.11+ idioms, and merge-friendly patterns for parallel multi-agent development.
+description: Python coding style enforcement (PEP standards, type hints, docstrings, modern patterns). Auto-loads when writing or reviewing Python code.
+user-invocable: false
 ---
 
 # Python Style Best Practices Skill

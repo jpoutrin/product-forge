@@ -1,6 +1,7 @@
 ---
 name: typescript-style
-description: Automatic enforcement of TypeScript/JavaScript coding style, ESLint standards, type safety, and modern patterns. Use when writing TypeScript or React code to ensure strict type safety and modern ES2024+ patterns.
+description: TypeScript coding style enforcement (ESLint, type safety, React patterns). Auto-loads when writing or reviewing TypeScript/JavaScript code.
+user-invocable: false
 ---
 
 # TypeScript/JavaScript Style Best Practices Skill

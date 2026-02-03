@@ -1,8 +1,8 @@
 ---
 name: python-code-review
 short: Python code review patterns and anti-patterns
-description: Python-specific code review guidelines covering common bugs, security issues, performance anti-patterns, and framework-specific concerns for Django, FastAPI, and Celery. Use when reviewing Python code changes for quality, security, and best practices.
-when: Reviewing Python code for bugs, security issues, performance problems, or best practices
+description: Python code review guidelines (security, performance, bugs, style). Auto-loads when reviewing Python code or analyzing code quality.
+user-invocable: false
 ---
 
 # Python Code Review Patterns

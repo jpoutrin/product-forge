@@ -1,6 +1,7 @@
 ---
 name: mcp-architecture
-description: MCP (Model Context Protocol) architecture patterns, security best practices, and memory management strategies. Use when designing, implementing, or debugging MCP servers in Python (FastMCP) or TypeScript.
+description: MCP architecture patterns, security, and memory management. Auto-loads when building MCP servers, implementing tools/resources, discussing MCP security, or working with FastMCP.
+user-invocable: false
 ---
 
 # MCP Architecture Skill

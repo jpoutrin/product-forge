@@ -1,8 +1,8 @@
 ---
 name: pattern-detection
 short: Recognize reusable patterns for Product Forge
-description: Identify reusable patterns, best practices, and workflow automations during implementation that could become Product Forge skills, commands, or templates. Use when implementing repetitive structures, applying consistent conventions, or recognizing generalizable solutions.
-when: Claude implements similar patterns multiple times, creates reusable structures, or applies best practices that could benefit others
+description: Auto-detects reusable patterns, best practices, and automation opportunities during implementation. Recognizes repetitive structures and generalizable solutions that could become skills.
+user-invocable: false
 ---
 
 # Pattern Detection Skill

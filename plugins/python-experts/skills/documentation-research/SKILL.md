@@ -1,6 +1,7 @@
 ---
 name: documentation-research
-description: Enforces online documentation research before any technical implementation. Use when implementing features to ensure code follows current best practices by researching official documentation first.
+description: Enforces documentation research before implementation. Auto-loads when implementing features to ensure current best practices are followed. Researches official docs first.
+user-invocable: false
 ---
 
 # Documentation Research Skill

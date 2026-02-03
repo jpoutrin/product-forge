@@ -1,8 +1,8 @@
 ---
 name: typescript-code-review
 short: TypeScript and React code review patterns
-description: TypeScript and React-specific code review guidelines covering type safety, React anti-patterns, performance issues, accessibility concerns, and security vulnerabilities. Use when reviewing TypeScript/React code changes for quality and best practices.
-when: Reviewing TypeScript, React, or JavaScript code for bugs, performance issues, or best practices
+description: TypeScript and React code review guidelines (type safety, React patterns, performance). Auto-loads when reviewing TypeScript/React code.
+user-invocable: false
 ---
 
 # TypeScript/React Code Review Patterns

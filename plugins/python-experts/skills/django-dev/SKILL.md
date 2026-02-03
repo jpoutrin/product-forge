@@ -1,6 +1,7 @@
 ---
 name: django
-description: Django web application development (2025). Use when creating or modifying Django projects, apps, models, views, URLs, forms, templates, or management commands. Covers project structure, naming conventions, async support, type hints, and modern best practices.
+description: Django development patterns and conventions (2025). Auto-loads when working with Django models, views, URLs, forms, templates, management commands, or project structure. Includes async support and type hints.
+user-invocable: false
 ---
 
 # Django Development (2025)

@@ -1,6 +1,7 @@
 ---
 name: qa-testing-methodology
-description: QA best practices and test design patterns. Use when designing test cases to ensure comprehensive coverage with equivalence partitioning, boundary analysis, and accessibility testing.
+description: QA test design patterns (equivalence partitioning, boundary analysis, accessibility). Auto-loads when designing test cases, planning test coverage, or writing test procedures.
+user-invocable: false
 ---
 
 # QA Testing Methodology Skill
