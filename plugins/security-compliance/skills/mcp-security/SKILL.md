@@ -1,6 +1,6 @@
 ---
 name: mcp-security
-description: Multi-agent and MCP pipeline security with 5-layer defense architecture. Use when building MCP servers, multi-agent systems, or any pipeline that handles user input to prevent prompt injection and ensure proper authorization.
+description: Use when securing MCP servers, preventing prompt injection, implementing authorization, validating user input, or building secure multi-agent pipelines. Provides 5-layer defense architecture patterns.
 ---
 
 # MCP Security Skill

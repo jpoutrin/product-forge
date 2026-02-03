@@ -1,6 +1,6 @@
 ---
 name: prd-management
-description: Automatic PRD lifecycle management, organization, and status tracking. Use when working with Product Requirements Documents (PRDs) or Feature Requirements Documents (FRDs) for proper naming, directory structure, and status transitions.
+description: Use when organizing PRDs, tracking requirements, managing product specs, updating PRD status, archiving completed docs, or setting up PRD structure. Auto-applies naming conventions and lifecycle management.
 ---
 
 # PRD Management Skill

@@ -1,6 +1,6 @@
 ---
 name: console-debugging
-description: Browser console message analysis for debugging JavaScript errors, warnings, and application logs. Use when investigating frontend issues, tracking console output, or diagnosing JavaScript problems.
+description: Use when debugging JavaScript errors, checking console warnings, analyzing browser logs, finding runtime errors, investigating console output, or troubleshooting browser issues. Provides console message analysis.
 ---
 
 # Console Debugging Skill

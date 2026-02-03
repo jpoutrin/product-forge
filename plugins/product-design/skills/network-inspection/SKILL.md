@@ -1,6 +1,6 @@
 ---
 name: network-inspection
-description: HTTP request and response analysis for debugging API calls, identifying failed requests, and understanding data flow. Use when investigating API issues, authentication problems, or data loading failures.
+description: Use when debugging API calls, checking network requests, inspecting HTTP traffic, finding failed requests, analyzing response data, or investigating API errors. Provides detailed request/response analysis.
 ---
 
 # Network Inspection Skill
