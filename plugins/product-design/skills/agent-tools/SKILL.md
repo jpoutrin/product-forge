@@ -1,8 +1,7 @@
 ---
 name: agent-tools
-short: Claude Code tool permissions reference
 description: Reference for configuring tool permissions when launching Claude Code agents. Use when setting up --allowedTools flags, restricting file access, or configuring agent permissions.
-when: User wants to configure agent permissions, restrict tool access, set up --allowedTools flags, or understand Claude Code CLI tool restrictions
+user-invocable: false
 ---
 
 # Claude Code Tools Reference

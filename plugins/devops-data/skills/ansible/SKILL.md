@@ -1,6 +1,7 @@
 ---
 name: ansible
 description: Ansible automation and configuration management patterns. Use when writing Ansible playbooks, roles, or automating infrastructure configuration and deployment tasks.
+user-invocable: false
 ---
 
 # Ansible Skill

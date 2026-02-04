@@ -1,8 +1,6 @@
 ---
 name: create-skill
-short: Create Claude Code agent skills
 description: Create a new Claude Code agent skill with proper folder structure and SKILL.md format. Use when the user wants to add a model-invoked skill that Claude uses autonomously based on context. Handles skill folder creation with SKILL.md and optional reference files.
-when: User wants to create a skill, add a model-invoked skill, or asks how to define skills
 ---
 
 # Create Skill Skill
@@ -28,9 +26,8 @@ skills/
 ```markdown
 ---
 name: skill-name
-short: Brief 5-8 word summary (optional)
 description: When and how Claude should use this skill. Be specific about triggers and use cases.
-when: Semantic activation trigger for index display (optional)
+user-invocable: false
 ---
 
 # Skill Title
@@ -43,16 +40,13 @@ Detailed instructions for how to apply this skill...
 | Field | Description | Example |
 |-------|-------------|---------|
 | `name` | Unique identifier (kebab-case) | `python-best-practices` |
-| `description` | When Claude should invoke this skill (used by Claude Code) | `Apply Python best practices when writing or reviewing Python code. Use for type hints, docstrings, and PEP compliance.` |
+| `description` | When Claude should invoke this skill | `Apply Python best practices when writing or reviewing Python code. Use for type hints, docstrings, and PEP compliance.` |
 
 ## Optional Frontmatter Fields
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| `short` | Brief 5-8 word summary for index display | `Python best practices and style enforcement` |
-| `when` | Semantic activation trigger for index display | `User writes Python code, reviews Python files, or asks about Python patterns` |
-
-**Note**: `short` and `when` are used for forge-index display. The `description` field is used by Claude Code for skill invocation.
+| Field | Description | Default | Example |
+|-------|-------------|---------|---------|
+| `user-invocable` | Whether users can invoke skill with `/skill-name` | `true` | `false` for knowledge skills, `true` for action skills |
 
 ## Writing Effective Descriptions
 
@@ -103,9 +97,8 @@ The body should include:
 ```markdown
 ---
 name: conventional-commits
-short: Conventional commit message formatting
 description: Apply conventional commit message format when the user is committing code or asking about commit messages. Enforces type prefixes, scope, and message structure.
-when: User commits code, writes commit messages, or asks about commit conventions
+user-invocable: false
 ---
 
 # Conventional Commits

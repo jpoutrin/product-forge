@@ -1,8 +1,7 @@
 ---
 name: zod
-short: TypeScript-first schema validation with Zod
-description: Apply Zod patterns when writing schema validation, data parsing, or type-safe validation in TypeScript. Use for API input validation, form validation, configuration parsing, and runtime type checking.
-when: User needs schema validation, data parsing, form validation, or runtime type checking in TypeScript
+description: Zod schema validation patterns and type inference. Auto-loads when validating schemas, parsing data, validating forms, checking types at runtime, or using z.object/z.string/z.infer in TypeScript.
+user-invocable: false
 ---
 
 # Zod Schema Validation

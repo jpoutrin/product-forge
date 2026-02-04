@@ -1,6 +1,7 @@
 ---
 name: dependency-alignment
 description: Dependency version alignment and conflict resolution for parallel development. Use when extracting dependencies from Tech Specs to ensure version compatibility with existing project dependencies and transitive dependencies.
+user-invocable: false
 ---
 
 # Dependency Version Alignment Skill

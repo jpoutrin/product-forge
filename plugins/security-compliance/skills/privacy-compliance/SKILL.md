@@ -1,6 +1,7 @@
 ---
 name: privacy-compliance
 description: GDPR, CCPA, and privacy compliance guidance for data protection. Use when handling personal data, implementing consent management, or ensuring regulatory compliance across jurisdictions.
+user-invocable: false
 ---
 
 # Privacy Compliance Skill

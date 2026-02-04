@@ -1,8 +1,7 @@
 ---
 name: parallel-execution
-short: Parallel agent execution with cpo
 description: Execute multiple Claude Code agents in parallel using the cpo CLI tool. Use when running parallel tasks, monitoring execution, or understanding the execution workflow.
-when: User wants to execute parallel agents, run cpo commands, monitor parallel task progress, or understand the execution workflow
+user-invocable: false
 ---
 
 # Parallel Execution

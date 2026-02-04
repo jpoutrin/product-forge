@@ -1,6 +1,7 @@
 ---
 name: branchless-workflow
 description: Git-branchless stacked diffs workflow patterns and command reference
+user-invocable: false
 ---
 
 # Git-Branchless Workflow

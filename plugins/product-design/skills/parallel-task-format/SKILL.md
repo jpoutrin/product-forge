@@ -1,8 +1,7 @@
 ---
 name: parallel-task-format
-short: Task specification format for parallel agents
 description: Compact YAML format for defining parallel task specifications with scope, boundaries, and agent assignments. Use when creating task files for parallel development.
-when: User wants to create task specifications, define task boundaries and scope, structure task files for agents, or understand the task YAML format
+user-invocable: false
 ---
 
 # Task Specification Format

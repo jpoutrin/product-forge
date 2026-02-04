@@ -1,6 +1,7 @@
 ---
 name: direnv
 description: Direnv environment management for automatic per-project shell configuration. Use when setting up .envrc files, configuring project-specific environment variables, or integrating direnv with development tools like nix, asdf, pyenv, or nvm.
+user-invocable: false
 ---
 
 # Direnv Skill

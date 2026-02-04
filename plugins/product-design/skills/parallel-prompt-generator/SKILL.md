@@ -1,8 +1,7 @@
 ---
 name: parallel-prompt-generator
-short: Generate agent prompts from task specs
 description: Generate agent-ready prompts from existing task specification files. Use when regenerating prompts after editing tasks, updating prompt templates, or preparing tasks for cpo execution.
-when: User wants to generate prompts from tasks, regenerate prompts after task edits, create agent-ready instructions from task specs, or refresh the prompts/ folder
+user-invocable: false
 ---
 
 # Prompt Generator

@@ -1,6 +1,7 @@
 ---
 name: sqlmesh
 description: SQLMesh patterns for data transformation with column-level lineage and virtual environments. Use when building data pipelines that need advanced features like automatic DAG inference and efficient incremental processing.
+user-invocable: false
 ---
 
 # SQLMesh Skill

@@ -1,6 +1,7 @@
 ---
 name: product-strategy
 description: Chief Product Officer expertise with proven frameworks and strategic guidance. Use when discussing product strategy, market analysis, competitive positioning, feature prioritization, or business models to apply expert CPO perspective.
+user-invocable: false
 ---
 
 # Product Strategy Skill

@@ -1,6 +1,7 @@
 ---
 name: design-system
 description: Design system management for building and reusing UI components, tokens, and patterns. Use when working with component libraries, design tokens, style guides, or reusable UI patterns to ensure consistency and promote component reuse.
+user-invocable: false
 ---
 
 # Design System Skill

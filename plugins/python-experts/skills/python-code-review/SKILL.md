@@ -1,6 +1,5 @@
 ---
 name: python-code-review
-short: Python code review patterns and anti-patterns
 description: Python code review guidelines (security, performance, bugs, style). Auto-loads when reviewing Python code or analyzing code quality.
 user-invocable: false
 ---

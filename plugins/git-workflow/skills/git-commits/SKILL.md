@@ -1,6 +1,7 @@
 ---
 name: git-commits
 description: Git commit best practices with conventional commits format and atomic commit principles. Use when committing code to ensure clear, meaningful commit history with proper type prefixes and semantic versioning support.
+user-invocable: false
 ---
 
 # Git Commits Skill

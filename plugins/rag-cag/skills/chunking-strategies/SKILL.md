@@ -1,6 +1,7 @@
 ---
 name: chunking-strategies
 description: Document chunking strategies for RAG systems. Use when implementing document processing pipelines to determine optimal chunking approaches based on document type and retrieval requirements.
+user-invocable: false
 ---
 
 # Chunking Strategies Skill

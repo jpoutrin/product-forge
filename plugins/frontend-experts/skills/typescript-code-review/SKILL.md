@@ -1,6 +1,5 @@
 ---
 name: typescript-code-review
-short: TypeScript and React code review patterns
 description: TypeScript and React code review guidelines (type safety, React patterns, performance). Auto-loads when reviewing TypeScript/React code.
 user-invocable: false
 ---

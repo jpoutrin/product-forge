@@ -1,6 +1,5 @@
 ---
 name: pattern-detection
-short: Recognize reusable patterns for Product Forge
 description: Auto-detects reusable patterns, best practices, and automation opportunities during implementation. Recognizes repetitive structures and generalizable solutions that could become skills.
 user-invocable: false
 ---

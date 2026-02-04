@@ -1,6 +1,7 @@
 ---
 name: aws-cloud
 description: AWS cloud infrastructure patterns and best practices. Use when designing or implementing AWS solutions including EC2, Lambda, S3, RDS, and infrastructure as code with Terraform or CloudFormation.
+user-invocable: false
 ---
 
 # AWS Cloud Skill

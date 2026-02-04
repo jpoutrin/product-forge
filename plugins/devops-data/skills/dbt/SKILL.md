@@ -1,6 +1,7 @@
 ---
 name: dbt
 description: dbt (data build tool) patterns for data transformation and analytics engineering. Use when building data models, implementing data quality tests, or managing data transformation pipelines.
+user-invocable: false
 ---
 
 # dbt Skill

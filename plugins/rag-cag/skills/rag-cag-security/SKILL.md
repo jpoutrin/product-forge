@@ -1,6 +1,7 @@
 ---
 name: rag-cag-security
 description: Security patterns for RAG and CAG systems with multi-tenant isolation. Use when building retrieval-augmented or cache-augmented generation systems that require tenant isolation, access control, and secure data handling.
+user-invocable: false
 ---
 
 # RAG/CAG Security Skill

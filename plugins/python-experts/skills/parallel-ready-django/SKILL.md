@@ -1,8 +1,6 @@
 ---
 name: parallel-ready-django
-short: Audit Django project for parallel agent development
 description: Audit and prepare a Django codebase for parallel multi-agent development. Use when asked to check if a Django project is ready for parallelization, prepare a repo for multi-agent work, audit codebase structure, set up orchestration infrastructure, or identify blockers for parallel development. Analyzes Django apps, models, migrations, and module boundaries.
-when: User wants to check Django parallelization readiness, prepare Django project for multi-agent development, audit Django app structure, identify parallel development blockers, or set up orchestration infrastructure for Django
 ---
 
 # Django Parallel Readiness Assessment

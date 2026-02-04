@@ -1,6 +1,7 @@
 ---
 name: task-orchestration
 description: Documentation-first task execution with quality checks and progress tracking. Use when working with task lists, implementing features, or executing multi-step work to ensure systematic completion with proper documentation review.
+user-invocable: false
 ---
 
 # Task Orchestration Skill

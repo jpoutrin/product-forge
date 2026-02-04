@@ -1,8 +1,6 @@
 ---
 name: parallel-decompose
-short: PRD decomposition into parallel tasks
 description: Decompose PRDs and Tech Specs into parallel-executable tasks with contracts, prompts, and dependency graphs. Use when breaking down a PRD for multi-agent execution.
-when: User wants to decompose a PRD into parallel tasks, generate task specs from a Tech Spec, create contracts for parallel development, or prepare artifacts for cpo execution
 ---
 
 # PRD Decomposition Workflow

@@ -1,8 +1,7 @@
 ---
 name: fastmcp
-short: TypeScript MCP server development with FastMCP
-description: Build MCP servers using the FastMCP TypeScript framework. Use when creating tools, resources, prompts, implementing authentication, session management, or configuring transports for Model Context Protocol servers.
-when: User creates MCP servers, implements MCP tools/resources/prompts, or works with FastMCP framework
+description: FastMCP TypeScript framework patterns for MCP servers. Auto-loads when building MCP servers, creating tools/resources/prompts, implementing authentication, configuring transports, or working with FastMCP in TypeScript.
+user-invocable: false
 ---
 
 # FastMCP Development Skill

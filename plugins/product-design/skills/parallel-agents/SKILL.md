@@ -1,7 +1,7 @@
 ---
 name: parallel-agents
-short: Orchestrate parallel multi-agent development
 description: Use when parallelizing development, running multiple agents, splitting work across agents, coordinating parallel tasks, or decomposing PRDs for concurrent execution. Breaks work into independent agent workstreams.
+user-invocable: false
 ---
 
 # Parallel Agent Development

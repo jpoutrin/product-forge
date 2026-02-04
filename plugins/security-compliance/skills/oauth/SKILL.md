@@ -1,6 +1,7 @@
 ---
 name: oauth
 description: OAuth 2.0 and OpenID Connect implementation patterns. Use when implementing authentication, authorization flows, or integrating with OAuth providers like Google, GitHub, or custom identity providers.
+user-invocable: false
 ---
 
 # OAuth Skill

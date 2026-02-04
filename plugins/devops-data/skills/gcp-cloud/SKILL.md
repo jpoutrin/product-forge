@@ -1,6 +1,7 @@
 ---
 name: gcp-cloud
 description: Google Cloud Platform infrastructure patterns and best practices. Use when designing or implementing GCP solutions including Compute Engine, Cloud Functions, Cloud Storage, and BigQuery.
+user-invocable: false
 ---
 
 # GCP Cloud Skill

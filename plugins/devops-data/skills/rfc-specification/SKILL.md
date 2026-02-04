@@ -1,6 +1,7 @@
 ---
 name: rfc-specification
 description: RFC (Request for Comments) specification writing with objective technical analysis. Use when creating technical specifications, design documents, or architecture proposals that require structured evaluation of options and trade-offs.
+user-invocable: false
 ---
 
 # RFC Specification Writing Skill

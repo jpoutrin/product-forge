@@ -1,6 +1,7 @@
 ---
 name: python-mypy
 description: Static type checking with Mypy for Python code quality. Use when writing or reviewing Python code to ensure type safety, catch bugs early, and maintain code quality through proper type annotations and Mypy configuration.
+user-invocable: false
 ---
 
 # Python Mypy Type Checking Skill

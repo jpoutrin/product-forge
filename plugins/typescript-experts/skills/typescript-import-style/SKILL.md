@@ -1,8 +1,7 @@
 ---
 name: typescript-import-style
-short: Merge-friendly TypeScript import formatting
-description: Apply import formatting and ordering rules that minimize merge conflicts when multiple developers or parallel agents modify the same file. Enforces one-import-per-line, alphabetical sorting, and consistent grouping.
-when: Writing TypeScript/JavaScript code with imports, especially in multi-agent parallel development or team environments
+description: Merge-friendly import formatting (one-per-line, alphabetical). Auto-loads when writing TypeScript/JavaScript imports to minimize merge conflicts in parallel development. Enforces consistent grouping and sorting.
+user-invocable: false
 ---
 
 # TypeScript Import Style Guidelines (Merge Conflict Reduction)

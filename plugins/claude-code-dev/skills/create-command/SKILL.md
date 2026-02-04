@@ -1,8 +1,6 @@
 ---
 name: create-command
-short: Create Claude Code slash commands
 description: Create a new Claude Code slash command with proper YAML frontmatter structure. Use when the user wants to add a custom slash command to a plugin. Handles command file creation with description, argument hints, allowed tools, and all advanced features.
-when: User wants to create a slash command, add a custom command, or asks how to define commands
 ---
 
 # Create Command Skill

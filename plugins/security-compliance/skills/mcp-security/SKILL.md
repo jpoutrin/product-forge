@@ -1,6 +1,7 @@
 ---
 name: mcp-security
 description: Use when securing MCP servers, preventing prompt injection, implementing authorization, validating user input, or building secure multi-agent pipelines. Provides 5-layer defense architecture patterns.
+user-invocable: false
 ---
 
 # MCP Security Skill

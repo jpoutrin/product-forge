@@ -1,6 +1,7 @@
 ---
 name: portman
 description: Port management for local development with git worktrees. Use when setting up local development environments, booking ports for services to avoid collisions between parallel worktrees, or configuring docker-compose with dynamic ports.
+user-invocable: false
 ---
 
 # Portman Skill
