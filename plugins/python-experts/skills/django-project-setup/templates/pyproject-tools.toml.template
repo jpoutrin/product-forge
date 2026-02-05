@@ -16,6 +16,8 @@ exclude = [
 module = [
     "factory.*",
     "environ.*",
+    "oauth2_provider.*",
+    "rest_framework.*",
 ]
 ignore_missing_imports = true
 
@@ -39,6 +41,9 @@ ignore = ["E501"]
 "__init__.py" = ["F401"]
 "*/migrations/*" = ["E501", "N806"]
 "*/tests/*" = ["F401", "F811"]
+"*/admin.py" = ["F401"]
+"*/models.py" = ["F401"]
+"*/views.py" = ["F401"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.dev"

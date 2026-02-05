@@ -183,12 +183,13 @@ Use the templates in `templates/` directory to create:
 1. `docker-compose.yml` - Use docker-compose.yml.template, replace {project_name}
 2. `Makefile` - Use Makefile.template
 3. `.envrc` - Use .envrc.template, replace {project_name}
-4. `.env.example` - Use .env.example.template, replace {project_name}
-5. `.envrc.local` - Use .envrc.local.template
-6. `.gitignore` - Use .gitignore.template
-7. `pytest.ini` - Use pytest.ini.template
-8. `conftest.py` - Use conftest.py.template
-9. `CLAUDE.md` - Use CLAUDE.md.template, replace {project_name}
+4. `.env` - Use .env.template, replace {project_name}
+5. `.env.example` - Use .env.example.template, replace {project_name}
+6. `.envrc.local` - Use .envrc.local.template
+7. `.gitignore` - Use .gitignore.template
+8. `pytest.ini` - Use pytest.ini.template
+9. `conftest.py` - Use conftest.py.template
+10. `CLAUDE.md` - Use CLAUDE.md.template, replace {project_name}
 
 **Step 7: Split Settings Files**
 
