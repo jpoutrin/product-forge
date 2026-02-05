@@ -1,0 +1,26 @@
+# Load environment from .env files
+dotenv_if_exists .env
+dotenv_if_exists .env.local
+
+# Project name
+export PROJECT_NAME="{project_name}"
+
+# Docker Database (local development)
+export POSTGRES_DB="${POSTGRES_DB:-{project_name}_dev}"
+export POSTGRES_USER="${POSTGRES_USER:-postgres}"
+export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+export POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+export DATABASE_URL="${DATABASE_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}}"
+
+# Supabase Configuration (production, optional)
+export SUPABASE_URL="${SUPABASE_URL:-}"
+export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-}"
+export SUPABASE_SERVICE_KEY="${SUPABASE_SERVICE_KEY:-}"
+
+# Django Configuration
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.dev}"
+export DJANGO_SECRET_KEY="${DJANGO_SECRET_KEY:-dev-secret-key-change-in-production}"
+export DEBUG="${DEBUG:-true}"
+
+# Allow local overrides (gitignored)
+source_env_if_exists .envrc.local

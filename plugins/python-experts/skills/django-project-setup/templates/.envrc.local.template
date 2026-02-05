@@ -1,0 +1,18 @@
+# Local environment overrides (gitignored)
+# Copy this template to .envrc.local and customize
+
+# Superuser password for development
+export DJANGO_SUPERUSER_PASSWORD="changeme"
+
+# Override database settings if needed
+# export DATABASE_URL="postgresql://user:pass@localhost:5432/mydb"
+
+# Production settings (when deploying)
+# export DEBUG="false"
+# export DJANGO_SECRET_KEY="production-secret-key-here"
+# export ALLOWED_HOSTS="example.com,www.example.com"
+
+# Supabase credentials (production database)
+# export SUPABASE_URL="https://xxx.supabase.co"
+# export SUPABASE_ANON_KEY="your-anon-key"
+# export SUPABASE_SERVICE_KEY="your-service-key"

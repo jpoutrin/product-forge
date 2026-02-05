@@ -1,0 +1,5 @@
+[pytest]
+DJANGO_SETTINGS_MODULE = config.settings.dev
+python_files = tests.py test_*.py *_tests.py
+addopts = --reuse-db --cov=apps --cov-report=html --cov-report=term
+testpaths = apps

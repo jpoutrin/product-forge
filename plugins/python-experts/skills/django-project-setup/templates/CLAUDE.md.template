@@ -1,0 +1,307 @@
+# {project_name} Development Notes
+
+## Project Setup
+
+This Django 6.0 project uses:
+- **uv** for package management (no pip/venv commands needed)
+- **direnv** for environment variables
+- **PostgreSQL** via Docker Compose (local) or Supabase (production)
+- **pytest-django** for testing
+- **HTMX** for frontend interactivity
+- **OAuth** for authentication
+- **DRF** for API endpoints
+
+## Running the Project
+
+**IMPORTANT**: Always use `/usr/bin/make` (full path) for make commands as per global CLAUDE.md.
+
+```bash
+# Start Docker database
+/usr/bin/make start-docker
+
+# Run migrations
+/usr/bin/make migrate
+
+# Create superuser (set password in .envrc.local first)
+/usr/bin/make createsuperuser
+
+# Start development server
+/usr/bin/make runserver
+
+# Run tests
+/usr/bin/make test
+
+# Type checking
+/usr/bin/make typecheck
+
+# Linting
+/usr/bin/make lint
+
+# Format code
+/usr/bin/make format
+
+# Django shell with IPython
+/usr/bin/make shell
+```
+
+## Creating New Apps
+
+```bash
+# Create new Django app
+mkdir -p apps/{app_name}
+uv run python manage.py startapp {app_name} apps/{app_name}
+
+# Update apps/{app_name}/apps.py to use UUID default
+class {AppName}Config(AppConfig):
+    default_auto_field = 'django.db.models.UUIDField'
+    name = 'apps.{app_name}'
+
+# Add to INSTALLED_APPS in config/settings/base.py
+INSTALLED_APPS += [
+    'apps.{app_name}',
+]
+```
+
+## Database Models
+
+All models use UUID primary keys by default. Inherit from `apps.core.models.UUIDModel`:
+
+```python
+from apps.core.models import UUIDModel
+
+class MyModel(UUIDModel):
+    # id field (UUID) is automatically added
+    # created_at and updated_at are also added
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'my_models'
+        ordering = ['-created_at']
+```
+
+## Testing
+
+Write tests using pytest-django and factory_boy:
+
+```python
+import pytest
+
+@pytest.mark.django_db
+class TestMyModel:
+    def test_creation(self, my_model_factory):
+        """Test model creation."""
+        obj = my_model_factory(name="Test")
+        assert obj.name == "Test"
+        assert obj.id is not None
+```
+
+### Creating Factories
+
+```python
+# apps/{app_name}/factories.py
+import factory
+from factory.django import DjangoModelFactory
+from .models import MyModel
+
+class MyModelFactory(DjangoModelFactory):
+    class Meta:
+        model = MyModel
+
+    name = factory.Faker('name')
+```
+
+Register factories in `conftest.py`:
+
+```python
+from pytest_factoryboy import register
+from apps.{app_name}.factories import MyModelFactory
+
+register(MyModelFactory)
+```
+
+## Environment Variables
+
+- `.envrc` - Committed defaults (safe to share)
+- `.envrc.local` - Local overrides (gitignored, contains secrets)
+- `.env.example` - Template for new developers
+
+To change environment variables:
+1. Copy `.env.example` to `.envrc.local`
+2. Edit `.envrc.local` with your values
+3. Run `direnv allow` to reload
+
+## HTMX Patterns
+
+Basic HTMX view pattern:
+
+```python
+def my_view(request):
+    """View with HTMX support."""
+    if request.htmx:
+        # Return partial template for HTMX requests
+        return render(request, 'partials/content.html', context)
+    # Return full page for regular requests
+    return render(request, 'page.html', context)
+```
+
+## API Development
+
+Create API views using DRF with Pydantic schemas:
+
+```python
+# apps/{app_name}/schemas.py
+from pydantic import BaseModel, ConfigDict
+from uuid import UUID
+
+class MyModelSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    name: str
+    created_at: datetime
+
+# apps/{app_name}/api.py
+from rest_framework import viewsets
+from .models import MyModel
+from .serializers import MyModelSerializer
+
+class MyModelViewSet(viewsets.ModelViewSet):
+    queryset = MyModel.objects.all()
+    serializer_class = MyModelSerializer
+```
+
+## OAuth Authentication
+
+To test OAuth:
+
+1. Create OAuth application in admin: http://localhost:8000/admin/oauth2_provider/application/
+2. Use client credentials to get access token
+3. Include token in API requests: `Authorization: Bearer {token}`
+
+## Admin Interface
+
+Access Django admin at http://localhost:8000/admin/
+
+Default credentials (set in .envrc.local):
+- Username: admin
+- Password: (see DJANGO_SUPERUSER_PASSWORD in .envrc.local)
+
+## Code Quality
+
+Before committing:
+
+```bash
+# Format code
+/usr/bin/make format
+
+# Check linting
+/usr/bin/make lint
+
+# Run type checker
+/usr/bin/make typecheck
+
+# Run tests with coverage
+/usr/bin/make test
+```
+
+## Related Skills
+
+- `/python-experts:django-dev` - Django development patterns
+- `/python-experts:django-api` - API development with DRF
+- `/devops-data:direnv` - Environment management
+- `/git-workflow:commit` - Commit changes with conventional format
+
+## Common Tasks
+
+### Add New Dependency
+
+```bash
+# Production dependency
+uv add package-name
+
+# Development dependency
+uv add --group dev package-name
+```
+
+### Create Migration
+
+```bash
+uv run python manage.py makemigrations
+uv run python manage.py migrate
+```
+
+### Run Specific Tests
+
+```bash
+# Run single test file
+uv run pytest apps/{app_name}/tests/test_models.py
+
+# Run with verbose output
+uv run pytest -vv
+
+# Run with coverage report
+uv run pytest --cov-report=html
+```
+
+### Database Operations
+
+```bash
+# Drop and recreate database
+docker-compose down -v
+/usr/bin/make start-docker
+/usr/bin/make migrate
+/usr/bin/make createsuperuser
+
+# Export data
+uv run python manage.py dumpdata > data.json
+
+# Import data
+uv run python manage.py loaddata data.json
+```
+
+## Project Structure Notes
+
+- **config/**: Django settings and core configuration
+- **apps/**: All Django apps live here (not in project root)
+- **apps/core/**: Shared utilities, base models, custom user
+- **templates/**: Global templates (app-specific templates go in app directories)
+- **static/**: Global static files (app-specific static files go in app directories)
+
+## Troubleshooting
+
+### Database Connection Issues
+
+```bash
+# Check if PostgreSQL is running
+docker ps
+
+# View database logs
+/usr/bin/make logs
+
+# Restart database
+/usr/bin/make restart-docker
+```
+
+### Environment Variable Issues
+
+```bash
+# Reload direnv
+direnv allow
+
+# Check loaded variables
+printenv | grep DJANGO
+printenv | grep DATABASE
+```
+
+### Migration Issues
+
+```bash
+# Show migration status
+uv run python manage.py showmigrations
+
+# Rollback migration
+uv run python manage.py migrate {app_name} {migration_number}
+
+# Squash migrations (after many iterations)
+uv run python manage.py squashmigrations {app_name} {end_migration}
+```

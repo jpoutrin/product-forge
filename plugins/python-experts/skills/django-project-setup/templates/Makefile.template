@@ -1,0 +1,40 @@
+.PHONY: start-docker stop-docker restart-docker logs shell migrate makemigrations test runserver createsuperuser lint format typecheck
+
+start-docker:
+	docker-compose up -d
+
+stop-docker:
+	docker-compose down
+
+restart-docker:
+	docker-compose restart
+
+logs:
+	docker-compose logs -f postgres
+
+shell:
+	uv run python manage.py shell_plus
+
+migrate:
+	uv run python manage.py migrate
+
+makemigrations:
+	uv run python manage.py makemigrations
+
+test:
+	uv run pytest
+
+runserver:
+	uv run python manage.py runserver
+
+createsuperuser:
+	uv run python manage.py createsuperuser
+
+lint:
+	uv run ruff check .
+
+format:
+	uv run ruff format .
+
+typecheck:
+	uv run mypy .

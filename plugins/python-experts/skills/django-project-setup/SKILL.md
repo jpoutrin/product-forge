@@ -1,0 +1,833 @@
+---
+name: django-project-setup
+description: Set up a new Django 6.0 project with modern tooling (uv, direnv, Supabase, HTMX, OAuth, DRF, testing). Use when the user wants to create a Django project from scratch with production-ready configuration.
+user-invocable: true
+argument-hint: "[project_name] - Name of the Django project to create"
+---
+
+# Django 6.0 Project Setup
+
+Automated setup for production-ready Django 6.0 projects with modern tooling.
+
+## What This Skill Does
+
+Creates a complete Django 6.0 project with:
+
+### Modern Stack (2026)
+- ✅ **uv** - Fast package manager (no pip/venv needed)
+- ✅ **Django 6.0** - Latest version with Python 3.12+ support
+- ✅ **PostgreSQL** - Docker Compose + Supabase support
+- ✅ **Custom User Model** - UUID primary keys from day 1
+- ✅ **direnv** - Automatic environment management
+- ✅ **HTMX** - Modern frontend interactivity
+- ✅ **OAuth** - Authentication ready (django-oauth-toolkit)
+- ✅ **DRF + Pydantic** - Type-safe API schemas
+- ✅ **pytest + factory_boy** - Modern testing infrastructure
+- ✅ **mypy + ruff** - Type checking and linting
+- ✅ **Docker Compose** - Local PostgreSQL container
+- ✅ **Makefile** - Common development commands
+
+### Directory Structure
+```
+{project_name}/
+├── config/              # Settings and core config
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── base.py      # Core settings
+│   │   ├── dev.py       # Development
+│   │   └── prod.py      # Production
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+├── apps/                # Django apps
+│   ├── __init__.py
+│   └── core/            # Shared utilities
+│       ├── models.py    # UUIDModel base class
+│       └── ...
+├── templates/           # Global templates
+├── static/              # Global static files
+├── pyproject.toml       # uv dependencies
+├── pytest.ini           # Test configuration
+├── conftest.py          # Test fixtures
+├── docker-compose.yml   # PostgreSQL container
+├── Makefile             # Development commands
+├── .envrc               # Environment config
+├── .env.example         # Environment template
+├── manage.py
+└── CLAUDE.md            # Project instructions
+```
+
+## Usage
+
+```bash
+/django-project-setup myproject
+```
+
+The skill will:
+1. Ask for first app name (e.g., 'accounts', 'blog', 'api')
+2. Create project structure with uv
+3. Set up Docker Compose for PostgreSQL
+4. Configure direnv environment
+5. Install all dependencies
+6. Create custom User model with UUID
+7. Run initial migrations
+8. Set up testing infrastructure
+9. Configure HTMX, OAuth, and DRF
+10. Create CLAUDE.md with project patterns
+
+## Requirements
+
+- **Python 3.12+** (Django 6.0 requirement)
+- **uv** (will be installed if missing)
+- **direnv** (recommended, will prompt if missing)
+- **Docker** (for local PostgreSQL)
+
+## After Setup
+
+```bash
+# Start PostgreSQL
+/usr/bin/make start-docker
+
+# Run migrations
+/usr/bin/make migrate
+
+# Create superuser (set password in .envrc.local first)
+/usr/bin/make createsuperuser
+
+# Start development server
+/usr/bin/make runserver
+
+# Run tests
+/usr/bin/make test
+
+# Type checking
+/usr/bin/make typecheck
+
+# Linting
+/usr/bin/make lint
+```
+
+Visit http://localhost:8000/admin/ to verify setup.
+
+## Implementation Guide
+
+### Step 0: Docker Compose Setup
+
+Create `docker-compose.yml` for local PostgreSQL:
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${PROJECT_NAME:-django}_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-django_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+```
+
+Create `Makefile` for common operations:
+
+```makefile
+.PHONY: start-docker stop-docker restart-docker logs shell migrate makemigrations test runserver createsuperuser lint format typecheck
+
+start-docker:
+	docker-compose up -d
+
+stop-docker:
+	docker-compose down
+
+restart-docker:
+	docker-compose restart
+
+logs:
+	docker-compose logs -f postgres
+
+shell:
+	uv run python manage.py shell_plus
+
+migrate:
+	uv run python manage.py migrate
+
+makemigrations:
+	uv run python manage.py makemigrations
+
+test:
+	uv run pytest
+
+runserver:
+	uv run python manage.py runserver
+
+createsuperuser:
+	uv run python manage.py createsuperuser
+
+lint:
+	uv run ruff check .
+
+format:
+	uv run ruff format .
+
+typecheck:
+	uv run mypy .
+```
+
+### Step 1: Initial Project Setup
+
+```bash
+# Initialize uv project
+uv init {project_name}
+cd {project_name}
+
+# Add Django and core dependencies
+uv add django psycopg[binary] django-environ
+
+# Create Django project structure
+uv run django-admin startproject config .
+```
+
+### Step 2: Environment Setup (direnv)
+
+Create `.envrc`:
+
+```bash
+# Load environment from .env files
+dotenv_if_exists .env
+dotenv_if_exists .env.local
+
+# Docker Database (local development)
+export POSTGRES_DB="${POSTGRES_DB:-django_dev}"
+export POSTGRES_USER="${POSTGRES_USER:-postgres}"
+export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
+export POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+export DATABASE_URL="${DATABASE_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}}"
+
+# Supabase (production)
+export SUPABASE_URL="${SUPABASE_URL:-}"
+export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-}"
+export SUPABASE_SERVICE_KEY="${SUPABASE_SERVICE_KEY:-}"
+
+# Django
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.dev}"
+export DJANGO_SECRET_KEY="${DJANGO_SECRET_KEY:-dev-secret-key-change-in-production}"
+export DEBUG="${DEBUG:-true}"
+
+# Allow local overrides
+source_env_if_exists .envrc.local
+```
+
+Create `.env.example`:
+
+```bash
+# Database Configuration
+POSTGRES_DB=django_dev
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/django_dev
+
+# Supabase Configuration (optional, for production)
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_KEY=
+
+# Django Configuration
+DJANGO_SETTINGS_MODULE=config.settings.dev
+DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+DJANGO_SUPERUSER_PASSWORD=admin
+DEBUG=true
+```
+
+### Step 3: Settings Configuration
+
+Split `config/settings.py` into modular files:
+
+**config/settings/base.py** (core settings):
+
+```python
+"""Django settings for {project_name} project."""
+import os
+from pathlib import Path
+import environ
+
+# Build paths
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Environment variables
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# Security
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+
+# Application definition
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Third-party apps
+    'rest_framework',
+    'oauth2_provider',
+    'django_htmx',
+
+    # Local apps
+    'apps.core',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_htmx.middleware.HtmxMiddleware',
+]
+
+ROOT_URLCONF = 'config.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'config.wsgi.application'
+
+# Database
+DATABASES = {
+    'default': env.db('DATABASE_URL'),
+}
+
+# Custom User model
+AUTH_USER_MODEL = 'core.User'
+
+# Password validation
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# Internationalization
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# Static files
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.UUIDField'
+
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+}
+
+# OAuth2
+OAUTH2_PROVIDER = {
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope'},
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
+}
+```
+
+**config/settings/dev.py** (development):
+
+```python
+"""Development settings."""
+from .base import *
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+
+# Development apps
+INSTALLED_APPS += [
+    'django_extensions',
+]
+
+# Console email backend
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+```
+
+**config/settings/prod.py** (production):
+
+```python
+"""Production settings."""
+from .base import *
+
+DEBUG = False
+
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+
+# Security settings
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# Static files
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+```
+
+### Step 4: Create Custom User Model
+
+**apps/core/models.py**:
+
+```python
+"""Core models with UUID base class."""
+import uuid
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+
+class UUIDModel(models.Model):
+    """Abstract base class for models with UUID primary keys."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class User(AbstractUser, UUIDModel):
+    """Custom user model with UUID primary key."""
+
+    email = models.EmailField(unique=True)
+
+    class Meta:
+        db_table = 'users'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.email
+```
+
+**apps/core/admin.py**:
+
+```python
+"""Admin configuration for core models."""
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import User
+
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    """Admin for custom User model."""
+
+    list_display = ['email', 'username', 'is_staff', 'is_active', 'created_at']
+    list_filter = ['is_staff', 'is_active', 'created_at']
+    search_fields = ['email', 'username']
+    ordering = ['-created_at']
+```
+
+### Step 5: Create First App
+
+Ask user: "What should be the first app to create?" (e.g., 'accounts', 'blog', 'api')
+
+Then:
+
+```bash
+mkdir -p apps/{app_name}
+uv run python manage.py startapp {app_name} apps/{app_name}
+```
+
+Update `apps/{app_name}/apps.py`:
+
+```python
+from django.apps import AppConfig
+
+
+class {AppName}Config(AppConfig):
+    default_auto_field = 'django.db.models.UUIDField'
+    name = 'apps.{app_name}'
+```
+
+### Step 6: HTMX Integration
+
+Add HTMX example view in first app:
+
+**apps/{app_name}/views.py**:
+
+```python
+"""Example HTMX views."""
+from django.shortcuts import render
+
+
+def index(request):
+    """Index view with HTMX support."""
+    if request.htmx:
+        return render(request, 'partials/content.html')
+    return render(request, 'index.html')
+```
+
+**templates/index.html**:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_name }}</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+    <h1>Welcome to {{ project_name }}</h1>
+    <div hx-get="/" hx-trigger="load" hx-swap="innerHTML">
+        Loading...
+    </div>
+</body>
+</html>
+```
+
+**templates/partials/content.html**:
+
+```html
+<div>
+    <p>This content was loaded via HTMX!</p>
+</div>
+```
+
+### Step 7: Testing Infrastructure
+
+**pytest.ini**:
+
+```ini
+[pytest]
+DJANGO_SETTINGS_MODULE = config.settings.dev
+python_files = tests.py test_*.py *_tests.py
+addopts = --reuse-db --cov=apps --cov-report=html --cov-report=term
+testpaths = apps
+```
+
+**conftest.py**:
+
+```python
+"""Pytest configuration and fixtures."""
+import pytest
+from pytest_factoryboy import register
+from apps.core.factories import UserFactory
+
+# Register factories
+register(UserFactory)
+
+
+@pytest.fixture
+def api_client():
+    """DRF API client."""
+    from rest_framework.test import APIClient
+    return APIClient()
+
+
+@pytest.fixture
+def authenticated_client(api_client, user):
+    """Authenticated API client."""
+    api_client.force_authenticate(user=user)
+    return api_client
+```
+
+**apps/core/factories.py**:
+
+```python
+"""Factory Boy factories for core models."""
+import factory
+from factory.django import DjangoModelFactory
+from .models import User
+
+
+class UserFactory(DjangoModelFactory):
+    """Factory for User model."""
+
+    class Meta:
+        model = User
+
+    email = factory.Faker('email')
+    username = factory.Faker('user_name')
+    is_active = True
+    is_staff = False
+    is_superuser = False
+
+    @factory.post_generation
+    def password(self, create, extracted, **kwargs):
+        """Set user password after generation."""
+        if not create:
+            return
+
+        password = extracted or 'testpass123'
+        self.set_password(password)
+        self.save()
+```
+
+**apps/core/tests/test_models.py**:
+
+```python
+"""Tests for core models."""
+import pytest
+from apps.core.models import User
+
+
+@pytest.mark.django_db
+class TestUserModel:
+    """Tests for User model."""
+
+    def test_user_creation(self, user_factory):
+        """Test creating a user."""
+        user = user_factory()
+        assert user.id is not None
+        assert user.email
+        assert user.username
+
+    def test_user_str(self, user_factory):
+        """Test user string representation."""
+        user = user_factory(email="test@example.com")
+        assert str(user) == "test@example.com"
+```
+
+### Step 8: Type Checking & Linting
+
+Add to **pyproject.toml**:
+
+```toml
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+django_settings_module = "config.settings.dev"
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+exclude = [
+    "migrations/",
+    "venv/",
+    ".venv/",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "factory.*",
+    "environ.*",
+]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.dev"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    "migrations",
+    ".venv",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"*/migrations/*" = ["E501", "N806"]
+"*/tests/*" = ["F401", "F811"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "--reuse-db --cov=apps --cov-report=html --cov-report=term"
+testpaths = ["apps"]
+```
+
+### Step 9: Update URLs
+
+**config/urls.py**:
+
+```python
+"""URL configuration."""
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('api-auth/', include('rest_framework.urls')),
+]
+```
+
+### Step 10: Create .gitignore
+
+```gitignore
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/static/
+/staticfiles/
+/media/
+
+# Environment variables
+.env
+.envrc.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+postgres_data/
+```
+
+### Step 11: Create CLAUDE.md
+
+See template in `templates/CLAUDE.md.template`.
+
+### Step 12: Install Dependencies
+
+```bash
+# Core dependencies
+uv add django psycopg[binary] django-environ
+
+# Third-party apps
+uv add djangorestframework django-oauth-toolkit django-htmx pydantic
+
+# Development tools
+uv add --group dev pytest pytest-django pytest-cov pytest-asyncio
+uv add --group dev factory-boy pytest-factoryboy
+uv add --group dev mypy django-stubs types-requests
+uv add --group dev ruff
+uv add --group dev django-extensions ipython
+```
+
+### Step 13: Run Initial Migrations
+
+```bash
+# Create migrations for core app
+uv run python manage.py makemigrations core
+
+# Run migrations
+uv run python manage.py migrate
+
+# Create superuser
+export DJANGO_SUPERUSER_PASSWORD=admin
+uv run python manage.py createsuperuser --noinput --username admin --email admin@example.com
+```
+
+## Verification Steps
+
+After setup, verify:
+
+1. ✅ **Project Structure**: Correct `config/` and `apps/` layout
+2. ✅ **Environment**: `direnv allow` succeeds
+3. ✅ **Database**: Docker container running
+4. ✅ **Migrations**: Applied successfully
+5. ✅ **Superuser**: Created and can log in to admin
+6. ✅ **Dev Server**: `uv run python manage.py runserver` starts
+7. ✅ **Admin**: http://localhost:8000/admin/ accessible
+8. ✅ **Tests**: `uv run pytest` passes
+9. ✅ **Type Check**: `uv run mypy .` runs without errors
+10. ✅ **Linting**: `uv run ruff check .` passes
+11. ✅ **HTMX**: Basic view works
+12. ✅ **OAuth**: `/oauth/` endpoint accessible
+
+## Related Skills
+
+- `/python-experts:django-dev` - Django development patterns
+- `/python-experts:django-api` - API development with DRF
+- `/devops-data:direnv` - Environment management
+- `/git-workflow:commit` - Commit the initial project
+
+## References
+
+- [Django 6.0 Documentation](https://docs.djangoproject.com/en/6.0/)
+- [uv Package Manager](https://github.com/astral-sh/uv)
+- [django-htmx](https://django-htmx.readthedocs.io/)
+- [django-oauth-toolkit](https://django-oauth-toolkit.readthedocs.io/)
+- [Django REST Framework](https://www.django-rest-framework.org/)
+- [Factory Boy](https://factoryboy.readthedocs.io/)
+- [pytest-django](https://pytest-django.readthedocs.io/)
