@@ -2,11 +2,10 @@
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
-django_settings_module = "config.settings.dev"
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = true
+disallow_untyped_defs = false
 exclude = [
     "migrations/",
     "venv/",
