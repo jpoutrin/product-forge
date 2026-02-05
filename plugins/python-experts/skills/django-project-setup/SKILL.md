@@ -109,6 +109,179 @@ The skill will:
 
 Visit http://localhost:8000/admin/ to verify setup.
 
+## Execution Instructions
+
+When this skill is invoked with a project name (e.g., `/django-project-setup myproject`), follow these steps:
+
+### Prerequisites Check
+
+1. Verify Python 3.12+ is available:
+   ```bash
+   python3 --version
+   ```
+
+2. Check if uv is installed, install if missing:
+   ```bash
+   which uv || curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+3. Verify current directory or use /tmp if not specified
+
+### Execution Steps
+
+**Step 1: Ask for First App Name**
+
+Use AskUserQuestion to ask:
+```
+Question: "What should be the first Django app to create?"
+Options:
+  - "blog" (description: "Blog/content management app")
+  - "accounts" (description: "User accounts and profiles")
+  - "api" (description: "API endpoints")
+  - "core" (description: "Core functionality only")
+Header: "First App"
+```
+
+**Step 2: Initialize uv Project**
+
+```bash
+uv init {project_name}
+builtin cd {project_name}
+```
+
+**Step 3: Add Core Dependencies**
+
+```bash
+uv add django psycopg[binary] django-environ
+uv add djangorestframework django-oauth-toolkit django-htmx pydantic
+uv add --group dev pytest pytest-django pytest-cov pytest-asyncio
+uv add --group dev factory-boy pytest-factoryboy
+uv add --group dev mypy django-stubs types-requests
+uv add --group dev ruff django-extensions ipython
+```
+
+**Step 4: Create Django Project Structure**
+
+```bash
+uv run django-admin startproject config .
+```
+
+**Step 5: Create Directory Structure**
+
+```bash
+mkdir -p apps/core/{migrations,tests}
+mkdir -p apps/{first_app_name}/{migrations,tests}
+mkdir -p templates/partials
+mkdir -p static
+mkdir -p config/settings
+```
+
+**Step 6: Create Configuration Files**
+
+Use the templates in `templates/` directory to create:
+
+1. `docker-compose.yml` - Use docker-compose.yml.template, replace {project_name}
+2. `Makefile` - Use Makefile.template
+3. `.envrc` - Use .envrc.template, replace {project_name}
+4. `.env.example` - Use .env.example.template, replace {project_name}
+5. `.envrc.local` - Use .envrc.local.template
+6. `.gitignore` - Use .gitignore.template
+7. `pytest.ini` - Use pytest.ini.template
+8. `conftest.py` - Use conftest.py.template
+9. `CLAUDE.md` - Use CLAUDE.md.template, replace {project_name}
+
+**Step 7: Split Settings Files**
+
+1. Delete `config/settings.py`
+2. Create `config/settings/__init__.py` (empty)
+3. Create `config/settings/base.py` with core settings (see implementation guide below)
+4. Create `config/settings/dev.py` with development settings
+5. Create `config/settings/prod.py` with production settings
+
+**Step 8: Create Core App**
+
+1. Create `apps/__init__.py` (empty)
+2. Create `apps/core/__init__.py` (empty)
+3. Create `apps/core/apps.py` with CoreConfig
+4. Create `apps/core/models.py` with UUIDModel and User
+5. Create `apps/core/admin.py` with UserAdmin
+6. Create `apps/core/factories.py` with UserFactory
+7. Create `apps/core/tests/__init__.py` (empty)
+8. Create `apps/core/tests/test_models.py` with User tests
+9. Create `apps/core/migrations/__init__.py` (empty)
+
+**Step 9: Create First App**
+
+```bash
+mkdir -p apps/{first_app_name}
+uv run python manage.py startapp {first_app_name} apps/{first_app_name}
+```
+
+Update `apps/{first_app_name}/apps.py` to use UUID default.
+
+**Step 10: Update Config Files**
+
+1. Update `config/settings/base.py` to include:
+   - apps.core
+   - apps.{first_app_name}
+   - All third-party apps
+
+2. Update `config/urls.py` to include OAuth and API auth URLs
+
+**Step 11: Create Initial Migrations**
+
+```bash
+uv run python manage.py makemigrations core
+uv run python manage.py makemigrations {first_app_name}
+```
+
+**Step 12: Update pyproject.toml**
+
+Add tool configurations for mypy, ruff, and pytest at the end of pyproject.toml.
+
+**Step 13: Verify Setup**
+
+Run verification checks:
+
+```bash
+# Check if files exist
+[ -f docker-compose.yml ] && echo "✅ Docker Compose"
+[ -f Makefile ] && echo "✅ Makefile"
+[ -f .envrc ] && echo "✅ direnv config"
+[ -f pytest.ini ] && echo "✅ pytest config"
+[ -f CLAUDE.md ] && echo "✅ Documentation"
+
+# Check Django setup
+uv run python manage.py check
+
+# Check if tests can be collected
+uv run pytest --collect-only
+```
+
+**Step 14: Display Summary**
+
+Show the user:
+- Project structure created
+- List of installed dependencies
+- Next steps to start using the project
+- Available Make commands
+
+### Error Handling
+
+- If Python < 3.12: Show error and exit
+- If uv installation fails: Show installation instructions
+- If Django project creation fails: Show Django error and suggest fixes
+- If migrations fail: Show error and suggest checking models
+
+### Success Criteria
+
+- All configuration files created
+- Dependencies installed
+- Initial migrations created
+- Tests can be collected
+- Django check passes
+- CLAUDE.md documentation exists
+
 ## Implementation Guide
 
 ### Step 0: Docker Compose Setup

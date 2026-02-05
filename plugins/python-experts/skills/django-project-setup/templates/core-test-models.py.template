@@ -1,0 +1,26 @@
+"""Tests for core models."""
+import pytest
+from apps.core.models import User
+
+
+@pytest.mark.django_db
+class TestUserModel:
+    """Tests for User model."""
+
+    def test_user_creation(self, user_factory):
+        """Test creating a user."""
+        user = user_factory()
+        assert user.id is not None
+        assert user.email
+        assert user.username
+
+    def test_user_str(self, user_factory):
+        """Test user string representation."""
+        user = user_factory(email="test@example.com")
+        assert str(user) == "test@example.com"
+
+    def test_user_uuid_primary_key(self, user_factory):
+        """Test user has UUID primary key."""
+        user = user_factory()
+        import uuid
+        assert isinstance(user.id, uuid.UUID)

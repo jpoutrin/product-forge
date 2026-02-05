@@ -1,0 +1,27 @@
+"""Factory Boy factories for core models."""
+import factory
+from factory.django import DjangoModelFactory
+from .models import User
+
+
+class UserFactory(DjangoModelFactory):
+    """Factory for User model."""
+
+    class Meta:
+        model = User
+
+    email = factory.Faker('email')
+    username = factory.Faker('user_name')
+    is_active = True
+    is_staff = False
+    is_superuser = False
+
+    @factory.post_generation
+    def password(self, create, extracted, **kwargs):
+        """Set user password after generation."""
+        if not create:
+            return
+
+        password = extracted or 'testpass123'
+        self.set_password(password)
+        self.save()

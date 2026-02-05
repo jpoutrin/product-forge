@@ -1,0 +1,48 @@
+# Add this to the end of pyproject.toml
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+django_settings_module = "config.settings.dev"
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+exclude = [
+    "migrations/",
+    "venv/",
+    ".venv/",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "factory.*",
+    "environ.*",
+]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.dev"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    "migrations",
+    ".venv",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"*/migrations/*" = ["E501", "N806"]
+"*/tests/*" = ["F401", "F811"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "--reuse-db --cov=apps --cov-report=html --cov-report=term"
+testpaths = ["apps"]
