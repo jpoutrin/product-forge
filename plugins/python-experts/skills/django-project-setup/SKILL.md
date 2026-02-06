@@ -3,6 +3,13 @@ name: django-project-setup
 description: Set up a new Django 6.0 project with modern tooling (uv, direnv, Supabase, HTMX, OAuth, DRF, testing). Use when the user wants to create a Django project from scratch with production-ready configuration.
 user-invocable: true
 argument-hint: "[project_name] - Name of the Django project to create"
+context: fork
+agent: django-expert
+hooks:
+  stop:
+    - name: validate-django-setup
+      command: forge validate django --skip-django-checks
+      description: Validate Django project setup with type checking, linting, and tests
 ---
 
 # Django 6.0 Project Setup

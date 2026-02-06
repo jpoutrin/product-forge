@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Django validation script for team-orchestration plugin
 # Runs type checking, linting, tests, and Django-specific checks
+#
+# DEPRECATED: This script is deprecated in favor of the forge CLI command:
+#   forge validate django [files]
+#
+# The forge command provides the same functionality with better integration
+# and logging. This script will be removed in a future version.
 
 set -e
 

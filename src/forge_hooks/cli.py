@@ -228,6 +228,151 @@ def validate_ownership(directory: str, extension: str, max_age: int):
     sys.exit(result.exit_code)
 
 
+@validate.command(name="django")
+@click.option(
+    "-f",
+    "--files",
+    default=None,
+    help="Files or directory to validate (default: current directory)",
+)
+@click.option("--skip-mypy", is_flag=True, help="Skip type checking")
+@click.option("--skip-ruff", is_flag=True, help="Skip linting")
+@click.option("--skip-tests", is_flag=True, help="Skip unit tests")
+@click.option("--skip-django-checks", is_flag=True, help="Skip Django system checks")
+@click.option(
+    "--coverage",
+    type=int,
+    default=80,
+    help="Minimum coverage percentage (default: 80)",
+)
+def validate_django(
+    files: Optional[str],
+    skip_mypy: bool,
+    skip_ruff: bool,
+    skip_tests: bool,
+    skip_django_checks: bool,
+    coverage: int,
+):
+    """
+    Validate Django projects with comprehensive checks.
+
+    Runs type checking, linting, tests, and Django-specific validations.
+
+    Examples:
+
+      forge validate django
+
+      forge validate django --files app/models.py
+
+      forge validate django --skip-tests
+
+      forge validate django --coverage 90
+    """
+    from .validators import DjangoValidator
+
+    logger.info(f"Running Django validation: files={files or '.'}")
+
+    validator = DjangoValidator(
+        files=files,
+        skip_mypy=skip_mypy,
+        skip_ruff=skip_ruff,
+        skip_tests=skip_tests,
+        skip_django_checks=skip_django_checks,
+        coverage_threshold=coverage,
+    )
+    result = validator.validate()
+
+    # Log validation result
+    log_validation(
+        validator="django",
+        passed=result.ok,
+        reason=result.message if not result.ok else None,
+    )
+
+    output_result(result)
+    sys.exit(result.exit_code)
+
+
+@validate.command(name="ruff")
+@click.option(
+    "-f",
+    "--files",
+    default=None,
+    help="Files or directory to validate (default: current directory)",
+)
+@click.option("--fix", is_flag=True, help="Automatically fix issues when possible")
+def validate_ruff(files: Optional[str], fix: bool):
+    """
+    Validate Python code with ruff linting.
+
+    Runs code style enforcement, PEP 8 compliance checks, and common bug pattern detection.
+
+    Examples:
+
+      forge validate ruff
+
+      forge validate ruff --files src/
+
+      forge validate ruff --fix
+    """
+    from .validators import RuffValidator
+
+    logger.info(f"Running ruff validation: files={files or '.'}, fix={fix}")
+
+    validator = RuffValidator(files=files, fix=fix)
+    result = validator.validate()
+
+    # Log validation result
+    log_validation(
+        validator="ruff",
+        passed=result.ok,
+        reason=result.message if not result.ok else None,
+    )
+
+    output_result(result)
+    sys.exit(result.exit_code)
+
+
+@validate.command(name="ty")
+@click.option(
+    "-f",
+    "--files",
+    default=None,
+    help="Files or directory to validate (default: current directory)",
+)
+@click.option("--strict", is_flag=True, help="Use strict type checking mode")
+def validate_type(files: Optional[str], strict: bool):
+    """
+    Validate Python code with mypy type checking.
+
+    Checks Python type hints and ensures type safety across your codebase.
+
+    Examples:
+
+      forge validate ty
+
+      forge validate ty --files src/
+
+      forge validate ty --strict
+    """
+    from .validators import TypeValidator
+
+    logger.info(f"Running type validation: files={files or '.'}, strict={strict}")
+
+    validator = TypeValidator(files=files, strict=strict)
+    result = validator.validate()
+
+    # Log validation result
+    log_validation(
+        validator="type",
+        passed=result.ok,
+        reason=result.message if not result.ok else None,
+    )
+
+    output_result(result)
+    sys.exit(result.exit_code)
+
+
 # === YOUTUBE COMMAND ===
 
 
