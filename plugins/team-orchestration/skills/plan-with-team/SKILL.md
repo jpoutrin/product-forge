@@ -9,12 +9,12 @@ hooks:
   Stop:
     - type: command
       command: >-
-        uv run $CLAUDE_PLUGIN_DIR/.claude/hooks/validators/validate_new_file.py
+        forge validate new-file
         --directory specs
         --extension .md
     - type: command
       command: >-
-        uv run $CLAUDE_PLUGIN_DIR/.claude/hooks/validators/validate_file_contains.py
+        forge validate contains
         --directory specs
         --extension .md
         --contains '## Task Description'
@@ -30,7 +30,7 @@ hooks:
         --contains '## Orchestration Validation'
     - type: command
       command: >-
-        uv run $CLAUDE_PLUGIN_DIR/.claude/hooks/validators/validate_file_ownership.py
+        forge validate ownership
         --directory specs
         --extension .md
 ---
