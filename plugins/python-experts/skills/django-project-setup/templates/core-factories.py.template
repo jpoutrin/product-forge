@@ -1,6 +1,9 @@
 """Factory Boy factories for core models."""
+from typing import Any
+
 import factory
 from factory.django import DjangoModelFactory
+
 from .models import User
 
 
@@ -17,11 +20,16 @@ class UserFactory(DjangoModelFactory):
     is_superuser = False
 
     @factory.post_generation
-    def password(self, create, extracted, **kwargs):
+    def password(
+        obj: User,
+        create: bool,
+        extracted: str | None,
+        **kwargs: Any
+    ) -> None:
         """Set user password after generation."""
         if not create:
             return
 
         password = extracted or 'testpass123'
-        self.set_password(password)
-        self.save()
+        obj.set_password(password)
+        obj.save()

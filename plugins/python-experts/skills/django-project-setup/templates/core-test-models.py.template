@@ -1,5 +1,9 @@
 """Tests for core models."""
+from typing import Any
+from uuid import UUID
+
 import pytest
+
 from apps.core.models import User
 
 
@@ -7,20 +11,19 @@ from apps.core.models import User
 class TestUserModel:
     """Tests for User model."""
 
-    def test_user_creation(self, user_factory):
+    def test_user_creation(self, user_factory: Any) -> None:
         """Test creating a user."""
-        user = user_factory()
+        user: User = user_factory()
         assert user.id is not None
         assert user.email
         assert user.username
 
-    def test_user_str(self, user_factory):
+    def test_user_str(self, user_factory: Any) -> None:
         """Test user string representation."""
-        user = user_factory(email="test@example.com")
+        user: User = user_factory(email="test@example.com")
         assert str(user) == "test@example.com"
 
-    def test_user_uuid_primary_key(self, user_factory):
+    def test_user_uuid_primary_key(self, user_factory: Any) -> None:
         """Test user has UUID primary key."""
-        user = user_factory()
-        import uuid
-        assert isinstance(user.id, uuid.UUID)
+        user: User = user_factory()
+        assert isinstance(user.id, UUID)

@@ -96,5 +96,8 @@ EOF
 
 # Run if called directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    echo "⚠️  DEPRECATED: Use 'forge feedback init' instead" >&2
+    echo "See: forge feedback --help" >&2
+    echo "" >&2
     init_learnings "$1"
 fi

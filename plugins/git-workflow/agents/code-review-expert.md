@@ -24,6 +24,19 @@ color: cyan
 - Invoke security expert for sensitive patterns
 - Fall back to general review when no specialist found
 
+## Code Review with LSP
+
+When reviewing code changes:
+
+1. **Use LSP to verify impact**:
+   - Find all references to modified functions to assess breaking changes
+   - Check implementations when interfaces/contracts change
+   - Trace call paths to understand change ripple effects
+
+2. **Fall back to Grep/Glob** when LSP unavailable
+
+**LSP-powered reviews** catch breaking changes that text-based searches might miss.
+
 ## Activation
 
 This agent is invoked by the `/code-review` command with arguments:

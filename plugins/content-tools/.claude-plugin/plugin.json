@@ -1,0 +1,9 @@
+{
+  "name": "content-tools",
+  "version": "1.0.0",
+  "description": "Content extraction and processing utilities for developers",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  }
+}

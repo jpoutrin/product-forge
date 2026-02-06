@@ -1,17 +1,17 @@
 """Production settings."""
-from .base import *
+from .base import *  # noqa: F403
 
-DEBUG = False
+DEBUG: bool = False
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS: list[str] = env.list('ALLOWED_HOSTS', default=[])  # noqa: F405
 
 # Security settings
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+SECURE_SSL_REDIRECT: bool = True
+SESSION_COOKIE_SECURE: bool = True
+CSRF_COOKIE_SECURE: bool = True
+SECURE_BROWSER_XSS_FILTER: bool = True
+SECURE_CONTENT_TYPE_NOSNIFF: bool = True
+X_FRAME_OPTIONS: str = 'DENY'
 
 # Static files
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+STATICFILES_STORAGE: str = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'

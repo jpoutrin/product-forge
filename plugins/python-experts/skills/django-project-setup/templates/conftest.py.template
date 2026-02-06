@@ -1,21 +1,23 @@
 """Pytest configuration and fixtures."""
 import pytest
 from pytest_factoryboy import register
+from rest_framework.test import APIClient
+
 from apps.core.factories import UserFactory
+from apps.core.models import User
 
 # Register factories
 register(UserFactory)
 
 
 @pytest.fixture
-def api_client():
+def api_client() -> APIClient:
     """DRF API client."""
-    from rest_framework.test import APIClient
     return APIClient()
 
 
 @pytest.fixture
-def authenticated_client(api_client, user):
+def authenticated_client(api_client: APIClient, user: User) -> APIClient:
     """Authenticated API client."""
     api_client.force_authenticate(user=user)
     return api_client

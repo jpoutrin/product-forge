@@ -67,6 +67,18 @@
       "description": "Atlassian Jira and Confluence integration via Remote MCP Server for issue tracking and documentation",
       "source": "./plugins/atlassian-integration",
       "category": "productivity"
+    },
+    {
+      "name": "content-tools",
+      "description": "Content extraction and processing utilities for developers",
+      "source": "./plugins/content-tools",
+      "category": "productivity"
+    },
+    {
+      "name": "team-orchestration",
+      "description": "Dynamic task-based agentic delegation with builder/validator pairs and meta-prompt team orchestration",
+      "source": "./plugins/team-orchestration",
+      "category": "development"
     }
   ]
 }

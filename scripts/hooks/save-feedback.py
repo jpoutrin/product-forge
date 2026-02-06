@@ -279,6 +279,11 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Deprecation notice
+    print("⚠️  DEPRECATED: Use 'forge feedback save' instead", file=sys.stderr)
+    print("See: forge feedback --help", file=sys.stderr)
+    print("", file=sys.stderr)
+
     try:
         sys.exit(main())
     except Exception as e:

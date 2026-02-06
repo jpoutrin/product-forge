@@ -1,0 +1,16 @@
+{
+  "name": "team-orchestration",
+  "version": "0.1.0",
+  "description": "Dynamic task-based agentic delegation with builder/validator pairs and meta-prompt team orchestration",
+  "author": {
+    "name": "jpoutrin",
+    "email": "contact@jpoutrin.dev"
+  },
+  "agents": [
+    "./agents/django-builder.md",
+    "./agents/django-validator.md"
+  ],
+  "skills": [
+    "./skills/plan-with-team/SKILL.md"
+  ]
+}
