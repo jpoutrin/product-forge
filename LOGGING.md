@@ -183,13 +183,38 @@ YYYY-MM-DD HH:MM:SS | logger_name | LEVEL | message
 
 ## Viewing Logs
 
-### Tail Live Logs
+### Using the `forge logs` Command (Recommended)
+
+The `forge logs` command provides a convenient wrapper around `tail`:
+
 ```bash
-tail -f ~/.claude/forge/logs/forge-cli.log
+# View last 10 lines (default)
+forge logs
+
+# View last 50 lines
+forge logs -n 50
+
+# Follow logs in real-time (like tail -f)
+forge logs -f
+
+# Follow with initial context
+forge logs -f -n 100
+
+# View a specific log file
+forge logs --file forge-cli.log.1
 ```
 
-### View Recent Activity
+**Note:** The `forge logs` command does not log anything itself to avoid polluting the log output while viewing.
+
+### Using Tail Directly
+
+Alternatively, you can use tail directly:
+
 ```bash
+# Follow logs in real-time
+tail -f ~/.claude/forge/logs/forge-cli.log
+
+# View recent activity
 tail -n 100 ~/.claude/forge/logs/forge-cli.log
 ```
 
