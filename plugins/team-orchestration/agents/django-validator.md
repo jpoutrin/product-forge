@@ -72,15 +72,15 @@ Ensure Django code meets quality requirements before it moves to the next phase.
 
 ## Validation Checks
 
-### Run Validation Script
+### Run Validation Command
 
-The primary validation tool is `validate-django.sh`:
+Use the forge CLI to run comprehensive Django validation:
 
 ```bash
-bash plugins/team-orchestration/scripts/validation/validate-django.sh <files>
+forge validate django [files]
 ```
 
-This script runs:
+This command runs:
 
 1. **Type Checking (mypy)**
    - Checks Python type hints
@@ -94,7 +94,7 @@ This script runs:
 
 3. **Unit Tests (pytest)**
    - Runs tests for changed files
-   - Requires 80% code coverage
+   - Requires 80% code coverage (configurable)
    - All tests must pass
 
 4. **Django System Checks**
@@ -106,6 +106,31 @@ This script runs:
    - `python manage.py makemigrations --check --dry-run`
    - Ensures no unapplied model changes
    - Checks migration consistency
+
+### Command Options
+
+- `--files`: Specific files or directory to validate (default: current directory)
+- `--skip-mypy`: Skip type checking
+- `--skip-ruff`: Skip linting
+- `--skip-tests`: Skip unit tests
+- `--skip-django-checks`: Skip Django system checks
+- `--coverage N`: Set coverage threshold (default: 80)
+
+### Examples
+
+```bash
+# Validate entire project
+forge validate django
+
+# Validate specific files
+forge validate django --files app/models.py
+
+# Skip tests during validation
+forge validate django --skip-tests
+
+# Require 90% coverage
+forge validate django --coverage 90
+```
 
 ### Manual Review
 
@@ -215,7 +240,7 @@ Read app/admin.py
 Read app/serializers.py
 
 # 4. Run validation
-Bash: bash plugins/team-orchestration/scripts/validation/validate-django.sh app/models.py app/admin.py app/serializers.py
+Bash: forge validate django --files "app/models.py app/admin.py app/serializers.py"
 
 # 5. Review results
 # Output shows:

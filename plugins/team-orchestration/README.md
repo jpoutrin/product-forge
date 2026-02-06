@@ -106,7 +106,7 @@ Both systems coexist. Use parallel framework for contract-first decomposition, t
 - `docs/migration-from-parallel.md` - Migration guide from parallel framework
 - `templates/team-plan-template.md` - Plan generation template
 - Agent docs in `agents/` directory
-- Validation scripts in `scripts/validation/`
+- Validation commands in forge CLI (`forge validate django|ruff|ty`)
 
 ## Contributing
 
@@ -114,7 +114,10 @@ When adding new builder/validator pairs:
 
 1. Create `agents/{domain}-builder.md` with Task tools
 2. Create `agents/{domain}-validator.md` with read-only tools
-3. Add validation script `scripts/validation/validate-{domain}.sh`
+3. Add `forge validate {domain}` command to forge-cli
+   - Create validator class in `src/forge_hooks/validators/{domain}_validator.py`
+   - Add CLI command in `src/forge_hooks/cli.py`
+   - Export validator in `src/forge_hooks/validators/__init__.py`
 4. Test full builder → validator → fix cycle
 5. Update this README
 

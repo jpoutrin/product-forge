@@ -45,7 +45,7 @@ Last Updated: 2026-02-05
 **Deliverables**:
 - ✅ `django-builder` agent with Task coordination
 - ✅ `django-validator` agent with read-only validation
-- ✅ `validate-django.sh` comprehensive validation script
+- ✅ `forge validate django` comprehensive validation command
 - ✅ Agents registered in plugin.json
 - ✅ Plugin refreshed with new agents
 
@@ -63,13 +63,15 @@ Last Updated: 2026-02-05
    - Fix task creation patterns
    - Read-only tool enforcement
 
-3. `plugins/team-orchestration/scripts/validation/validate-django.sh`
-   - Type checking with mypy (--strict)
+3. `forge validate django` command (in forge-cli)
+   - Type checking with mypy
    - Linting with ruff
    - Unit tests with pytest (80% coverage requirement)
    - Django system checks (--deploy)
    - Migration validation
-   - Color-coded output with clear pass/fail indicators
+   - JSON output with proper logging
+   - Supports --skip flags for individual checks
+   - Configurable coverage threshold
 
 **Capabilities**:
 - Builder can claim Django tasks from task queue
@@ -117,7 +119,7 @@ claude agent launch django-validator
    - Build verification
    - Read-only validation
 
-3. `plugins/team-orchestration/scripts/validation/validate-react.sh`
+3. `forge validate react` command (to be added to forge-cli)
    - `tsc --noEmit` for type checking
    - `eslint --max-warnings 0` for linting
    - `vitest run --coverage` for tests (80% threshold)
@@ -132,7 +134,7 @@ claude agent launch django-validator
 **Target Files**:
 1. `plugins/team-orchestration/agents/fastapi-builder.md`
 2. `plugins/team-orchestration/agents/fastapi-validator.md`
-3. `plugins/team-orchestration/scripts/validation/validate-fastapi.sh`
+3. `forge validate fastapi` command (to be added to forge-cli)
 
 **Integration Test**:
 Create 3 tasks (Django, FastAPI, React), launch builders/validators in sequence, verify full cycle works.
@@ -259,14 +261,18 @@ Create 3 tasks (Django, FastAPI, React), launch builders/validators in sequence,
 
 ## Files Summary
 
-### Created (7 files)
+### Created (6 files)
 1. `.claude-plugin/plugin.json` - Plugin manifest
 2. `README.md` - Comprehensive documentation
 3. `forge-index.md` - Plugin index
-4. `agents/django-builder.md` - Builder agent (1,500+ lines)
-5. `agents/django-validator.md` - Validator agent (1,400+ lines)
-6. `scripts/validation/validate-django.sh` - Validation script
-7. `IMPLEMENTATION_STATUS.md` - This file
+4. `agents/django-builder.md` - Builder agent
+5. `agents/django-validator.md` - Validator agent
+6. `IMPLEMENTATION_STATUS.md` - This file
+
+### Forge CLI Integration
+- `forge validate django` - Django validation command (in forge-cli)
+- `forge validate ruff` - Ruff linting command
+- `forge validate ty` - Type checking command
 
 ### Modified (1 file)
 1. `.claude-plugin/marketplace.json` - Added team-orchestration entry
