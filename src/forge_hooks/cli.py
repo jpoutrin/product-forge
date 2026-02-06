@@ -17,8 +17,17 @@ from .common.logging_config import (
 from .validators import FileContainsValidator, FileOwnershipValidator, NewFileValidator
 
 # Setup logging (file-based with rotation)
-log_level = os.environ.get("FORGE_LOG_LEVEL", "INFO")
-logger = setup_logging(log_level=log_level)
+# Skip logging setup if we're just viewing logs (to avoid polluting the output)
+_skip_logging = len(sys.argv) > 1 and sys.argv[1] == "logs"
+if not _skip_logging:
+    log_level = os.environ.get("FORGE_LOG_LEVEL", "INFO")
+    logger = setup_logging(log_level=log_level)
+else:
+    # Create a dummy logger that doesn't log anything
+    import logging
+
+    logger = logging.getLogger("forge_hooks")
+    logger.addHandler(logging.NullHandler())
 
 
 @click.group()
@@ -26,6 +35,90 @@ logger = setup_logging(log_level=log_level)
 def main():
     """Product Forge command-line tools and utilities."""
     pass
+
+
+@main.command("logs")
+@click.option(
+    "-n",
+    "--lines",
+    type=int,
+    default=None,
+    help="Number of lines to show (default: 10, or all with -f)",
+)
+@click.option("-f", "--follow", is_flag=True, help="Follow log file (like tail -f)")
+@click.option(
+    "--file",
+    "log_file",
+    default=None,
+    help="Specific log file to view (default: forge-cli.log)",
+)
+def logs_command(lines: Optional[int], follow: bool, log_file: Optional[str]) -> None:
+    """
+    View forge-cli log files.
+
+    This command provides a convenient way to tail the forge-cli logs
+    without needing to remember the log file location.
+
+    Examples:
+
+      forge logs              # Show last 10 lines
+
+      forge logs -n 50        # Show last 50 lines
+
+      forge logs -f           # Follow logs in real-time
+
+      forge logs -f -n 100    # Follow with 100 initial lines
+    """
+    import subprocess
+
+    from .common.logging_config import get_log_directory
+
+    # Get log file path
+    log_dir = get_log_directory()
+    if log_file is None:
+        log_file = "forge-cli.log"
+    log_path = log_dir / log_file
+
+    # Check if log file exists
+    if not log_path.exists():
+        click.echo(f"Log file not found: {log_path}", err=True)
+        click.echo(f"\nLog directory: {log_dir}", err=True)
+        click.echo("\nAvailable log files:", err=True)
+        if log_dir.exists():
+            log_files = sorted(log_dir.glob("*.log*"))
+            if log_files:
+                for f in log_files:
+                    click.echo(f"  - {f.name}", err=True)
+            else:
+                click.echo("  (none)", err=True)
+        sys.exit(1)
+
+    # Build tail command
+    cmd = ["tail"]
+
+    # Add follow flag if requested
+    if follow:
+        cmd.append("-f")
+
+    # Add lines option
+    if lines is not None:
+        cmd.extend(["-n", str(lines)])
+    elif not follow:
+        # Default to 10 lines if not following
+        cmd.extend(["-n", "10"])
+
+    # Add log file path
+    cmd.append(str(log_path))
+
+    # Execute tail command
+    try:
+        subprocess.run(cmd)
+    except KeyboardInterrupt:
+        # Clean exit on Ctrl+C (when following)
+        sys.exit(0)
+    except Exception as e:
+        click.echo(f"Error running tail: {e}", err=True)
+        sys.exit(1)
 
 
 @main.group()
