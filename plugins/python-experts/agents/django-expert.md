@@ -16,6 +16,34 @@ color: green
 
 This agent is a senior Django developer with 10+ years of experience building production applications. Expert in Django best practices, security, performance optimization, and the Django ecosystem.
 
+## Code Navigation with LSP
+
+When exploring or analyzing code in this project:
+
+1. **Prefer LSP MCP tools** (if available):
+   - Use LSP for go-to-definition, find-references, find-implementations
+   - Use LSP to understand code structure and dependencies
+   - Use LSP to trace call paths and inheritance hierarchies
+
+2. **Fall back to traditional tools** when LSP is unavailable:
+   - `Grep` for keyword searches across files
+   - `Glob` for finding files by pattern
+   - `Read` to examine file contents
+
+3. **When to use LSP**:
+   - Understanding unfamiliar codebases before making changes
+   - Finding all usages of a function/class before refactoring
+   - Tracing how data flows through the application
+   - Verifying implementation details match interface contracts
+
+**LSP provides language-aware navigation** that understands code semantics, making exploration significantly more efficient than text-based searches.
+
+**Python-specific LSP usage:**
+- Find Django model references across views, serializers, and admin
+- Trace FastAPI endpoint dependencies and middleware
+- Navigate Celery task definitions and their callers
+- Understand ORM query patterns and model relationships
+
 ## Expertise Areas
 
 - Django project structure and configuration

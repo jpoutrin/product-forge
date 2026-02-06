@@ -2,6 +2,46 @@
 
 A comprehensive Claude Code marketplace plugin for product development, PRD management, task tracking, and secure technical implementation. Features CPO/CTO/Marketing/UX/DPO/DevOps/Data Engineering/RAG-CAG expertise with specialized technical agents (Django, FastAPI, FastMCP, React/TypeScript, Celery, Playwright) that research current documentation before coding. Includes design system management, cloud infrastructure (AWS, GCP, Ansible), data transformation (dbt, SQLMesh), RAG/CAG architecture with multi-tenant security, MCP security with 5-layer defense, OAuth/OIDC, and privacy compliance (GDPR/CCPA).
 
+## Forge CLI Utilities
+
+Product Forge includes a unified `forge` CLI tool for skill-related utilities:
+
+### YouTube Transcript Fetcher
+
+Fetch YouTube video transcripts as readable text files:
+
+```bash
+# Install with YouTube support
+uv tool install . --with youtube-transcript-api
+
+# Fetch transcript
+forge youtube "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+forge youtube "https://youtu.be/dQw4w9WgXcQ" --output transcripts/
+forge youtube dQw4w9WgXcQ
+```
+
+### Feedback Management
+
+Manage Product Forge learnings and feedback:
+
+```bash
+# Initialize learnings directory
+forge feedback init
+
+# Show statistics
+forge feedback stats
+
+# List feedback items
+forge feedback list
+forge feedback list --project product-forge
+forge feedback list --type improvement
+
+# Save feedback (used by hooks)
+cat feedback.json | forge feedback save
+```
+
+**See [FORGE_CLI_IMPLEMENTATION_SUMMARY.md](FORGE_CLI_IMPLEMENTATION_SUMMARY.md) for complete CLI documentation.**
+
 ## Features
 
 ### Skills (Automatic Context Activation)

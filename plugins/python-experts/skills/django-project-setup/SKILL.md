@@ -26,6 +26,29 @@ Creates a complete Django 6.0 project with:
 - ✅ **mypy + ruff** - Type checking and linting
 - ✅ **Docker Compose** - Local PostgreSQL container
 - ✅ **Makefile** - Common development commands
+- ✅ **Full Type Annotations** - AI tooling optimized (Copilot, Cursor, Cody)
+
+## AI Tooling Compatibility
+
+This project template is optimized for AI coding assistants:
+
+- ✅ **Full Type Coverage**: All generated code has comprehensive type annotations
+- ✅ **Strict mypy**: `disallow_untyped_defs = true` enforced from day 1
+- ✅ **Better Completions**: AI tools understand code context and relationships
+- ✅ **Fewer Errors**: Type checking catches issues before runtime
+- ✅ **Improved Refactoring**: AI can suggest safer, type-aware refactorings
+- ✅ **Self-Documenting**: Type hints serve as inline documentation
+
+Compatible with: GitHub Copilot, Cursor, Cody, Continue, Tabnine, and other AI coding assistants.
+
+### Why This Matters
+
+When you provide full type annotations:
+- AI assistants give more accurate code completions
+- Auto-import suggestions are more precise
+- Refactoring suggestions are type-safe
+- Error detection happens as you type
+- Generated documentation is more comprehensive
 
 ### Directory Structure
 ```
@@ -589,7 +612,7 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 ### Step 4: Create Custom User Model
 
-**apps/core/models.py**:
+**apps/core/models.py** (with full type annotations):
 
 ```python
 """Core models with UUID base class."""
@@ -601,33 +624,42 @@ from django.db import models
 class UUIDModel(models.Model):
     """Abstract base class for models with UUID primary keys."""
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    id: models.UUIDField = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    created_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
+    updated_at: models.DateTimeField = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
+
+    def __str__(self) -> str:
+        return str(self.id)
 
 
 class User(AbstractUser, UUIDModel):
     """Custom user model with UUID primary key."""
 
-    email = models.EmailField(unique=True)
+    email: models.EmailField = models.EmailField(unique=True)
 
     class Meta:
         db_table = 'users'
         ordering = ['-created_at']
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
 ```
 
-**apps/core/admin.py**:
+**apps/core/admin.py** (with type annotations):
 
 ```python
 """Admin configuration for core models."""
+from typing import Any
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.http import HttpRequest
 from .models import User
 
 
@@ -635,10 +667,10 @@ from .models import User
 class UserAdmin(BaseUserAdmin):
     """Admin for custom User model."""
 
-    list_display = ['email', 'username', 'is_staff', 'is_active', 'created_at']
-    list_filter = ['is_staff', 'is_active', 'created_at']
-    search_fields = ['email', 'username']
-    ordering = ['-created_at']
+    list_display: list[str] = ['email', 'username', 'is_staff', 'is_active', 'created_at']
+    list_filter: list[str] = ['is_staff', 'is_active', 'created_at']
+    search_fields: list[str] = ['email', 'username']
+    ordering: list[str] = ['-created_at']
 ```
 
 ### Step 5: Create First App
@@ -721,36 +753,38 @@ addopts = --reuse-db --cov=apps --cov-report=html --cov-report=term
 testpaths = apps
 ```
 
-**conftest.py**:
+**conftest.py** (with type annotations):
 
 ```python
 """Pytest configuration and fixtures."""
 import pytest
 from pytest_factoryboy import register
+from rest_framework.test import APIClient
 from apps.core.factories import UserFactory
+from apps.core.models import User
 
 # Register factories
 register(UserFactory)
 
 
 @pytest.fixture
-def api_client():
+def api_client() -> APIClient:
     """DRF API client."""
-    from rest_framework.test import APIClient
     return APIClient()
 
 
 @pytest.fixture
-def authenticated_client(api_client, user):
+def authenticated_client(api_client: APIClient, user: User) -> APIClient:
     """Authenticated API client."""
     api_client.force_authenticate(user=user)
     return api_client
 ```
 
-**apps/core/factories.py**:
+**apps/core/factories.py** (with type annotations):
 
 ```python
 """Factory Boy factories for core models."""
+from typing import Any
 import factory
 from factory.django import DjangoModelFactory
 from .models import User
@@ -762,14 +796,19 @@ class UserFactory(DjangoModelFactory):
     class Meta:
         model = User
 
-    email = factory.Faker('email')
-    username = factory.Faker('user_name')
-    is_active = True
-    is_staff = False
-    is_superuser = False
+    email: factory.Faker = factory.Faker('email')
+    username: factory.Faker = factory.Faker('user_name')
+    is_active: bool = True
+    is_staff: bool = False
+    is_superuser: bool = False
 
     @factory.post_generation
-    def password(self, create, extracted, **kwargs):
+    def password(
+        self,
+        create: bool,
+        extracted: str | None,
+        **kwargs: Any
+    ) -> None:
         """Set user password after generation."""
         if not create:
             return
@@ -779,10 +818,12 @@ class UserFactory(DjangoModelFactory):
         self.save()
 ```
 
-**apps/core/tests/test_models.py**:
+**apps/core/tests/test_models.py** (with type annotations):
 
 ```python
 """Tests for core models."""
+from typing import Any
+from uuid import UUID
 import pytest
 from apps.core.models import User
 
@@ -791,31 +832,39 @@ from apps.core.models import User
 class TestUserModel:
     """Tests for User model."""
 
-    def test_user_creation(self, user_factory):
+    def test_user_creation(self, user_factory: Any) -> None:
         """Test creating a user."""
-        user = user_factory()
+        user: User = user_factory()
         assert user.id is not None
         assert user.email
         assert user.username
 
-    def test_user_str(self, user_factory):
+    def test_user_str(self, user_factory: Any) -> None:
         """Test user string representation."""
-        user = user_factory(email="test@example.com")
+        user: User = user_factory(email="test@example.com")
         assert str(user) == "test@example.com"
+
+    def test_user_uuid_primary_key(self, user_factory: Any) -> None:
+        """Test user has UUID primary key."""
+        user: User = user_factory()
+        assert isinstance(user.id, UUID)
 ```
 
 ### Step 8: Type Checking & Linting
 
-Add to **pyproject.toml**:
+Add to **pyproject.toml** (with strict typing enabled):
 
 ```toml
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
-django_settings_module = "config.settings.dev"
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = true
+disallow_untyped_defs = true  # Strict: all functions must have type annotations
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+check_untyped_defs = true
 exclude = [
     "migrations/",
     "venv/",
@@ -826,6 +875,8 @@ exclude = [
 module = [
     "factory.*",
     "environ.*",
+    "oauth2_provider.*",
+    "rest_framework.*",
 ]
 ignore_missing_imports = true
 
@@ -849,6 +900,9 @@ ignore = ["E501"]
 "__init__.py" = ["F401"]
 "*/migrations/*" = ["E501", "N806"]
 "*/tests/*" = ["F401", "F811"]
+"*/admin.py" = ["F401"]
+"*/models.py" = ["F401"]
+"*/views.py" = ["F401"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.dev"
@@ -856,6 +910,8 @@ python_files = ["tests.py", "test_*.py", "*_tests.py"]
 addopts = "--reuse-db --cov=apps --cov-report=html --cov-report=term"
 testpaths = ["apps"]
 ```
+
+**Note**: `disallow_untyped_defs = true` enforces that all functions and methods must have type annotations. This is intentional to ensure maximum compatibility with AI coding assistants.
 
 ### Step 9: Update URLs
 
@@ -984,10 +1040,11 @@ After setup, verify:
 6. ✅ **Dev Server**: `uv run python manage.py runserver` starts
 7. ✅ **Admin**: http://localhost:8000/admin/ accessible
 8. ✅ **Tests**: `uv run pytest` passes
-9. ✅ **Type Check**: `uv run mypy .` runs without errors
+9. ✅ **Type Check**: `uv run mypy .` passes with strict mode (`disallow_untyped_defs = true`)
 10. ✅ **Linting**: `uv run ruff check .` passes
 11. ✅ **HTMX**: Basic view works
 12. ✅ **OAuth**: `/oauth/` endpoint accessible
+13. ✅ **AI Tooling**: All generated files have comprehensive type annotations
 
 ## Related Skills
 

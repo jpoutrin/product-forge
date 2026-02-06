@@ -1,8 +1,9 @@
 """URL configuration for {project_name} project."""
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
+from django.urls.resolvers import URLPattern, URLResolver
 
-urlpatterns = [
+urlpatterns: list[URLPattern | URLResolver] = [
     path('admin/', admin.site.urls),
     path('oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('api-auth/', include('rest_framework.urls')),

@@ -1,20 +1,22 @@
 """Django settings for {project_name} project."""
 import os
 from pathlib import Path
+from typing import Any
+
 import environ
 
 # Build paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
 
 # Environment variables
-env = environ.Env()
+env: environ.Env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Security
-SECRET_KEY = env('DJANGO_SECRET_KEY')
+SECRET_KEY: str = env('DJANGO_SECRET_KEY')
 
 # Application definition
-INSTALLED_APPS = [
+INSTALLED_APPS: list[str] = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,7 +33,7 @@ INSTALLED_APPS = [
     'apps.core',
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE: list[str] = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -42,9 +44,9 @@ MIDDLEWARE = [
     'django_htmx.middleware.HtmxMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF: str = 'config.urls'
 
-TEMPLATES = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
@@ -60,18 +62,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION: str = 'config.wsgi.application'
 
 # Database
-DATABASES = {
+DATABASES: dict[str, dict[str, Any]] = {
     'default': env.db('DATABASE_URL'),
 }
 
 # Custom User model
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL: str = 'core.User'
 
 # Password validation
-AUTH_PASSWORD_VALIDATORS = [
+AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
@@ -79,21 +81,21 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_TZ = True
+LANGUAGE_CODE: str = 'en-us'
+TIME_ZONE: str = 'UTC'
+USE_I18N: bool = True
+USE_TZ: bool = True
 
 # Static files
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL: str = 'static/'
+STATIC_ROOT: Path = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS: list[Path] = [BASE_DIR / 'static']
 
 # Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.UUIDField'
+DEFAULT_AUTO_FIELD: str = 'django.db.models.BigAutoField'
 
 # REST Framework
-REST_FRAMEWORK = {
+REST_FRAMEWORK: dict[str, Any] = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -106,7 +108,7 @@ REST_FRAMEWORK = {
 }
 
 # OAuth2
-OAUTH2_PROVIDER = {
+OAUTH2_PROVIDER: dict[str, Any] = {
     'SCOPES': {'read': 'Read scope', 'write': 'Write scope'},
     'ACCESS_TOKEN_EXPIRE_SECONDS': 36000,
 }

@@ -5,5 +5,5 @@ from django.apps import AppConfig
 class CoreConfig(AppConfig):
     """Configuration for core app."""
 
-    default_auto_field = 'django.db.models.UUIDField'
-    name = 'apps.core'
+    default_auto_field: str = 'django.db.models.BigAutoField'
+    name: str = 'apps.core'

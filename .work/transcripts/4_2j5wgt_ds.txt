@@ -1,0 +1,854 @@
+# YouTube Transcript: 4_2j5wgt_ds
+# URL: https://www.youtube.com/watch?v=4_2j5wgt_ds
+
+[00:00] We're entering a new paradigm of agentic
+[00:02] coding. And I'm not talking about the
+[00:05] very powerful but very dangerous maltbot
+[00:07] or previously cloudbot. More on that
+[00:10] later. I'm talking about new tools for
+[00:12] engineers to orchestrate intelligence.
+[00:16] The new cla code task system is going
+[00:18] under the radar in a massive way,
+[00:20] probably because of all the cloud pot
+[00:22] hype. But this feature hints at the
+[00:24] future of engineering work. I have two
+[00:27] prompts to show you that you can use to
+[00:29] extend your ability to build with agents
+[00:31] and it's all based on this new cloud
+[00:33] code task system. This changes the
+[00:36] workflow of engineering in a pretty
+[00:38] significant way and really it's not
+[00:40] getting enough attention. So I want to
+[00:41] focus on this in a very anti-hype way. I
+[00:44] have one metaprompt and one plan to
+[00:46] share with you that can really push what
+[00:49] you can do with agents in a cloud code
+[00:51] instance. We will slash plan, but this
+[00:53] isn't an ordinary plan. We're going to
+[00:55] plan with a team. We have a user prompt
+[00:57] and an orchestrator prompt. I'm going to
+[00:59] jump through this and fill this out.
+[01:00] Paste and paste. I'll explain what this
+[01:02] does further on. Feel free to pause the
+[01:04] video if you want. I'll fire this off.
+[01:06] This prompt will showcase you can now
+[01:08] reliably and consistently create teams
+[01:11] of agents. More agents, more autonomy,
+[01:14] and more compute doesn't always mean
+[01:16] better outcomes. What we want is more
+[01:19] organized agents that can communicate
+[01:21] together to work toward a common goal.
+[01:24] If you want to understand how to use the
+[01:26] cloud code task system at scale reliably
+[01:28] and consistently to create teams of
+[01:30] agents, stick around and let's jump
+[01:33] right in. Let's take a look at plan with
+[01:35] team. This isn't like most prompts
+[01:38] you've seen. This prompt has three
+[01:40] powerful components to it. Self-
+[01:42] validation, agent orchestration, and
+[01:44] templating. The first thing you'll
+[01:46] notice here is that we have hooks in the
+[01:47] front matter. This agent is self
+[01:50] validating. In fact, it has specialized
+[01:52] scripts that it uses to validate its own
+[01:54] work. You can see here we have validate
+[01:56] new file and we have validate file
+[01:59] contains. So on the stop hook once this
+[02:02] agent finishes running, it's going to
+[02:04] make sure that it created a file of a
+[02:06] specific type in a specific directory
+[02:08] and it's going to make sure that it
+[02:09] contains specific content. This is very
+[02:13] powerful. Now we know for a fact that
+[02:15] this plan was created. And in fact, we
+[02:18] should be able to see that right now. If
+[02:19] we close this, we can see that our plan
+[02:21] has been created and it's been
+[02:23] validated. And so now the next step is
+[02:25] we're going to actually kick this off.
+[02:26] And you can see our agent has done
+[02:28] something really interesting here. We
+[02:30] have a team task list. Every task has an
+[02:34] owner. All right. So this is not an
+[02:35] ordinary sub aent prompt. This task list
+[02:38] has specific team members doing specific
+[02:41] work all the way through. and we're
+[02:43] using two specific types of agents.
+[02:45] We're going to break down in just a
+[02:46] second a builder agent and a validator
+[02:48] agent. We're going to go ahead and kick
+[02:50] off this prompt and we're going to
+[02:51] actually start building this out. We'll
+[02:53] look at the spec. This is the second
+[02:54] prompt that we're going to look at and
+[02:55] we're going to understand why this
+[02:58] generated prompt from our meta prompt is
+[03:00] so unique. Let's just go ahead and kick
+[03:02] this off. Get this building in the
+[03:03] background. We're going to use a /bu
+[03:04] prompt. And now you'll notice here it is
+[03:07] building up that brand new task list.
+[03:09] And so it's just going to keep stacking
+[03:11] on the brand new task list. We're also
+[03:13] going to look at the actual tools that
+[03:15] this agent is running to put together
+[03:17] this team of agent and to communicate
+[03:19] the results. You can see we have five
+[03:21] more pending. So a lot of work is
+[03:23] getting stacked up here. And now we're
+[03:25] getting the dependency blockers. Not
+[03:27] only is our agent planning out work,
+[03:29] building a team, it's also setting up
+[03:30] the tasks and the order that the tasks
+[03:33] need to operate in. So you can see here
+[03:34] our first five or six tasks. These can
+[03:37] run in parallel. They're building out
+[03:38] the brand new hooks. And so to be clear
+[03:40] here, what we're doing is I have this
+[03:41] code base on my repo cloud code hooks
+[03:43] mastery. Last update was five or six
+[03:45] months ago. So we're going to go ahead
+[03:46] and update the documentation and update
+[03:49] some of the code. Right? So this is a
+[03:50] very common engineering workflow that
+[03:52] you would run that you would enhance
+[03:54] with agents. You need to update old code
+[03:56] to update and reflect changes and new
+[03:58] documentation. So that's what we're
+[03:59] doing here. Right now we're kicking off
+[04:01] a bunch of agents to run in parallel.
+[04:03] >> Dan A4 EC 608 built out your post tool
+[04:05] used failure hook so error handling
+[04:07] works smoothly now. A249 B56 built out
+[04:10] the session end hook implementation and
+[04:12] it's ready to go.
+[04:13] >> All right, so you're hearing our sub
+[04:15] agent text to speech responses. Those
+[04:17] are going to keep streaming in here. So
+[04:18] it might be
+[04:20] >> agent A7A 26A nailed it.
+[04:22] >> It might be a little annoying. It's
+[04:23] going to interrupt us a bunch here, but
+[04:24] every sub aent that completes is going
+[04:26] to summarize their work as well. So I
+[04:28] have this built into the sub agent stop
+[04:30] hook
+[04:31] >> a356. Got your setup hook implementation
+[04:33] done. Hook setup.py PI file is ready and
+[04:36] Dan A1FA9A7
+[04:38] built your permission and it's ready to
+[04:40] handle authorization.
+[04:41] >> Awesome. This work is just going to
+[04:42] continue to stream in. The next
+[04:44] important piece is of course agent
+[04:46] orchestration. If we collapse everything
+[04:48] here, you can see a classic agentic
+[04:50] prompt format. We have our purpose. We
+[04:52] have our list of variables. You can see
+[04:53] our prompt format and our orchestration
+[04:56] prompt. We have our instructions. This
+[04:58] is where things get really interesting.
+[05:00] Inside of the instructions, we have an
+[05:01] additional new block, team
+[05:03] orchestration. And so here we're
+[05:04] starting to detail these new task
+[05:07] management tools. Task create, update,
+[05:09] list, and git. This is how the task
+[05:12] system works. This is everything that
+[05:13] our primary agent needs to conduct,
+[05:16] control, and orchestrate all possible
+[05:18] sub aents, right? The communication
+[05:20] happens through this task list. This is
+[05:22] a huge stepping stone from just calling
+[05:24] ad hoc sub aents without a common
+[05:27] mission without task dependencies and
+[05:29] without a way to communicate to each
+[05:32] agent that the work is or isn't done
+[05:34] yet. We're detailing some things there.
+[05:35] But what's really important here is in
+[05:37] our workflow. If we look at our agentic
+[05:40] prompt format here where we're detailing
+[05:42] the steps that we want our plan with
+[05:44] team prompt to set up, um we can see
+[05:46] something really interesting here. In
+[05:47] step four and five, we're doing two
+[05:49] important things. We're defining team
+[05:51] members using the orchestration prompt
+[05:53] if provided and we're defining
+[05:55] stepby-step tasks. So our plan is going
+[05:59] to use team orchestration. So this
+[06:02] primary agent that is actually creating
+[06:04] this plan is going to build a team and
+[06:06] then give each team member a task step
+[06:09] by step. All right. So this is, you
+[06:10] know, unique in that our previous
+[06:12] planning prompts that we would set up
+[06:14] that create the plans for us that
+[06:16] research the codebase, we would have to
+[06:18] specify exactly what agent was running,
+[06:21] exactly how we wanted to specialize that
+[06:22] workflow, and then it would run in some
+[06:25] topto bottom format that you would have
+[06:26] to strictly organize. Now, with teams
+[06:29] and with the task list, we can teach our
+[06:32] primary agent how to create plans that
+[06:34] also contain individual team members.
+[06:37] And then the last very important piece
+[06:39] of this prompt is that we are
+[06:41] templating. So this metaprompt is
+[06:43] actually a template metaprompt. This is
+[06:45] a big idea we talk about in tactical
+[06:47] agentic coding. We're teaching our
+[06:49] agents how to build as we would. You can
+[06:51] see here we have a plan format and the
+[06:53] plan format actually has embedded
+[06:56] prompts inside of it. Replace nested
+[06:58] content with the actual request inside
+[07:01] of it. So our plan is going to come out
+[07:02] to task name. And we can pull up the
+[07:04] plan that was generated side by side
+[07:05] here. If we open up specs, you can see
+[07:07] we have hooks update with team. And if
+[07:08] we go side by side, you can see exactly
+[07:11] how this is getting templated. Here's
+[07:13] the plan name. Here's the task
+[07:14] description. And then we're having our
+[07:15] agent fill out the task description. So
+[07:18] this agent is really building as we
+[07:21] would. You want to be teaching your
+[07:22] agents how to build like you would,
+[07:24] right? This is the big difference
+[07:25] between a gentic engineering and vibe
+[07:28] coding and slop engineering. When you're
+[07:30] running a prompt to a random tool like
+[07:33] Clawbot or insert whatever tool,
+[07:35] whatever agent, and you don't know what
+[07:36] the agent is actually going to do or how
+[07:38] it's going to do the work, the results
+[07:40] can be anywhere from exactly what you
+[07:41] wanted to not so great to this doesn't
+[07:43] work at all. As models progress and
+[07:45] become more proficient, of course,
+[07:47] you'll be able to prompt with less
+[07:48] effort, with less thought. But if you're
+[07:50] doing real engineering work, you want to
+[07:52] be going the opposite direction. You
+[07:53] want to know the outcome that your agent
+[07:55] is generating for you. And you can do
+[07:57] that with the template prompt, right?
+[07:59] specifically the template meta prompt.
+[08:01] This is a prompt that generates a new
+[08:03] prompt in a very specific, highly vetted
+[08:07] consistent format. And so we can just
+[08:08] continue down the line. You can see the
+[08:10] objective on both sides here, right? We
+[08:12] have our problem statement. We have the
+[08:14] solution approach. So on and so forth.
+[08:16] But where things get interesting is
+[08:18] here. We have team orchestration. If we
+[08:20] search for this uh I know for a fact
+[08:23] that team orchestration will be inside
+[08:25] the generated prompt. Why is that? It's
+[08:28] because if we scroll up here, remember
+[08:29] that this stop hook ran self validation.
+[08:32] And check this out, right? It's running
+[08:34] validate file contains. It's making sure
+[08:36] that it's in the specs directory, which
+[08:38] obviously it is here. It's a markdown
+[08:40] file and it contains these sub points.
+[08:43] So, I'm making absolute sure that the
+[08:46] file that was generated has the correct
+[08:47] section. If it doesn't, this script
+[08:49] here, validate file contains, is going
+[08:51] to spit back out instructions for this
+[08:54] planner agent. Right? So, this is very,
+[08:56] very powerful. We're combining
+[08:58] specialized self validation, which we've
+[09:00] covered in a previous video, with this
+[09:01] new team orchestration with powerful
+[09:04] templating. Okay? And again, templating
+[09:06] is something we discuss at length in
+[09:08] tactical agent coding because it allows
+[09:10] you to teach your agents to build like
+[09:13] you would. But this team orchestration
+[09:15] section is very, very powerful. So,
+[09:17] let's go and just take a look at this.
+[09:18] You can see here this is part of a
+[09:20] template, but it's, you know, just raw
+[09:22] text. So, our agent copied it as is per
+[09:25] the instructions. But then here our
+[09:27] agent starts building out the team
+[09:29] members. And so, you know, to be super
+[09:30] clear here, just to reiterate this, on
+[09:32] the left we have the template
+[09:33] metaprompt. And on the right, we have
+[09:35] the generated plan file that our agent
+[09:38] is running and probably has completed it
+[09:40] by now. Okay, look, it's it's already
+[09:41] finished, right? 2 minutes of work
+[09:42] thanks to that parallel setup.
+[09:44] Everything's already done. Hooks
+[09:45] configured, complete documentation in
+[09:46] the readme. We'll check this out after
+[09:48] we finish breaking down this powerful
+[09:50] prompt. Right. So, team members, you can
+[09:51] see builder, validator, builder,
+[09:53] validator, builder, validator, on and on
+[09:55] and on. Right? I have two specific
+[09:57] agents that I'm using in this workflow.
+[09:59] And I think this is going to be the most
+[10:01] like foundational like bare minimum that
+[10:04] you're going to want to have set up. A
+[10:05] builder and a validator. An agent that
+[10:08] does the work and an agent that checks
+[10:09] the work. I'm 2xing the compute for
+[10:12] every single task so that we build and
+[10:14] then we validate. We actually push this
+[10:16] further. I'll show you the agents in
+[10:18] just a second here, but uh you can see
+[10:19] here in our prompt template, we have our
+[10:22] builder and then we're specifying the
+[10:23] name, role, agent type, and if it should
+[10:25] resume if something goes wrong. And this
+[10:28] is all just about filling in the
+[10:30] variables, filling in the specification
+[10:32] for the team that's going to execute
+[10:34] this work. Okay, we also have the
+[10:36] step-by-step tasks, which breaks down
+[10:37] the actual workflow. This is the part of
+[10:40] the plan where we're just going through
+[10:41] step by step and our agents are going
+[10:43] through the work that they need to do.
+[10:45] And so this is this task list. Just to
+[10:48] make this super clear, this is the task
+[10:49] list that we're building up, working
+[10:51] step by step. And again, we built this
+[10:53] into a reusable prompt that we can
+[10:55] deploy over and over and over. And so,
+[10:58] you know, it's always one thing to just
+[11:00] open up a terminal and start prompting
+[11:02] something, but we can do much much
+[11:04] better than this, right? Build reusable
+[11:06] prompts, build reusable skills. I think
+[11:07] a lot of engineers in the space, you
+[11:09] already understand this as a kind of
+[11:10] foundational concept, but you can push
+[11:12] it further. Remember this metaprompt has
+[11:14] three powerful components. It is self-
+[11:17] validating. It is building a team and it
+[11:19] has specific instructions on how to
+[11:21] build a team. And if the orchestration
+[11:23] prompt is provided like we passed in,
+[11:26] that orchestration prompt is actually
+[11:27] going to help guide how the planner
+[11:29] builds the team. All right, so that's
+[11:30] where you solve that. And then we're
+[11:31] also templating. So this is a template
+[11:34] metaprompt. It might sound like a super
+[11:36] fancy term, but it's it's not. It's a
+[11:38] prompt that generates another prompt in
+[11:40] a specific format. All right, it's
+[11:41] actually quite simple, but it's very
+[11:43] very powerful. This is advanced agentic
+[11:45] prompt engineering. But once you see
+[11:47] this and once you start building these
+[11:48] out, it becomes second nature. Becomes
+[11:50] very easy to build out these reusable
+[11:53] formulas for success in your engineering
+[11:55] work. All right. And you can see what
+[11:56] it's built out here for us. Uh a huge
+[11:58] prompt. You know, we have all of our
+[12:00] validation commands at the bottom as you
+[12:02] saw here. We have notes here. You know,
+[12:04] again, this is a classic metaprompt. The
+[12:07] big difference here is that we are
+[12:08] instructing our metaprompt that's going
+[12:10] to run over and over and over for us
+[12:12] hundreds of times. We're instructing it
+[12:13] how to build a team with the new cloud
+[12:15] code task system. And so what does the
+[12:18] new cloud code task system look like?
+[12:20] How is this unique? As mentioned, what
+[12:22] we're doing here is we're actually
+[12:24] building up a task list and a dedicated
+[12:27] team to handle the individual tasks.
+[12:29] Now, this is vastly superior to the
+[12:32] previous generation to-do list and
+[12:34] previous generation sub aent colon via
+[12:36] the task tool because you can set up
+[12:38] tasks that run in specific order that
+[12:41] block and that depend on other tasks to
+[12:43] be complete. Okay. And not only that,
+[12:45] this allows for massively longer running
+[12:48] threads of work because your primary
+[12:50] agent can orchestrate a massive task
+[12:52] list, kick it off, and then as agents
+[12:54] complete it will receive specific
+[12:56] events. As sub agents complete work,
+[12:59] they will actually ping back to the
+[13:01] primary agent that accomplished the
+[13:03] work. And the primary agent can react to
+[13:05] it in real time. So you don't have to
+[13:07] sit, you don't need to add bash, sleep,
+[13:09] loops. The task system handles all of
+[13:11] that. And now, you know, speaking of the
+[13:12] task system, what are the task system
+[13:15] key function? So let's just take a look
+[13:16] at the key ones, right? There's task
+[13:18] create, there's task get, we have task
+[13:21] list, and we have task update. Task
+[13:24] update is obviously the big one. You'll
+[13:26] create a task and then update the task
+[13:27] with additional details. The powerful
+[13:29] thing about this is that your primary
+[13:31] agent and your sub agents can use these
+[13:33] tools to communicate to each other.
+[13:35] That's what's happening here with these
+[13:38] four tools. Task update is going to be
+[13:40] the big one because this allows the sub
+[13:42] agents and the primary agent to
+[13:43] communicate the work. And this unlocks
+[13:45] powerful workflows like this. We can now
+[13:48] set up multi- aent teams with even more
+[13:50] than one primary agent. So, you know,
+[13:52] same type of workflow, right? You kick
+[13:54] off a larger plan, a larger set of work.
+[13:56] Your agents will start working on it.
+[13:58] The agents will then complete their work
+[13:59] and then the blocked tasks are now
+[14:02] unblocked and the agents will continue
+[14:04] working through those piece by piece,
+[14:06] sending messages that they finished once
+[14:08] the task list is complete. And really,
+[14:10] as work completes, the primary agents
+[14:12] will be alerted. So, you can spin up as
+[14:14] many agents as you want. And notice how
+[14:15] this is looking a lot like the agent
+[14:18] threads that we talked about a couple
+[14:19] weeks ago. You know, thread-based
+[14:21] engineering is a powerful mental
+[14:22] framework to think about how work gets
+[14:25] complete. And we're seeing that here
+[14:26] with this multi- aent task system. So,
+[14:28] just once again, you prompt your agents.
+[14:30] Your agents create a large task list.
+[14:32] Your agent teams, right? Your sub agents
+[14:35] then accomplish the work in order
+[14:37] reviewing, checking each other's work.
+[14:38] If you set up the right reviewer agents,
+[14:41] and then they unblock the next task, so
+[14:43] on and so forth, right? They'll
+[14:44] communicate when their work is done. The
+[14:46] task list system will ping back to the
+[14:48] agent and then your agent will respond
+[14:50] to you once the work is done. So this is
+[14:52] the powerful taskless system and it
+[14:54] becomes even more powerful when you
+[14:56] deploy it and build it into a reusable
+[14:59] prompt that you can run over and over
+[15:01] and over. So what did our agent do for
+[15:03] us? It added and update the
+[15:05] documentation for this codebase. Let's
+[15:06] go ahead and check it out. Let's open up
+[15:08] a terminal here. Let's run gs. So you
+[15:10] can see all the files changed. You can
+[15:12] see we have a bunch of new status lines.
+[15:14] We got those new hooks that just weren't
+[15:16] there. We updated the readme. We have
+[15:18] that new spec. And we have our new JSON
+[15:20] file. Let's go ahead and just diff this.
+[15:21] And we can see those new hooks there.
+[15:23] Session end, permission request, sub
+[15:25] aent start, setup, and we have a bunch
+[15:27] of new hooks. And every one of these
+[15:28] hooks should have their own log file. So
+[15:31] keep in mind if we open up this prompt
+[15:33] here, let's just understand how these
+[15:36] two agents work together. We had our
+[15:37] planning agent build a team. Okay? And
+[15:40] so why is this different? Why is this
+[15:42] more powerful? because you can build
+[15:44] specialized agents that do one thing
+[15:46] extraordinarily well. All right. So, if
+[15:48] we look at the team members here, uh
+[15:50] where's that where's that note agent
+[15:52] slash here we go. So, team members, this
+[15:54] is a variable here and it's something
+[15:56] that we detail inside of the workflow.
+[15:58] In step four, we say this exactly,
+[16:00] right? Use the orchestration prompt to
+[16:03] guide team composition. Identify
+[16:05] fromcloud agents team markdown. So we're
+[16:08] looking at agents only in the specific
+[16:10] directory or we're using a
+[16:11] generalpurpose agent. And so if we open
+[16:14] up this directory here.Cloud agents
+[16:16] team, you can see I have just two
+[16:18] teammates, right? Two specific types of
+[16:21] agents that this codebase has access to.
+[16:23] We have a builder and we have a
+[16:24] validator. The purpose of the builder is
+[16:27] just to focus on that one task to build
+[16:29] it and then to report its work. But our
+[16:31] builder goes a little further. We
+[16:33] covered this in the previous video, but
+[16:35] it's so important to keep mentioning
+[16:36] this. You can now build specialized self
+[16:39] validation into every one of your
+[16:41] agents. You can see here my builder
+[16:43] agent after it runs. So on post tool
+[16:45] use, write edit, it's going to look to
+[16:47] see if it's operating in a Python file
+[16:49] and then it's going to run rough and ty.
+[16:51] So it's going to run its own code
+[16:53] checkers basically, right? And these can
+[16:56] be any types of code validation that you
+[16:58] want. The powerful thing here is that
+[16:59] we've kind of built in a micro step of
+[17:02] validation inside the builder on its
+[17:04] own. And then we have a higher level
+[17:06] validator agent that's just going to
+[17:08] make sure that the task was done
+[17:09] properly, right? Make sure that the code
+[17:11] is complete, make sure that it can run
+[17:13] whatever validation it needs to validate
+[17:15] that the builder did actually do the
+[17:17] work. Okay, so I really like this kind
+[17:19] of two agent pairing. We're basically
+[17:21] increasing our compute to increase the
+[17:23] trust we have that the work was
+[17:25] delivered. And if we had a specific type
+[17:27] of validation, we could also build out
+[17:29] tools to give this agent specialized
+[17:31] tools to make sure that the builder did
+[17:32] his job properly. I think this is
+[17:34] probably the simplest team combination
+[17:36] you can build. Of course, there are
+[17:38] other things, you know, QA tester
+[17:39] agents, reviewer agents, deploy agents,
+[17:42] blog monitoring agents. You can build
+[17:43] all types of agent teams, but I think
+[17:45] these are the two most foundational.
+[17:47] Have an agent build the thing and then
+[17:48] have another agent validate the thing.
+[17:51] Very powerful. This is what our primary
+[17:53] agent that was doing the planning work,
+[17:55] right, with the template metaprompt.
+[17:56] This is what it used to actually put
+[17:58] together the team. You know to be super
+[18:00] clear if we search for team
+[18:01] orchestration here we can see our team
+[18:03] members but you can see here every one
+[18:04] of these agents was unique. So we built
+[18:07] a session end builder for this session
+[18:09] end hook and then we built the
+[18:10] corresponding validator. Same thing with
+[18:12] permission request builder and then
+[18:14] permission request validator. All right
+[18:16] and this is where it gets really
+[18:17] powerful. If we go to this step-by-step
+[18:19] task, you can see here we have build
+[18:21] workflows. So build build build. And
+[18:23] then guess what happens after six? We
+[18:26] have validators. is doing compilation on
+[18:28] the code to make sure that it's legit.
+[18:30] And then we have additional validation
+[18:32] steps down here. And you know, looking
+[18:34] back at this, I actually missed an
+[18:36] opportunity here. If I search for
+[18:38] claw-p, there's a huge opportunity for
+[18:41] every validator agent to actually just
+[18:43] fire off claw--pey
+[18:48] all logs are created in logs slash. We
+[18:51] could have built a more tighter closed
+[18:53] loop where the agents were validating
+[18:55] this log file. We have all of our logs
+[18:58] for each one of these new methods. So,
+[19:00] if we just search for one of our new
+[19:02] ones, session end, we should see a
+[19:04] session end file here now. Yeah, there's
+[19:06] our session end. And so, we have some
+[19:08] new logging files that just weren't
+[19:09] there before, right? Permission request.
+[19:11] Um, and one of the newer ones that I
+[19:13] haven't really played with a lot, post
+[19:15] tool use failure. And you can see that
+[19:17] log file there. Fantastic. And then you
+[19:19] can see here, step 15, step 16, we're
+[19:21] going to update the readme. So, of
+[19:23] course, you know, simple validation
+[19:24] here. Just to quickly check this, we can
+[19:26] open this. And then once again, we can
+[19:27] just search for one of these tools that
+[19:29] weren't previously documented, right?
+[19:31] So, if I just search for post tool use,
+[19:33] you can see all of our documentation got
+[19:35] edited. And we can do this even faster
+[19:36] if we just want to get the file path
+[19:38] here. GDF, which is get diff, and then
+[19:40] we can just see the overall diff there.
+[19:41] We got a bunch of new status lines. We
+[19:43] got our file references updated, yada
+[19:45] yada yada. We have our new documentation
+[19:47] for these hooks here. So, that's
+[19:49] fantastic. We also got our GDF uh
+[19:52] settings file got updated as well. And
+[19:55] you can see new hooks were added.
+[19:57] Nothing super novel there. This was a
+[19:58] relatively simple task for Opus to
+[20:01] handle, especially with it deployed
+[20:04] across multiple agents, focusing on one
+[20:06] specific task at a time. That's another
+[20:09] huge value proposition of this system.
+[20:11] Every one of your agents has a focused
+[20:13] context window doing one thing
+[20:14] extraordinarily well. This is something
+[20:16] we talk about all the time in tactical
+[20:18] agent coding. This is the lesson six
+[20:20] tactic. If you're interested, check that
+[20:22] out. Link in the description. But
+[20:23] basically, the more agents you have with
+[20:25] focus context windows doing one specific
+[20:28] thing, the better. And this multi- aent
+[20:29] task system is perfect for that. Your
+[20:32] top level planner orchestrator agent
+[20:34] writes the plan. You want to refresh the
+[20:36] context after that, kick it off in a new
+[20:37] agent to do the building that was inside
+[20:39] of the plan. But once they do that, your
+[20:41] multi- aent systems task list and the
+[20:44] individual agent teams that you assign
+[20:46] the work to, they kind of take care of
+[20:47] it from there. And that leads us to the
+[20:50] question when should you use this task
+[20:52] system? So this is on by default if you
+[20:54] write a large enough prompt claude code
+[20:56] and opus it knows it has access to these
+[20:59] tools that in itself is like fine. It's
+[21:01] like you know a little bit more valuable
+[21:02] but I think if you're really pushing and
+[21:04] you're really scaling what you can do
+[21:06] with agents you're going to want to
+[21:07] build out a meta prompt like this. Okay.
+[21:09] It's a prompt that builds a prompt.
+[21:12] Specifically with agentic coding there
+[21:14] are two primary constraints. Planning
+[21:16] and reviewing. you're probably spending
+[21:17] most of your time planning or reviewing
+[21:20] if you're doing things right, if you're
+[21:21] doing true agentic engineering. Now,
+[21:23] this prompt, this new set of tools
+[21:26] really helps us in the planning phase.
+[21:28] We can build out specialized agents that
+[21:31] are again self- validating. So, every
+[21:33] one of them is checking their own work.
+[21:35] This is super important. I'll link
+[21:36] previous videos on the channel where we
+[21:38] talk about building out these embedded
+[21:40] hooks so that your agents are validating
+[21:42] specific work that they're designed to
+[21:44] do. But what you can do with your team
+[21:46] members, your agents that are, you know,
+[21:48] built for specific purposes, is really
+[21:50] build in unique workflows where you
+[21:52] think about the combination of running
+[21:55] multiple agents together that outperform
+[21:57] a single one. And that's why, you know,
+[21:59] we do build, we do test, we do build, we
+[22:01] do review. We have a documentation agent
+[22:04] that is just all about documenting.
+[22:06] That's another direction we can go with
+[22:08] this. You can see here our validator is
+[22:10] just reporting if the thing was built
+[22:12] right. If it was, we report success. If
+[22:14] it wasn't, we report failure. Okay, so a
+[22:16] very powerful dedicated agent just for
+[22:18] validating work. And as mentioned here,
+[22:21] you know, I could have pushed uh this
+[22:22] validation a bit further. We should have
+[22:25] had cloud-p messages for every single
+[22:27] validation agent. Instead, we just got
+[22:29] Python compile of the individual
+[22:31] scripts. This is probably enough for
+[22:32] Opus, though. If we open up any one of
+[22:34] these files, right, we had the logs
+[22:36] generated, too. But it's going to
+[22:37] basically mirror and copy the previous
+[22:39] format from all of the other hook
+[22:42] scripts that were running. And yeah,
+[22:44] just at a glance, I can see that this is
+[22:45] right. So, we got our sub agent
+[22:47] announce. This all looks great. But you
+[22:50] get the point, right? We could have
+[22:51] improved our validation there. And this
+[22:52] is where that orchestrator prompt
+[22:55] becomes even more important. If we go to
+[22:57] plan with team here, remember we pass in
+[22:59] two prompts. What we wanted to build and
+[23:00] then the actual orchestration prompt.
+[23:03] And I can pull that out here. I just
+[23:04] copy pasted that in. Had that set up
+[23:06] beforehand. So, you can just kind of see
+[23:07] exactly what this looks like, right?
+[23:08] create groups of agents for each hook,
+[23:11] one builder and one validator. All
+[23:13] right, so this is our orchestration
+[23:14] prompt. This is our highle prompt that
+[23:16] gets boiled down into a low-level prompt
+[23:18] thanks to our metaprompt. Then in the
+[23:20] orchestrator prompt, we're actually
+[23:22] helping our agent guide how to build the
+[23:24] team that does the work. This is a new
+[23:27] paradigm of multi- aent orchestration
+[23:29] that's emerging. This is one way you can
+[23:31] use it repeatedly, consistently, and
+[23:34] reliably. And it also gives you a little
+[23:35] bit of flexibility because you can also
+[23:37] pass in that orchestration prompt. So a
+[23:39] couple big ideas we're hitting on here.
+[23:41] Self- validation. We're hitting on
+[23:43] multi- aent orchestration. And again,
+[23:46] we're building it into our reusable
+[23:48] prompts. A lot of engineers are going to
+[23:49] miss this. Please don't be one of them.
+[23:51] You can build team orchestration into
+[23:53] your reusable prompt so you get the
+[23:55] value every single time. Right? It only
+[23:58] takes one time to build out a great
+[24:00] prompt, right? Just that upfront
+[24:01] investment is really where you want to
+[24:03] be spending more and more of your time.
+[24:04] As mentioned in tactical agentic coding,
+[24:06] you want to be building the agentic
+[24:09] layer of your code base. Don't work on
+[24:11] the application anymore. Work on the
+[24:13] agents that build the application for
+[24:15] you. All right, big big idea there. Uh
+[24:18] there's a lot of value embedded in that.
+[24:19] A lot of what we're seeing coming out,
+[24:21] you know, the Ralph Wickham technique,
+[24:23] uh all of this stuff around multi- aent
+[24:25] orchestration, which the cloud code team
+[24:27] is not documenting very well. Oh, I wish
+[24:29] they would really up their documentation
+[24:30] on this stuff. This task feature is
+[24:33] pushing in the direction of multi- aent
+[24:35] orchestration. Remember, in the
+[24:37] beginning, you have a base agent. Then
+[24:38] you learn how to use it better by
+[24:40] context engineering and prompt
+[24:42] engineering. And then you add more
+[24:44] agents. Very powerful. After you add
+[24:45] more agents, you customize them. And
+[24:47] then lastly, you add an orchestrator
+[24:50] agent to help you conduct all of them.
+[24:52] And that's what we're turning our
+[24:53] primary agent into. Let's be super clear
+[24:55] about this. your primary agent when
+[24:57] they're working with this task list,
+[24:58] when they're working with your agent
+[24:59] teams, they are orchestrating. All
+[25:01] right. Now, there's levels to this. We
+[25:03] built our own multi- aent orchestration
+[25:05] system inside of Agentic Horizon. Um,
+[25:07] I'll link the course in the description
+[25:09] obviously for you if you want to push
+[25:10] what you can do with Agentic Engineering
+[25:13] further beyond. I'll leave this prompt
+[25:15] in the cloud code hooks mastery codebase
+[25:17] for you. If you want to check it out, if
+[25:18] you want to understand how you can build
+[25:20] template meta prompts that encode your
+[25:22] engineering, this is very, very
+[25:23] powerful. I think there's a lot of hype
+[25:26] right now in the tech industry. There's
+[25:28] a lot of slop engineering and just vibe
+[25:31] slopping
+[25:33] and it's coming out by a lot of people
+[25:35] just jumping onto these super super
+[25:37] highle abstract tools like Moltbot. Now
+[25:39] I have nothing against this thing. I can
+[25:41] see why people are really interested.
+[25:42] You know, it's very powerful. This
+[25:43] thing's gone super viral, but I am super
+[25:46] concerned about an over reliance on
+[25:48] tools like this without understanding
+[25:50] the pieces of it. Now I think if you're
+[25:52] a agentic engineer, if you're an
+[25:54] engineer that has been learning to
+[25:57] really use agents and build proficient
+[26:00] systems that operate with and without
+[26:02] you, you know, go crazy with tools like
+[26:04] this. You know what's happening
+[26:05] underneath the hood. It's more of
+[26:06] everyone else that I'm worried about,
+[26:08] right?
+[26:09] That uh really have no idea what's going
+[26:11] on underneath the hood. When really, if
+[26:13] you're trying to learn how to build with
+[26:14] agents, it's all about the core four
+[26:16] context, model, prompt, and tools. And
+[26:19] it's about learning to leverage these
+[26:21] fundamental levers of agentic coding,
+[26:24] the fundamental pieces of building with
+[26:26] agents. And that comes down to reusable
+[26:28] prompts, building out your own
+[26:29] specialized agents, and building out AI
+[26:32] developer workflows, ADWs as we call
+[26:34] them in TAC. It's all about knowing what
+[26:37] you're doing and teaching your agents
+[26:39] how to do it. All right. There's going
+[26:40] to be a big gap between engineers that
+[26:42] turn their brain off and engineers that
+[26:44] keep learning and keep adding to their
+[26:46] stack of agentics, their patterns and
+[26:49] tools that they can use to teach their
+[26:51] agents how to build on their behalf. I'm
+[26:53] not saying don't use agents. I think
+[26:55] this tool and other tools like it,
+[26:56] they're incredible. What I'm saying is
+[26:58] know how to use the primitives and the
+[27:01] leverage points of agentic coding,
+[27:03] right? The foundational pieces that make
+[27:05] it all up. Because if you do that as I
+[27:07] have, as many of us have that watch this
+[27:09] channel, um you'll be able to hop from
+[27:10] tool to tool to tool to feature to
+[27:12] feature to feature. All right? And this
+[27:14] tool is a great example, right? This
+[27:16] system that the cloud code team has
+[27:18] built out, it's not new, right? Open
+[27:20] source tools have had this, but what
+[27:22] they've done here is standardized it and
+[27:24] made it accessible through the best
+[27:26] agent coding tool. That's worth paying
+[27:27] attention to. That's worth learning.
+[27:29] These are just tools and prompts. This
+[27:32] entire feature set is just tools and
+[27:34] prompts. So if we needed to, if you
+[27:36] wanted to, we could step away from cloud
+[27:38] code. We could build it into another
+[27:39] tool if needed. Thankfully, we don't
+[27:41] have to. They built it in. This is the
+[27:43] Claude Code task system. You can use
+[27:45] this to build specialized agent teams
+[27:47] when you combine it with a powerful meta
+[27:49] prompt, a prompt that builds a prompt.
+[27:51] And when you template and add self
+[27:53] validation into your agentic systems,
+[27:55] all right, these are powerful trends.
+[27:57] We're starting to stack up on the
+[27:58] channel. Make sure to like and comment.
+[27:59] let the algorithm know you're interested
+[28:01] in like real hands-on agentic
+[28:04] engineering. I want to kind of push back
+[28:06] against some of this, you know, insane
+[28:09] AI hype that's going on right now. Let's
+[28:11] stay close to the fundamentals. Let's
+[28:13] stay close to what makes up the agent at
+[28:16] a foundational level while increasing
+[28:18] what we can do with this. All right,
+[28:20] that's all for this one. You know where
+[28:21] to find me every single Monday. Stay
+[28:23] focused and keep building.
