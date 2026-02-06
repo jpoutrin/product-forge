@@ -11,38 +11,55 @@ This Django 6.0 project uses:
 - **OAuth** for authentication
 - **DRF** for API endpoints
 
-## Running the Project
+## Quick Start
 
 **IMPORTANT**: Always use `/usr/bin/make` (full path) for make commands as per global CLAUDE.md.
 
 ```bash
-# Start Docker database
-/usr/bin/make start-docker
+# Complete setup (first time only)
+/usr/bin/make setup
 
-# Run migrations
-/usr/bin/make migrate
-
-# Create superuser (set password in .envrc.local first)
-/usr/bin/make createsuperuser
-
-# Start development server
-/usr/bin/make runserver
-
-# Run tests
-/usr/bin/make test
-
-# Type checking
-/usr/bin/make typecheck
-
-# Linting
-/usr/bin/make lint
-
-# Format code
-/usr/bin/make format
-
-# Django shell with IPython
-/usr/bin/make shell
+# Or manually:
+/usr/bin/make install        # Install dependencies
+/usr/bin/make start          # Start PostgreSQL
+/usr/bin/make migrate        # Run migrations
+/usr/bin/make createsuperuser # Create admin user
+/usr/bin/make runserver      # Start dev server
 ```
+
+## Available Make Commands
+
+Run `/usr/bin/make help` to see all available commands.
+
+### Setup Commands
+- `setup` - Complete project setup (install, start DB, migrate, create superuser)
+- `install` - Install all dependencies with uv
+
+### Docker/Database Commands
+- `start` or `start-docker` - Start PostgreSQL in Docker
+- `stop` or `stop-docker` - Stop PostgreSQL
+- `restart` or `restart-docker` - Restart PostgreSQL
+- `logs` - Show PostgreSQL logs (follow mode)
+
+### Django Commands
+- `runserver` - Start Django development server
+- `shell` - Open Django shell with IPython and shell_plus
+- `migrate` - Run database migrations
+- `makemigrations` - Create new migrations
+- `createsuperuser` - Create Django superuser
+
+### Testing Commands
+- `test` - Run tests with pytest
+- `test-cov` - Run tests with coverage report
+
+### Code Quality Commands
+- `lint` - Check code with ruff
+- `format` - Format code with ruff
+- `typecheck` - Run mypy type checking
+- `check` or `validate` - Run all checks (lint, typecheck, test)
+
+### Maintenance Commands
+- `clean` - Remove Python cache files and test artifacts
 
 ## Creating New Apps
 
@@ -62,6 +79,82 @@ INSTALLED_APPS += [
 ]
 ```
 
+## Type Annotations
+
+This project uses strict type checking with mypy. All code must include type annotations.
+
+**IMPORTANT**: Run type checks before committing to ensure all types are correct.
+
+```python
+# Good - Fully typed
+def create_user(email: str, username: str) -> User:
+    """Create a new user with the given email and username."""
+    return User.objects.create(email=email, username=username)
+
+def process_items(items: list[str]) -> None:
+    """Process a list of items."""
+    for item in items:
+        print(item)
+
+# Bad - No type hints (will fail mypy check)
+def create_user(email, username):
+    return User.objects.create(email=email, username=username)
+```
+
+### Type-Annotated Models
+
+All models should have type annotations for fields and methods:
+
+```python
+from typing import Any
+import uuid
+from django.db import models
+from apps.core.models import UUIDModel
+
+
+class MyModel(UUIDModel):
+    """Example model with full type annotations."""
+
+    # Fields with type annotations
+    name: models.CharField = models.CharField(max_length=100)
+    description: models.TextField = models.TextField(blank=True)
+    is_active: models.BooleanField = models.BooleanField(default=True)
+    count: models.IntegerField = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'my_models'
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return self.name
+
+    def increment_count(self) -> None:
+        """Increment the count by one."""
+        self.count += 1
+        self.save()
+```
+
+### Benefits for AI Coding Assistants
+
+Full type annotations enable:
+- **Better Completions**: GitHub Copilot, Cursor, Cody understand code context
+- **Fewer Errors**: Type checker catches bugs before runtime
+- **Safer Refactoring**: AI can suggest type-safe refactorings
+- **Self-Documenting**: Type hints serve as inline documentation
+
+### Running Type Checks
+
+```bash
+# Check all files with mypy
+/usr/bin/make typecheck
+
+# Or run mypy directly
+uv run mypy .
+
+# Check specific file
+uv run mypy apps/blog/models.py
+```
+
 ## Database Models
 
 All models use UUID primary keys by default. Inherit from `apps.core.models.UUIDModel`:
@@ -72,11 +165,14 @@ from apps.core.models import UUIDModel
 class MyModel(UUIDModel):
     # id field (UUID) is automatically added
     # created_at and updated_at are also added
-    name = models.CharField(max_length=100)
+    name: models.CharField = models.CharField(max_length=100)
 
     class Meta:
         db_table = 'my_models'
         ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return self.name
 ```
 
 ## Testing

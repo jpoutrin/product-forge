@@ -1,40 +1,90 @@
-.PHONY: start-docker stop-docker restart-docker logs shell migrate makemigrations test runserver createsuperuser lint format typecheck
+.PHONY: help setup install start stop restart logs clean shell migrate makemigrations test test-cov runserver createsuperuser lint format typecheck check validate start-docker stop-docker restart-docker
 
-start-docker:
+.DEFAULT_GOAL := help
+
+help: ## Show this help message
+	@echo 'Usage: make [target]'
+	@echo ''
+	@echo 'Available targets:'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+## Setup Commands
+
+setup: install start migrate createsuperuser ## Complete project setup (install deps, start DB, migrate, create superuser)
+	@echo "✅ Setup complete! Run 'make runserver' to start the development server."
+
+install: ## Install all dependencies with uv
+	uv sync
+
+## Docker/Database Commands
+
+start-docker: ## Start PostgreSQL in Docker
 	docker-compose up -d
+	@echo "✅ PostgreSQL started"
 
-stop-docker:
+stop-docker: ## Stop PostgreSQL Docker container
 	docker-compose down
+	@echo "✅ PostgreSQL stopped"
 
-restart-docker:
+restart-docker: ## Restart PostgreSQL Docker container
 	docker-compose restart
+	@echo "✅ PostgreSQL restarted"
 
-logs:
+logs: ## Show PostgreSQL logs (follow mode)
 	docker-compose logs -f postgres
 
-shell:
+start: start-docker ## Alias for start-docker
+
+stop: stop-docker ## Alias for stop-docker
+
+restart: restart-docker ## Alias for restart-docker
+
+## Django Commands
+
+shell: ## Open Django shell with IPython and shell_plus
 	uv run python manage.py shell_plus
 
-migrate:
+migrate: ## Run database migrations
 	uv run python manage.py migrate
 
-makemigrations:
+makemigrations: ## Create new migrations
 	uv run python manage.py makemigrations
 
-test:
-	uv run pytest
-
-runserver:
+runserver: ## Start Django development server
 	uv run python manage.py runserver
 
-createsuperuser:
+createsuperuser: ## Create Django superuser (interactive)
 	uv run python manage.py createsuperuser
 
-lint:
+## Testing Commands
+
+test: ## Run tests with pytest
+	uv run pytest
+
+test-cov: ## Run tests with coverage report
+	uv run pytest --cov --cov-report=html --cov-report=term
+
+## Code Quality Commands
+
+lint: ## Check code with ruff
 	uv run ruff check .
 
-format:
+format: ## Format code with ruff
 	uv run ruff format .
 
-typecheck:
+typecheck: ## Run mypy type checking
 	uv run mypy .
+
+check: lint typecheck test ## Run all checks (lint, typecheck, test)
+
+validate: check ## Alias for check
+
+## Maintenance Commands
+
+clean: ## Remove Python cache files and test artifacts
+	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name "*.pyc" -delete
+	find . -type f -name "*.pyo" -delete
+	find . -type f -name "*.coverage" -delete
+	rm -rf .pytest_cache .mypy_cache .ruff_cache htmlcov
+	@echo "✅ Cleaned up cache files"
