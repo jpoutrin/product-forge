@@ -10,10 +10,10 @@ hooks:
       hooks:
         - type: command
           command: >-
-            uv run $CLAUDE_PLUGIN_DIR/hooks/validators/ruff_validator.py
+            $CLAUDE_PLUGIN_DIR/hooks/validators/ruff_validator.py
         - type: command
           command: >-
-            uv run $CLAUDE_PLUGIN_DIR/hooks/validators/ty_validator.py
+            $CLAUDE_PLUGIN_DIR/hooks/validators/ty_validator.py
 ---
 
 # Django Builder
