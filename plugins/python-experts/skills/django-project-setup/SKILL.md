@@ -107,8 +107,8 @@ The skill will:
 
 ## Requirements
 
-- **Python 3.12+** (Django 6.0 requirement)
-- **uv** (will be installed if missing)
+- **Python 3.12+** (Django 6.0 requirement - automatically installed by uv if missing)
+- **uv** (will be installed if missing - handles Python version management)
 - **direnv** (recommended, will prompt if missing)
 - **Docker** (for local PostgreSQL)
 
@@ -145,14 +145,17 @@ When this skill is invoked with a project name (e.g., `/django-project-setup myp
 
 ### Prerequisites Check
 
-1. Verify Python 3.12+ is available:
-   ```bash
-   python3 --version
-   ```
-
-2. Check if uv is installed, install if missing:
+1. Check if uv is installed, install if missing:
    ```bash
    which uv || curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. Check if Python 3.12+ is available, install via uv if missing:
+   ```bash
+   # Check current Python version
+   python3 --version 2>/dev/null | grep -q "Python 3.1[2-9]" || \
+   # If not found, use uv to install Python 3.12
+   uv python install 3.12
    ```
 
 3. Verify current directory or use /tmp if not specified
@@ -175,8 +178,12 @@ Header: "First App"
 **Step 2: Initialize uv Project**
 
 ```bash
-uv init {project_name}
+# Initialize project with Python 3.12+
+uv init --python 3.12 {project_name}
 builtin cd {project_name}
+
+# Verify .python-version file was created
+[ -f .python-version ] && echo "✅ Python version pinned" || echo "3.12" > .python-version
 ```
 
 **Step 3: Add Core Dependencies**
@@ -299,10 +306,11 @@ Show the user:
 
 ### Error Handling
 
-- If Python < 3.12: Show error and exit
+- If Python < 3.12: Use `uv python install 3.12` to automatically download and install Python 3.12
 - If uv installation fails: Show installation instructions
 - If Django project creation fails: Show Django error and suggest fixes
 - If migrations fail: Show error and suggest checking models
+- If `uv python install` fails: Check network connectivity and suggest manual Python installation
 
 ### Success Criteria
 
@@ -392,9 +400,15 @@ typecheck:
 ### Step 1: Initial Project Setup
 
 ```bash
-# Initialize uv project
-uv init {project_name}
+# Ensure Python 3.12+ is available
+uv python install 3.12
+
+# Initialize uv project with Python 3.12+
+uv init --python 3.12 {project_name}
 cd {project_name}
+
+# Verify Python version is pinned
+echo "3.12" > .python-version
 
 # Add Django and core dependencies
 uv add django psycopg[binary] django-environ
