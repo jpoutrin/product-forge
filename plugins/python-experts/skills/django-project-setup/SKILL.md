@@ -1,8 +1,8 @@
 ---
 name: django-project-setup
-description: Set up a new Django 6.0 project with modern tooling (uv, direnv, Supabase, HTMX, OAuth, DRF, testing). Use when the user wants to create a Django project from scratch with production-ready configuration.
+description: Set up a new Django 6.0 project with modern tooling (uv, direnv, HTMX, OAuth, DRF, testing). Use when the user wants to create a Django project from scratch with production-ready configuration.
 user-invocable: true
-argument-hint: "[project_name] - Name of the Django project to create"
+argument-hint: "[project_name] [--with-supabase] - Name of the Django project to create. Use --with-supabase to use Supabase instead of Docker PostgreSQL."
 context: fork
 agent: django-expert
 hooks:
@@ -90,20 +90,25 @@ When you provide full type annotations:
 ## Usage
 
 ```bash
+# With Docker PostgreSQL (default)
 /django-project-setup myproject
+
+# With Supabase
+/django-project-setup myproject --with-supabase
 ```
 
 The skill will:
-1. Ask for first app name (e.g., 'accounts', 'blog', 'api')
-2. Create project structure with uv
-3. Set up Docker Compose for PostgreSQL
-4. Configure direnv environment
-5. Install all dependencies
-6. Create custom User model with UUID
-7. Run initial migrations
-8. Set up testing infrastructure
-9. Configure HTMX, OAuth, and DRF
-10. Create CLAUDE.md with project patterns
+1. Parse arguments (project name and optional --with-supabase flag)
+2. Ask for first app name (e.g., 'accounts', 'blog', 'api')
+3. Create project structure with uv
+4. Set up database (Docker Compose or Supabase instructions)
+5. Configure direnv environment
+6. Install all dependencies
+7. Create custom User model with UUID
+8. Run initial migrations (or show Supabase setup instructions)
+9. Set up testing infrastructure
+10. Configure HTMX, OAuth, and DRF
+11. Create CLAUDE.md with project patterns
 
 ## Requirements
 
@@ -113,6 +118,8 @@ The skill will:
 - **Docker** (for local PostgreSQL)
 
 ## After Setup
+
+### With Docker PostgreSQL (default)
 
 ```bash
 # Start PostgreSQL
@@ -139,18 +146,54 @@ The skill will:
 
 Visit http://localhost:8000/admin/ to verify setup.
 
+### With Supabase
+
+```bash
+# 1. Complete Supabase setup (see SUPABASE_SETUP.md)
+# 2. Add DATABASE_URL to .env.local
+# 3. Allow direnv
+direnv allow
+
+# Run migrations
+uv run python manage.py migrate
+
+# Create superuser
+uv run python manage.py createsuperuser
+
+# Start development server
+uv run python manage.py runserver
+
+# Run tests
+uv run pytest
+
+# Type checking
+uv run mypy .
+
+# Linting
+uv run ruff check .
+```
+
+Visit http://localhost:8000/admin/ to verify setup.
+
 ## Execution Instructions
 
-When this skill is invoked with a project name (e.g., `/django-project-setup myproject`), follow these steps:
+When this skill is invoked with a project name (e.g., `/django-project-setup myproject` or `/django-project-setup myproject --with-supabase`), follow these steps:
 
 ### Prerequisites Check
 
-1. Check if uv is installed, install if missing:
+1. **Parse Arguments**:
+   ```bash
+   # Extract project name (first non-flag argument)
+   # Check if --with-supabase flag is present
+   # Set use_supabase=true if flag found, false otherwise
+   ```
+
+2. Check if uv is installed, install if missing:
    ```bash
    which uv || curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-2. Check if Python 3.12+ is available, install via uv if missing:
+3. Check if Python 3.12+ is available, install via uv if missing:
    ```bash
    # Check current Python version
    python3 --version 2>/dev/null | grep -q "Python 3.1[2-9]" || \
@@ -158,7 +201,7 @@ When this skill is invoked with a project name (e.g., `/django-project-setup myp
    uv python install 3.12
    ```
 
-3. Verify current directory or use /tmp if not specified
+4. Verify current directory or use /tmp if not specified
 
 ### Execution Steps
 
@@ -217,16 +260,22 @@ mkdir -p config/settings
 
 Use the templates in `templates/` directory to create:
 
-1. `docker-compose.yml` - Use docker-compose.yml.template, replace {project_name}
-2. `Makefile` - Use Makefile.template
-3. `.envrc` - Use .envrc.template, replace {project_name}
-4. `.env` - Use .env.template, replace {project_name}
-5. `.env.example` - Use .env.example.template, replace {project_name}
-6. `.envrc.local` - Use .envrc.local.template
-7. `.gitignore` - Use .gitignore.template
-8. `pytest.ini` - Use pytest.ini.template
-9. `conftest.py` - Use conftest.py.template
-10. `CLAUDE.md` - Use CLAUDE.md.template, replace {project_name}
+1. `Makefile` - Use Makefile.template (conditionally add Docker targets if use_supabase == false)
+2. `.envrc` - Use .envrc.template, configure DATABASE_URL based on use_supabase
+3. `.env` - Use .env.template, configure database variables based on use_supabase
+4. `.env.example` - Use .env.example.template, configure based on use_supabase
+5. `.envrc.local` - Use .envrc.local.template
+6. `.gitignore` - Use .gitignore.template
+7. `pytest.ini` - Use pytest.ini.template
+8. `conftest.py` - Use conftest.py.template
+9. `CLAUDE.md` - Use CLAUDE.md.template, replace {project_name} and add database-specific notes
+
+**If use_supabase == false (Docker):**
+- Create `docker-compose.yml` - Use docker-compose.yml.template, replace {project_name}
+
+**If use_supabase == true:**
+- Create `SUPABASE_SETUP.md` with instructions for Supabase project creation
+- Display message: "⚠️  Supabase setup required - see SUPABASE_SETUP.md for instructions"
 
 **Step 7: Split Settings Files**
 
@@ -277,32 +326,76 @@ uv run python manage.py makemigrations {first_app_name}
 
 Add tool configurations for mypy, ruff, and pytest at the end of pyproject.toml.
 
-**Step 13: Verify Setup**
+**Step 13: Database Setup**
+
+**If use_supabase == false (Docker):**
+```bash
+# Start PostgreSQL container
+/usr/bin/make start-docker
+
+# Wait for database to be ready
+sleep 3
+
+# Run migrations
+uv run python manage.py migrate
+```
+
+**If use_supabase == true:**
+```bash
+# Display setup instructions
+echo ""
+echo "=========================================="
+echo "⚠️  Supabase Setup Required"
+echo "=========================================="
+echo ""
+echo "Next steps:"
+echo "1. Create a Supabase project at https://supabase.com"
+echo "2. Go to Settings > Database"
+echo "3. Copy the 'Connection string' (URI format)"
+echo "4. Add to .env.local:"
+echo "   DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres"
+echo "5. Run: direnv allow"
+echo "6. Run migrations: uv run python manage.py migrate"
+echo ""
+echo "See SUPABASE_SETUP.md for detailed instructions"
+echo ""
+```
+
+**Step 14: Verify Setup**
 
 Run verification checks:
 
 ```bash
 # Check if files exist
-[ -f docker-compose.yml ] && echo "✅ Docker Compose"
 [ -f Makefile ] && echo "✅ Makefile"
 [ -f .envrc ] && echo "✅ direnv config"
 [ -f pytest.ini ] && echo "✅ pytest config"
 [ -f CLAUDE.md ] && echo "✅ Documentation"
 
-# Check Django setup
-uv run python manage.py check
+# Database-specific checks
+if [ "$use_supabase" = "true" ]; then
+  [ -f SUPABASE_SETUP.md ] && echo "✅ Supabase setup instructions"
+else
+  [ -f docker-compose.yml ] && echo "✅ Docker Compose"
+fi
+
+# Check Django setup (only if DATABASE_URL is configured for Supabase)
+if [ "$use_supabase" = "false" ] || [ -n "$DATABASE_URL" ]; then
+  uv run python manage.py check
+fi
 
 # Check if tests can be collected
 uv run pytest --collect-only
 ```
 
-**Step 14: Display Summary**
+**Step 15: Display Summary**
 
 Show the user:
 - Project structure created
+- Database configuration (Docker PostgreSQL or Supabase)
 - List of installed dependencies
 - Next steps to start using the project
-- Available Make commands
+- Available commands (Make targets for Docker, or direct uv commands for Supabase)
 
 ### Error Handling
 
@@ -316,10 +409,11 @@ Show the user:
 
 - All configuration files created
 - Dependencies installed
-- Initial migrations created
+- Initial migrations created (or Supabase setup instructions provided)
 - Tests can be collected
-- Django check passes
+- Django check passes (if database is configured)
 - CLAUDE.md documentation exists
+- Database setup complete (Docker Compose or SUPABASE_SETUP.md)
 
 ## Implementation Guide
 
@@ -419,6 +513,8 @@ uv run django-admin startproject config .
 
 ### Step 2: Environment Setup (direnv)
 
+**For Docker PostgreSQL (default):**
+
 Create `.envrc`:
 
 ```bash
@@ -432,11 +528,6 @@ export POSTGRES_USER="${POSTGRES_USER:-postgres}"
 export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-postgres}"
 export POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 export DATABASE_URL="${DATABASE_URL:-postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_PORT}/${POSTGRES_DB}}"
-
-# Supabase (production)
-export SUPABASE_URL="${SUPABASE_URL:-}"
-export SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY:-}"
-export SUPABASE_SERVICE_KEY="${SUPABASE_SERVICE_KEY:-}"
 
 # Django
 export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.dev}"
@@ -457,16 +548,94 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/django_dev
 
-# Supabase Configuration (optional, for production)
-SUPABASE_URL=
-SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_KEY=
+# Django Configuration
+DJANGO_SETTINGS_MODULE=config.settings.dev
+DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+DJANGO_SUPERUSER_PASSWORD=admin
+DEBUG=true
+```
+
+**For Supabase (--with-supabase):**
+
+Create `.envrc`:
+
+```bash
+# Load environment from .env files
+dotenv_if_exists .env
+dotenv_if_exists .env.local
+
+# Supabase Database
+# Set DATABASE_URL in .env.local (see SUPABASE_SETUP.md)
+export DATABASE_URL="${DATABASE_URL:-}"
+
+# Django
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.dev}"
+export DJANGO_SECRET_KEY="${DJANGO_SECRET_KEY:-dev-secret-key-change-in-production}"
+export DEBUG="${DEBUG:-true}"
+
+# Allow local overrides
+source_env_if_exists .envrc.local
+```
+
+Create `.env.example`:
+
+```bash
+# Supabase Configuration
+# Get these values from your Supabase project:
+# https://supabase.com/dashboard/project/[PROJECT-REF]/settings/database
+DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
 
 # Django Configuration
 DJANGO_SETTINGS_MODULE=config.settings.dev
 DJANGO_SECRET_KEY=dev-secret-key-change-in-production
 DJANGO_SUPERUSER_PASSWORD=admin
 DEBUG=true
+```
+
+Create `SUPABASE_SETUP.md`:
+
+```markdown
+# Supabase Setup Instructions
+
+This project is configured to use Supabase as the PostgreSQL database.
+
+## Steps
+
+1. **Create a Supabase Project**
+   - Go to https://supabase.com
+   - Click "New Project"
+   - Choose your organization and set a database password
+
+2. **Get Database Connection String**
+   - Go to Settings > Database
+   - Find "Connection string" section
+   - Copy the "URI" format connection string
+   - It looks like: `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres`
+
+3. **Configure Local Environment**
+   - Create `.env.local` file (gitignored):
+     ```bash
+     DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+     ```
+   - Replace `[PROJECT-REF]`, `[PASSWORD]`, and `[REGION]` with your actual values
+   - Run `direnv allow` to load the environment
+
+4. **Run Migrations**
+   ```bash
+   uv run python manage.py migrate
+   ```
+
+5. **Create Superuser**
+   ```bash
+   uv run python manage.py createsuperuser
+   ```
+
+## Notes
+
+- Use the "Session pooler" connection string (port 6543) for development
+- Use the "Direct connection" (port 5432) for production/long-running connections
+- Connection strings are in Settings > Database > Connection string
+- Don't commit `.env.local` (it's in .gitignore)
 ```
 
 ### Step 3: Settings Configuration
@@ -1055,8 +1224,10 @@ After setup, verify:
 
 1. ✅ **Project Structure**: Correct `config/` and `apps/` layout
 2. ✅ **Environment**: `direnv allow` succeeds
-3. ✅ **Database**: Docker container running
-4. ✅ **Migrations**: Applied successfully
+3. ✅ **Database**:
+   - **Docker**: Container running (`docker ps` shows postgres)
+   - **Supabase**: DATABASE_URL configured in `.env.local`
+4. ✅ **Migrations**: Applied successfully (or Supabase setup instructions provided)
 5. ✅ **Superuser**: Created and can log in to admin
 6. ✅ **Dev Server**: `uv run python manage.py runserver` starts
 7. ✅ **Admin**: http://localhost:8000/admin/ accessible
@@ -1078,6 +1249,8 @@ After setup, verify:
 
 - [Django 6.0 Documentation](https://docs.djangoproject.com/en/6.0/)
 - [uv Package Manager](https://github.com/astral-sh/uv)
+- [uv Python Version Management](https://docs.astral.sh/uv/concepts/python-versions/)
+- [Supabase Database](https://supabase.com/docs/guides/database)
 - [django-htmx](https://django-htmx.readthedocs.io/)
 - [django-oauth-toolkit](https://django-oauth-toolkit.readthedocs.io/)
 - [Django REST Framework](https://www.django-rest-framework.org/)
