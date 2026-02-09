@@ -9,13 +9,6 @@
   "agents": [
     "./agents/fastmcp-ts-expert.md"
   ],
-  "commands": [
-    "./commands/create-mcp-server.md",
-    "./commands/add-mcp-tool.md",
-    "./commands/add-mcp-resource.md",
-    "./commands/add-mcp-prompt.md",
-    "./commands/setup-mcp-auth.md"
-  ],
   "skills": [
     "./skills/fastmcp/SKILL.md",
     "./skills/zod/SKILL.md"

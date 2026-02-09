@@ -6,7 +6,6 @@
     "name": "jpoutrin",
     "email": "contact@jpoutrin.dev"
   },
-  "commands": "./commands/",
   "agents": [
     "./agents/marketing-expert.md",
     "./agents/prd-orchestrator.md",
