@@ -95,7 +95,7 @@ def setup_logging(
         logger.addHandler(console_handler)
 
     # Log startup
-    logger.info(f"Logging initialized: {log_path}")
+    logger.debug(f"Logging initialized: {log_path}")
     logger.debug(f"Log level: {log_level}, Console: {enable_console}")
     logger.debug(f"Max bytes: {max_bytes}, Backup count: {backup_count}")
 
