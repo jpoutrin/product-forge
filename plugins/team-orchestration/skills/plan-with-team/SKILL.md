@@ -5,12 +5,26 @@ user-invocable: true
 argument-hint: [user prompt] [orchestration prompt]
 model: opus
 hooks:
-  Stop:
+  stop:
     - name: validate-new-file
       command: forge validate new-file --directory specs --extension .md
       description: Validate that plan was created as a new file in specs/
     - name: validate-plan-sections
-      command: forge validate contains --directory specs --extension .md --contains '## Task Description' --contains '## Objective' --contains '## Relevant Files' --contains '## Step by Step Tasks' --contains '## Acceptance Criteria' --contains '## Team Orchestration' --contains '### Team Members' --contains '## Contracts' --contains '## File Ownership Matrix' --contains '## Task Dependency Graph' --contains '## Orchestration Validation'
+      command: >-
+        forge validate contains
+        --directory specs
+        --extension .md
+        --contains '## Task Description'
+        --contains '## Objective'
+        --contains '## Relevant Files'
+        --contains '## Step by Step Tasks'
+        --contains '## Acceptance Criteria'
+        --contains '## Team Orchestration'
+        --contains '### Team Members'
+        --contains '## Contracts'
+        --contains '## File Ownership Matrix'
+        --contains '## Task Dependency Graph'
+        --contains '## Orchestration Validation'
       description: Validate that plan contains all required sections
     - name: validate-plan-ownership
       command: forge validate ownership --directory specs --extension .md
