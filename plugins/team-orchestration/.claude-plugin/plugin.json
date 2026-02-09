@@ -9,8 +9,5 @@
   "agents": [
     "./agents/django-builder.md",
     "./agents/django-validator.md"
-  ],
-  "skills": [
-    "./skills/plan-with-team/SKILL.md"
   ]
 }
