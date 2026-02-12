@@ -43,6 +43,46 @@ PLAN_OUTPUT_DIRECTORY: `specs/`
 TEAM_MEMBERS: `.claude/agents/team/*.md`
 GENERAL_PURPOSE_AGENT: `general-purpose`
 
+## Available Specialized Agents
+
+Use these specialized agents for specific task types instead of defaulting to `general-purpose`:
+
+### Django Development
+- **team-orchestration:django-builder** - Fast Django implementation (models, views, serializers, admin)
+- **team-orchestration:django-validator** - Django validation (tests, type checks, linting)
+- **python-experts:django-expert** - Django development with best practices and modern patterns
+
+### Python Development
+- **python-experts:fastapi-expert** - FastAPI async API development
+- **python-experts:celery-expert** - Celery distributed task queues
+- **python-experts:python-testing-expert** - Python testing with pytest
+- **python-experts:fastmcp-expert** - FastMCP Python server development
+
+### Frontend Development
+- **frontend-experts:react-typescript-expert** - React TypeScript components
+- **frontend-experts:playwright-testing-expert** - Playwright E2E testing
+- **typescript-experts:fastmcp-ts-expert** - FastMCP TypeScript servers
+
+### DevOps & Infrastructure
+- **devops-data:devops-expert** - CI/CD, infrastructure, Docker, Kubernetes
+- **devops-data:data-engineering-expert** - Data pipelines, dbt, SQLMesh
+- **devops-data:cto-architect** - System architecture and technical decisions
+
+### Security & Compliance
+- **security-compliance:mcp-security-expert** - MCP security and authorization
+- **security-compliance:dpo-expert** - GDPR, CCPA, privacy compliance
+
+### Product & Testing
+- **product-design:qa-tester** - QA testing with browser automation
+- **product-design:web-debugger** - Web debugging with Chrome DevTools
+- **rag-cag:rag-cag-expert** - RAG/CAG systems
+
+### Git Workflow
+- **git-workflow:commit-expert** - Git commits with conventional format
+- **git-workflow:code-review-expert** - Code review with specialist delegation
+
+**IMPORTANT**: Only use `general-purpose` if no specialized agent matches the task type.
+
 ## Instructions
 
 - **PLANNING ONLY**: Do NOT build, write code, or deploy agents. Your only output is a plan document saved to `PLAN_OUTPUT_DIRECTORY`.
@@ -50,6 +90,7 @@ GENERAL_PURPOSE_AGENT: `general-purpose`
 - If `ORCHESTRATION_PROMPT` is provided, use it to guide team composition, task granularity, dependency structure, and parallel/sequential decisions.
 - Carefully analyze the user's requirements provided in the USER_PROMPT variable
 - Determine the task type (chore|feature|refactor|fix|enhancement) and complexity (simple|medium|complex)
+- **Identify technology stack** (Django, React, FastAPI, etc.) to select appropriate specialized agents
 - Think deeply (ultrathink) about the best approach to implement the requested functionality or solve the problem
 - Understand the codebase directly without subagents to understand existing patterns and architecture
 - Follow the Plan Format below to create a comprehensive implementation plan
@@ -60,6 +101,7 @@ GENERAL_PURPOSE_AGENT: `general-purpose`
 - Include code examples or pseudo-code where appropriate to clarify complex concepts
 - Consider edge cases, error handling, and scalability concerns
 - Understand your role as the team lead. Refer to the `Team Orchestration` section for more details.
+- **CRITICAL**: Select specialized agents from "Available Specialized Agents" based on task technology. Only use `general-purpose` if no specialized agent exists for the task type.
 
 ### Team Orchestration
 
@@ -232,18 +274,28 @@ IMPORTANT: **PLANNING ONLY** - Do not execute, build, or deploy. Output is a pla
 
 1. Analyze Requirements - Parse the USER_PROMPT to understand the core problem and desired outcome
 2. Understand Codebase - Without subagents, directly understand existing patterns, architecture, and relevant files
-3. Generate Contracts (if needed) - If task involves multiple parallel agents or API boundaries, create shared contracts:
+3. Identify Technology Stack - Determine which technologies are involved (Django, React, FastAPI, etc.) to inform agent selection
+4. Generate Contracts (if needed) - If task involves multiple parallel agents or API boundaries, create shared contracts:
    - `contracts/types.py` - Shared data structures, enums, type aliases for cross-agent consistency
    - `contracts/api-schema.yaml` - OpenAPI specification for API endpoints and request/response schemas
    - Skip if contracts already exist or task is purely sequential with no API boundaries
-4. Analyze File Ownership - For each task, determine file ownership to prevent merge conflicts in parallel execution:
+5. Analyze File Ownership - For each task, determine file ownership to prevent merge conflicts in parallel execution:
    - **CREATE**: Files this task will create (exclusive to one task across all waves)
    - **MODIFY**: Files this task will modify, with scoped changes specified (e.g., `file.py::function_name`, `file.py::ClassName.method`)
    - **BOUNDARY**: Files this task must NOT touch (owned by other tasks)
    - Build File Ownership Matrix to validate no conflicts exist in parallel tasks (same wave)
-5. Design Solution - Develop technical approach including architecture decisions and implementation strategy
-6. Define Team Members - Use `ORCHESTRATION_PROMPT` (if provided) to guide team composition. Identify from `.claude/agents/team/*.md` or use `general-purpose`. Document in plan.
-7. Define Step by Step Tasks - Use `ORCHESTRATION_PROMPT` (if provided) to guide task granularity and parallel/sequential structure. Write out tasks with IDs, dependencies, assignments. Document in plan.
+6. Design Solution - Develop technical approach including architecture decisions and implementation strategy
+7. Select Specialized Agents - Choose appropriate agents from "Available Specialized Agents" based on task type:
+   - **Django tasks**: Use `team-orchestration:django-builder` or `python-experts:django-expert`
+   - **Testing tasks**: Use `python-experts:python-testing-expert` or `frontend-experts:playwright-testing-expert`
+   - **API tasks**: Use `python-experts:fastapi-expert` or `python-experts:django-expert`
+   - **Frontend tasks**: Use `frontend-experts:react-typescript-expert`
+   - **DevOps tasks**: Use `devops-data:devops-expert`
+   - **Validation tasks**: Use `team-orchestration:django-validator` (for Django) or appropriate validator
+   - **Git commits**: Use `git-workflow:commit-expert`
+   - **Only use `general-purpose` if no specialized agent matches**
+8. Define Team Members - Use `ORCHESTRATION_PROMPT` (if provided) to guide team composition. Select specialized agents from step 7 and document in plan.
+9. Define Step by Step Tasks - Use `ORCHESTRATION_PROMPT` (if provided) to guide task granularity and parallel/sequential structure. Write out tasks with IDs, dependencies, assignments to specialized agents. Document in plan.
 8. Organize into Waves - Group tasks by dependency depth for parallel execution:
    - **Wave 1**: Tasks with no dependencies (can run immediately in parallel)
    - **Wave 2**: Tasks that depend only on Wave 1 (run after Wave 1 completes)
@@ -385,14 +437,41 @@ paths:
 - Take note of the session id of each team member. This is how you'll reference them.
 
 ### Team Members
-<list the team members you'll use to execute the plan>
 
-- Builder
-  - Name: <unique name for this builder - this allows you and other team members to reference THIS builder by name. Take note there may be multiple builders, the name make them unique.>
-  - Role: <the single role and focus of this builder will play>
-  - Agent Type: <the subagent type of this builder, you'll specify based on the name in TEAM_MEMBERS file or GENERAL_PURPOSE_AGENT if you want to use a general-purpose agent>
-  - Resume: <default true. This lets the agent continue working with the same context. Pass false if you want to start fresh with a new context.>
-- <continue with additional team members as needed in the same format as above>
+Select specialized agents based on task requirements. Prefer specialized agents over `general-purpose`.
+
+**Example for Django Project:**
+- Builder (Foundation)
+  - Name: builder-foundation
+  - Role: Create app scaffolding, models, migrations, admin configuration
+  - Agent Type: team-orchestration:django-builder
+  - Resume: true
+- Builder (API)
+  - Name: builder-api
+  - Role: Implement DRF serializers, viewsets, and URL routing
+  - Agent Type: team-orchestration:django-builder
+  - Resume: true
+- Testing Specialist
+  - Name: test-engineer
+  - Role: Write factories, model tests, and integration tests
+  - Agent Type: python-experts:python-testing-expert
+  - Resume: true
+- Validator
+  - Name: validator
+  - Role: Run validation suite (lint, typecheck, tests) and create fix tasks
+  - Agent Type: team-orchestration:django-validator
+  - Resume: true
+- Commit Specialist
+  - Name: commit-specialist
+  - Role: Create conventional commits for completed work
+  - Agent Type: git-workflow:commit-expert
+  - Resume: false
+
+**Agent Selection Guidelines:**
+- **Multiple builders**: Use unique names (builder-foundation, builder-api, builder-services) to distinguish roles
+- **Specialized agents**: Select from "Available Specialized Agents" section based on task technology
+- **Resume strategy**: Use `true` for sequential work requiring context, `false` for independent tasks
+- **Only use general-purpose**: When no specialized agent matches the task type
 
 ### File Ownership Matrix
 
@@ -418,12 +497,12 @@ Track which tasks create or modify which files to prevent merge conflicts in par
 <list step by step tasks as h3 headers. Start with foundational work, then core implementation, then validation.>
 
 ### 1. <First Task Name>
-- **Task ID**: <unique kebab-case identifier, e.g., "setup-database">
-- **Wave**: <wave number, e.g., 1>
-- **Depends On**: <Task ID(s) this depends on, or "none" if no dependencies>
+- **Task ID**: <unique kebab-case identifier, e.g., "setup-app-structure">
+- **Wave**: 1
+- **Depends On**: none
 - **Assigned To**: <team member name from Team Members section>
-- **Agent Type**: <subagent from TEAM_MEMBERS file or GENERAL_PURPOSE_AGENT if you want to use a general-purpose agent>
-- **Parallel**: <true if can run alongside other tasks, false if must be sequential>
+- **Agent Type**: <specialized agent like team-orchestration:django-builder, NOT general-purpose unless no specialized agent exists>
+- **Parallel**: true
 - **File Ownership**:
   - **CREATE**: <list of files this task will create, e.g., "apps/users/models.py, apps/users/views.py">
   - **MODIFY**: <list of files this task will modify with scope if parallel, e.g., "config/settings.py::INSTALLED_APPS">
@@ -433,10 +512,10 @@ Track which tasks create or modify which files to prevent merge conflicts in par
 
 ### 2. <Second Task Name>
 - **Task ID**: <unique-id>
-- **Wave**: <wave number>
-- **Depends On**: <previous Task ID, e.g., "setup-database">
+- **Wave**: 2
+- **Depends On**: <previous Task ID, e.g., "setup-app-structure">
 - **Assigned To**: <team member name>
-- **Agent Type**: <subagent type from TEAM_MEMBERS file or GENERAL_PURPOSE_AGENT if you want to use a general-purpose agent>
+- **Agent Type**: <specialized agent based on task type - see Available Specialized Agents>
 - **Parallel**: <true/false>
 - **File Ownership**:
   - **CREATE**: <files to create>
@@ -447,21 +526,36 @@ Track which tasks create or modify which files to prevent merge conflicts in par
 
 ### 3. <Continue Pattern>
 
+### N-1. <Testing Task Example>
+- **Task ID**: test-implementation
+- **Wave**: <wave before final validation>
+- **Depends On**: <implementation tasks>
+- **Assigned To**: test-engineer
+- **Agent Type**: python-experts:python-testing-expert
+- **Parallel**: true
+- **File Ownership**:
+  - **CREATE**: apps/*/tests/test_*.py
+  - **MODIFY**: conftest.py::register_factories
+  - **BOUNDARY**: apps/*/models.py, apps/*/views.py
+- Write comprehensive test coverage
+- Create factories for test data
+
 ### N. <Final Validation Task>
 - **Task ID**: validate-all
 - **Wave**: <final wave number>
 - **Depends On**: <all previous Task IDs>
-- **Assigned To**: <validator team member>
-- **Agent Type**: <validator agent>
+- **Assigned To**: validator
+- **Agent Type**: team-orchestration:django-validator (or appropriate validator for your stack)
 - **Parallel**: false
 - **File Ownership**:
-  - **CREATE**: <none typically>
-  - **MODIFY**: <none typically>
-  - **BOUNDARY**: <none - validation only>
-- Run all validation commands
+  - **CREATE**: none
+  - **MODIFY**: none
+  - **BOUNDARY**: none (read-only validation)
+- Run all validation commands (lint, typecheck, tests)
 - Verify acceptance criteria met
+- Create fix tasks if issues found
 
-<continue with additional tasks as needed. Agent types must exist in .claude/agents/team/*.md>
+**CRITICAL**: Select specialized agents from "Available Specialized Agents" section based on task type. Only use `general-purpose` if no specialized agent matches.
 
 ## Task Dependency Graph
 
@@ -587,14 +681,41 @@ File Ownership:
 - <N> files created across <N> tasks
 - <N> files modified (all conflicts resolved)
 
+Team Composition:
+- <N> specialized agents assigned (e.g., "3 django-builder, 1 python-testing-expert, 1 django-validator")
+- <N> general-purpose agents (should be 0 or minimal)
+⚠️  Warning: If using general-purpose agents, explain why no specialized agent was appropriate
+
 Team Task List:
-- <list of tasks, and owner (concise)>
+- <list of tasks, owner, and agent type (concise)>
+  Example: "Task 1 (setup-app) → builder-foundation (team-orchestration:django-builder)"
 
-Team members:
-- <list of team members and their roles (concise)>
+Agent Selection Quality:
+✅ All tasks assigned to specialized agents appropriate for their technology stack
+OR
+⚠️  <N> tasks using general-purpose (explain why specialized agents weren't suitable)
 
-When you're ready, execute the plan by:
-1. Review the File Ownership Matrix to ensure no conflicts
+**Next Steps - Plan Execution**
+
+This skill ONLY creates the plan document. To execute the plan:
+
+Option 1: Manual Execution with Task Tool
+1. Read the plan: specs/<filename>.md
+2. Create tasks using TaskCreate for each step
+3. Set dependencies using TaskUpdate + addBlockedBy
+4. Deploy agents using Task tool with appropriate subagent_type
+5. Monitor with TaskList and TaskOutput
+
+Option 2: Use Parallel Execution Skill (if available)
+```bash
+/parallel-run specs/<filename>.md
+```
+
+Option 3: Execute Step by Step
+1. Review File Ownership Matrix to ensure no conflicts
 2. Create contracts if defined in plan
-3. Run tasks in wave order, launching parallel tasks simultaneously
+3. For each wave (in order):
+   - Deploy all tasks in wave simultaneously using Task tool
+   - Wait for wave completion
+   - Proceed to next wave
 ```

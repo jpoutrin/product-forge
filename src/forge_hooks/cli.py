@@ -614,5 +614,417 @@ def feedback_sync(project: Optional[str]) -> None:
     click.echo("This will sync feedback items to Product Forge for review and integration.")
 
 
+# === TMUX COMMAND GROUP ===
+
+
+@main.group("tmux")
+def tmux():
+    """Manage tmux sessions and navigation."""
+    pass
+
+
+@tmux.command("go")
+@click.argument("location")
+@click.option("--no-activate", is_flag=True, help="Don't activate iTerm2")
+def tmux_go(location: str, no_activate: bool):
+    """
+    Navigate to tmux session:window.pane and activate iTerm2.
+
+    The location format is 'session:window.pane' where:
+
+      - session: tmux session name
+
+      - window: window index (number)
+
+      - pane: pane index (optional, defaults to 0)
+
+    Examples:
+
+      forge tmux go main:2.1    # Session 'main', window 2, pane 1
+
+      forge tmux go dev:0       # Session 'dev', window 0, pane 0
+
+      forge tmux go work:3      # Session 'work', window 3, pane 0 (implicit)
+    """
+    from .utils.tmux import TmuxManager
+
+    try:
+        manager = TmuxManager()
+        session, window, pane = manager.parse_location(location)
+
+        # Validate session exists
+        if not manager.session_exists(session):
+            click.echo(f"Error: tmux session '{session}' not found", err=True)
+            sys.exit(1)
+
+        # Navigate to location
+        manager.navigate_to(location)
+
+        # Activate iTerm2 unless disabled
+        if not no_activate:
+            manager.activate_iterm()
+
+        # Success message
+        click.echo(f"Navigated to {location}")
+
+    except FileNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        click.echo("\nInstall tmux with: brew install tmux", err=True)
+        sys.exit(1)
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+# === WEBHOOK COMMAND GROUP ===
+
+
+@main.group("webhook")
+def webhook():
+    """Manage Claude Code webhook notification system."""
+    pass
+
+
+@webhook.command("init")
+@click.option("--skip-deps", is_flag=True, help="Skip dependency installation")
+@click.option("--skip-shell", is_flag=True, help="Skip shell configuration")
+@click.option("--force", is_flag=True, help="Reinstall even if already installed")
+def webhook_init(skip_deps: bool, skip_shell: bool, force: bool):
+    """
+    Install Claude Code webhook notification system for tmux.
+
+    This sets up native macOS notifications that trigger when Claude Code
+    finishes a task or needs your attention. Clicking a notification takes
+    you directly to the correct tmux pane.
+
+    Components installed:
+
+      - Python CLI commands (forge notify hook, forge tmux go)
+
+      - Webhook service (LaunchAgent on port 9000)
+
+      - Claude hooks (Stop and Notification)
+
+      - Shell environment (tmux location variables)
+
+      - Configuration files (hooks.json)
+
+    Examples:
+
+      forge webhook init           # Full installation
+
+      forge webhook init --force   # Reinstall everything
+    """
+    from .utils.webhook import WebhookInstaller
+
+    installer = WebhookInstaller()
+
+    # Check current status
+    status = installer.check_status()
+    if status["installed"] and not force:
+        click.echo("Webhook system already installed. Use --force to reinstall.")
+        sys.exit(0)
+
+    try:
+        # Install dependencies
+        if not skip_deps:
+            click.echo("Checking dependencies...")
+            deps = installer.check_dependencies()
+            missing = [k for k, v in deps.items() if not v]
+            if missing:
+                click.echo(f"Installing: {', '.join(missing)}")
+                installer.install_dependencies()
+            else:
+                click.echo("All dependencies already installed")
+
+        # Ensure scripts are executable
+        click.echo("Checking notification scripts...")
+        installer.ensure_scripts_executable()
+
+        # Create hooks.json
+        click.echo("Creating webhook configuration...")
+        installer.create_hooks_json()
+
+        # Install LaunchAgent
+        click.echo("Installing webhook service...")
+        installer.install_launchagent()
+
+        # Setup shell
+        if not skip_shell:
+            click.echo("Configuring shell environment...")
+            installer.setup_shell_env()
+
+        # Configure Claude hooks
+        click.echo("Configuring Claude Code hooks...")
+        installer.configure_claude_hooks()
+
+        click.echo("\n✓ Webhook notification system installed successfully!")
+        click.echo("\nNext steps:")
+        click.echo("  1. Restart your shell: source ~/.zshrc")
+        click.echo("  2. Start Claude Code in a tmux session")
+        click.echo("  3. You'll receive notifications when tasks complete")
+        click.echo("\nTest with: forge webhook status")
+
+    except Exception as e:
+        click.echo(f"Error during installation: {e}", err=True)
+        logger.error(f"Webhook installation failed: {e}")
+        sys.exit(1)
+
+
+@webhook.command("status")
+@click.option("--format", type=click.Choice(["text", "json"]), default="text")
+def webhook_status(format: str):
+    """Check webhook notification system status."""
+    from .utils.webhook import WebhookInstaller
+
+    installer = WebhookInstaller()
+    status = installer.check_status()
+
+    if format == "json":
+        click.echo(json.dumps(status, indent=2))
+    else:
+        # Pretty text output
+        click.echo("Webhook Notification System Status\n")
+        click.echo(f"Dependencies:")
+        for dep, installed in status.get("dependencies", {}).items():
+            icon = "✓" if installed else "✗"
+            click.echo(f"  {icon} {dep}")
+
+        click.echo(f"\nCLI Commands:")
+        icon = "✓" if status.get("forge_cli_available") else "✗"
+        click.echo(f"  {icon} forge notify hook (called by Claude Code hooks)")
+        click.echo(f"  {icon} forge tmux go (called by go-tmux webhook)")
+
+        click.echo(f"\nWebhook:")
+        icon = "✓" if status.get("hooks_json_configured") else "✗"
+        click.echo(f"  {icon} ~/bin/hooks.json (go-tmux only)")
+        icon = "✓" if status.get("launchagent_loaded") else "✗"
+        click.echo(f"  {icon} LaunchAgent running (port 9000)")
+
+        click.echo(f"\nConfiguration:")
+        icon = "✓" if status.get("claude_hooks_configured") else "✗"
+        click.echo(f"  {icon} Claude hooks")
+        icon = "✓" if status.get("shell_configured") else "✗"
+        click.echo(f"  {icon} Shell environment")
+
+        click.echo(f"\nOverall Status: {'✓ Installed' if status.get('installed') else '✗ Not fully installed'}")
+
+
+# === NOTIFY COMMAND GROUP ===
+
+
+@main.group("notify")
+def notify():
+    """Manage macOS notifications for Claude Code."""
+    pass
+
+
+@notify.command("hook")
+@click.argument("event", type=click.Choice(["Stop", "Notification"]))
+def notify_hook(event: str):
+    """
+    Wrapper for Claude Code hooks that automatically gathers environment info.
+
+    This command is designed to be called from Claude Code hooks.json.
+    It automatically detects tmux environment and sends notifications.
+
+    Usage in hooks.json:
+
+      "hooks": [
+        {
+          "type": "command",
+          "command": "forge notify hook Stop"
+        }
+      ]
+
+    Environment variables used:
+      - WS_TMUX_LOCATION: Tmux location (session:window.pane)
+      - WS_TMUX_SESSION_NAME: Tmux session name
+      - WS_TMUX_WINDOW_NAME: Tmux window name
+      - CLAUDE_SESSION_ID: Claude session ID
+      - CLAUDE_TRANSCRIPT_PATH: Path to transcript
+      - PWD: Current working directory
+      - TMUX: Set when inside tmux (for dynamic detection)
+    """
+    import os
+    import subprocess
+    from pathlib import Path
+    from .utils.notification import NotificationManager
+
+    # Try to get tmux info dynamically if inside tmux
+    if os.environ.get("TMUX"):
+        try:
+            # Get current tmux location
+            result = subprocess.run(
+                ["tmux", "display-message", "-p", "#{session_name}:#{window_index}.#{pane_index}"],
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+            if result.returncode == 0:
+                tmux_location = result.stdout.strip()
+            else:
+                tmux_location = os.environ.get("WS_TMUX_LOCATION", "unknown:0")
+
+            # Get session name
+            result = subprocess.run(
+                ["tmux", "display-message", "-p", "#{session_name}"],
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+            session_name = result.stdout.strip() if result.returncode == 0 else os.environ.get("WS_TMUX_SESSION_NAME", "unknown")
+
+            # Get window name
+            result = subprocess.run(
+                ["tmux", "display-message", "-p", "#{window_name}"],
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+            window_name = result.stdout.strip() if result.returncode == 0 else os.environ.get("WS_TMUX_WINDOW_NAME", "unknown")
+
+        except Exception:
+            # Fallback to env vars
+            tmux_location = os.environ.get("WS_TMUX_LOCATION", "unknown:0")
+            session_name = os.environ.get("WS_TMUX_SESSION_NAME", "unknown")
+            window_name = os.environ.get("WS_TMUX_WINDOW_NAME", "unknown")
+    else:
+        # Use env vars from tmux-env.sh
+        tmux_location = os.environ.get("WS_TMUX_LOCATION")
+        session_name = os.environ.get("WS_TMUX_SESSION_NAME")
+        window_name = os.environ.get("WS_TMUX_WINDOW_NAME")
+
+        # If no env vars and not in tmux, skip notification
+        if not tmux_location:
+            sys.exit(0)
+
+    # Get project name from PWD
+    cwd = os.environ.get("PWD", os.getcwd())
+    project = Path(cwd).name
+
+    # Get other info
+    transcript_path = os.environ.get("CLAUDE_TRANSCRIPT_PATH", "")
+    session_id = os.environ.get("CLAUDE_SESSION_ID", "")
+
+    try:
+        manager = NotificationManager()
+
+        success = manager.send_notification(
+            tmux_location=tmux_location,
+            session_name=session_name,
+            window_name=window_name,
+            project=project,
+            cwd=cwd,
+            transcript_path=transcript_path,
+            hook_event=event,
+            session_id=session_id,
+            skip_focus_check=False,
+        )
+
+        sys.exit(0 if success else 1)
+
+    except FileNotFoundError as e:
+        # Silently fail if terminal-notifier not installed
+        # (hooks should degrade gracefully)
+        sys.exit(0)
+    except Exception as e:
+        # Log error but don't fail the hook
+        click.echo(f"Warning: {e}", err=True)
+        sys.exit(0)
+
+
+@notify.command("send")
+@click.option("--location", required=True, help="Tmux location (session:window.pane)")
+@click.option("--session-name", required=True, help="Tmux session name")
+@click.option("--window-name", required=True, help="Tmux window name")
+@click.option("--project", required=True, help="Project name")
+@click.option("--cwd", required=True, help="Current working directory")
+@click.option("--transcript-path", default="", help="Path to transcript file")
+@click.option(
+    "--event",
+    default="Notification",
+    help="Hook event name (Stop or Notification)",
+)
+@click.option("--session-id", default="", help="Claude session ID for grouping")
+@click.option(
+    "--skip-focus-check",
+    is_flag=True,
+    help="Skip iTerm2 focus detection",
+)
+def notify_send(
+    location: str,
+    session_name: str,
+    window_name: str,
+    project: str,
+    cwd: str,
+    transcript_path: str,
+    event: str,
+    session_id: str,
+    skip_focus_check: bool,
+):
+    """
+    Send macOS notification for Claude Code task completion.
+
+    This command is typically called by the webhook service when Claude
+    triggers Stop or Notification hooks. It can also be used for testing.
+
+    Examples:
+
+      forge notify send \\
+        --location "main:2.1" \\
+        --session-name "main" \\
+        --window-name "editor" \\
+        --project "my-project" \\
+        --cwd "/path/to/project" \\
+        --event "Stop"
+
+      forge notify send \\
+        --location "dev:0" \\
+        --session-name "dev" \\
+        --window-name "code" \\
+        --project "test" \\
+        --cwd "/tmp" \\
+        --skip-focus-check
+    """
+    from .utils.notification import NotificationManager
+
+    try:
+        manager = NotificationManager()
+
+        success = manager.send_notification(
+            tmux_location=location,
+            session_name=session_name,
+            window_name=window_name,
+            project=project,
+            cwd=cwd,
+            transcript_path=transcript_path,
+            hook_event=event,
+            session_id=session_id,
+            skip_focus_check=skip_focus_check,
+        )
+
+        if success:
+            click.echo("Notification sent successfully")
+            sys.exit(0)
+        else:
+            click.echo("Failed to send notification (see logs)", err=True)
+            sys.exit(1)
+
+    except FileNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        click.echo(
+            "\nInstall terminal-notifier with: brew install terminal-notifier",
+            err=True,
+        )
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     main()
