@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/bin/claude-hook-notify.sh Stop"
+            "command": "forge notify hook Stop"
           },
           {
             "type": "command",
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/bin/claude-hook-notify.sh Notification"
+            "command": "forge notify hook Notification"
           }
         ]
       }

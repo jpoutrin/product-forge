@@ -38,88 +38,67 @@ Claude Code Session
         ▼
 ┌─────────────────────────────────────────────┐
 │  Claude Hooks (settings.json)               │
-│  - Captures tmux location, project info     │
-│  - Sends JSON to localhost:9000             │
+│  - Calls: forge notify hook <event>        │
+│  - Passes tmux location, project info       │
 └─────────────────────────────────────────────┘
         │
         ▼
 ┌─────────────────────────────────────────────┐
-│  Webhook Service (port 9000)                │
-│  - Receives notification requests           │
-│  - Executes notify-claude.sh                │
+│  forge notify hook (Python)                 │
+│  - NotificationManager class                │
+│  - Formats and sends notification           │
 └─────────────────────────────────────────────┘
         │
         ▼
 ┌─────────────────────────────────────────────┐
 │  terminal-notifier                          │
 │  - Shows native macOS notification          │
-│  - On click: calls go-tmux.sh               │
+│  - On click: webhook to go-tmux             │
 └─────────────────────────────────────────────┘
         │
         │ user clicks
         ▼
 ┌─────────────────────────────────────────────┐
-│  go-tmux.sh                                 │
-│  - Switches to tmux session:window.pane    │
-│  - Activates iTerm2                         │
+│  Webhook Service (port 9000)                │
+│  - Routes click to: forge tmux go           │
+└─────────────────────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────────────────────┐
+│  forge tmux go (Python)                     │
+│  - Switches to tmux session:window.pane     │
+│  - Activates iTerm2                          │
 └─────────────────────────────────────────────┘
 ```
+
+All components are Python-based forge CLI commands.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `notify-claude.sh` | Generates macOS notification with terminal-notifier |
-| `go-tmux.sh` | Navigates to tmux pane and activates terminal |
-| `hooks.json` | Webhook configuration for routing requests |
+| `hooks.json` | Webhook configuration (go-tmux only) |
 | `com.claude.webhook.plist` | LaunchAgent to run webhook service |
 | `tmux-env.sh` | Shell snippet for tmux environment variables |
 | `claude-hooks.json` | Claude hooks configuration reference |
 
-## Manual Installation
+**Python CLI Commands:**
+- `forge notify hook` - Sends notifications (called by Claude hooks)
+- `forge tmux go` - Navigates to tmux location (called by webhook)
+- `forge webhook init` - Automated installer
+- `forge webhook status` - Check installation status
 
-If you prefer to install manually:
+## Installation Details
 
-### 1. Install Dependencies
+The automated installer (`forge webhook init`) handles:
 
-```bash
-brew install terminal-notifier webhook jq
-```
+1. **Dependencies** - Installs terminal-notifier, webhook, jq via Homebrew
+2. **Configuration** - Creates ~/bin/hooks.json with webhook routing
+3. **LaunchAgent** - Sets up com.claude.webhook.plist for auto-start
+4. **Shell Environment** - Adds tmux env vars to ~/.zshrc
+5. **Claude Hooks** - Configures hooks to call `forge notify hook`
 
-### 2. Copy Scripts
-
-```bash
-mkdir -p ~/bin
-cp notify-claude.sh go-tmux.sh ~/bin/
-chmod +x ~/bin/notify-claude.sh ~/bin/go-tmux.sh
-
-# Update hooks.json with your path
-sed 's|__BIN_DIR__|'"$HOME/bin"'|g' hooks.json > ~/bin/hooks.json
-```
-
-### 3. Set Up LaunchAgent
-
-```bash
-# Update plist with your paths
-sed -e 's|__WEBHOOK_BIN__|'$(which webhook)'|g' \
-    -e 's|__HOOKS_JSON__|'"$HOME/bin/hooks.json"'|g' \
-    -e 's|__LOG_DIR__|'"$HOME/Library/Logs/claude-webhook"'|g' \
-    com.claude.webhook.plist > ~/Library/LaunchAgents/com.claude.webhook.plist
-
-mkdir -p ~/Library/Logs/claude-webhook
-launchctl load ~/Library/LaunchAgents/com.claude.webhook.plist
-```
-
-### 4. Add to ~/.zshrc
-
-```bash
-cat tmux-env.sh >> ~/.zshrc
-source ~/.zshrc
-```
-
-### 5. Configure Claude Hooks
-
-Add the hooks from `claude-hooks.json` to `~/.claude/settings.json`.
+All notification logic is implemented in Python (NotificationManager class) rather than bash scripts.
 
 ## Commands
 
@@ -127,57 +106,37 @@ Add the hooks from `claude-hooks.json` to `~/.claude/settings.json`.
 /tmux-init              # Install notification system
 /tmux-init --status     # Check installation status
 /tmux-init --uninstall  # Remove notification system
+
+# Or use forge CLI directly:
+forge webhook init      # Install notification system
+forge webhook status    # Check installation status
+forge notify hook Stop  # Test notification
+forge tmux go "main:0.0"  # Test navigation
 ```
 
 ## Customization
 
 ### Change Terminal
 
-Edit `go-tmux.sh` to use a different terminal:
+Edit `src/forge_hooks/utils/tmux.py` in the `TmuxManager.activate_terminal()` method to use a different terminal application.
 
-```bash
-# For Ghostty:
-osascript -e 'tell application "Ghostty" to activate'
+### Change Notification Sound or Style
 
-# For Alacritty:
-osascript -e 'tell application "Alacritty" to activate'
-
-# For Terminal.app:
-osascript -e 'tell application "Terminal" to activate'
-```
-
-### Change Notification Sound
-
-Edit `notify-claude.sh`:
-
-```bash
-# Available sounds: Basso, Blow, Bottle, Frog, Funk, Glass, Hero,
-# Morse, Ping, Pop, Purr, Sosumi, Submarine, Tink
--sound "Glass"
-```
+Edit `src/forge_hooks/utils/notification.py` in the `NotificationManager.send()` method to customize notification appearance and sound.
 
 ### Change Webhook Port
 
-1. Edit `com.claude.webhook.plist`:
-   ```xml
-   <string>9001</string>  <!-- Change from 9000 -->
-   ```
-
-2. Update Claude hooks in `~/.claude/settings.json`:
-   ```
-   http://localhost:9001/hooks/claude-notify
-   ```
-
-3. Update `notify-claude.sh`:
-   ```bash
-   http://localhost:9001/hooks/go-tmux
-   ```
+1. Edit `com.claude.webhook.plist` to change the port
+2. Update `hooks.json` if needed
+3. No need to update notification code - webhook URL is generated automatically
 
 ## Troubleshooting
 
 ### Check Status
 
 ```bash
+forge webhook status
+# or
 /tmux-init --status
 ```
 
@@ -191,6 +150,10 @@ tail -f ~/Library/Logs/claude-webhook/webhook.error.log
 ### Test Notification
 
 ```bash
+# Test with Python CLI
+forge notify hook Stop
+
+# Or test webhook directly (legacy)
 curl -X POST -H "Content-Type: application/json" \
   -d '{"tmux_location":"main:0.0","tmux_session_name":"main","tmux_window_name":"dev","project":"test","cwd":"/tmp","hook_event_name":"Stop","session_id":"test"}' \
   http://localhost:9000/hooks/claude-notify
