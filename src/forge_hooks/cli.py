@@ -614,6 +614,181 @@ def feedback_sync(project: Optional[str]) -> None:
     click.echo("This will sync feedback items to Product Forge for review and integration.")
 
 
+# === SESSION COMMANDS ===
+
+
+@main.group("session")
+def session():
+    """Manage Claude Code session captures."""
+    pass
+
+
+@session.command("save")
+def session_save() -> None:
+    """Save session from stdin (used by hooks)."""
+    from .session import SessionManager
+
+    manager = SessionManager()
+
+    # Parse input from stdin
+    try:
+        raw_input = sys.stdin.read()
+        if not raw_input.strip():
+            click.echo("No input received", err=True)
+            logger.warning("Session save called with no input")
+            sys.exit(0)
+        session_data = json.loads(raw_input)
+    except json.JSONDecodeError as e:
+        click.echo(f"Failed to parse input JSON: {e}", err=True)
+        logger.error(f"Invalid JSON in session input: {e}")
+        sys.exit(1)
+
+    # Check for stop_hook_active to prevent loops
+    if session_data.get("stop_hook_active"):
+        click.echo("Stop hook already active, skipping to prevent loop", err=True)
+        logger.warning("Session save skipped: stop_hook_active=true")
+        sys.exit(0)
+
+    # Save session
+    logger.info("Saving session from hook")
+    filepath = manager.save_session(session_data)
+
+    if filepath:
+        click.echo(f"Session saved: {filepath.name}", err=True)
+        logger.info(f"Session saved: {filepath}")
+        log_hook_execution(
+            hook_type="session",
+            operation="save",
+            success=True,
+            details={"file": str(filepath)},
+        )
+    else:
+        click.echo("Failed to save session", err=True)
+        logger.error("Failed to save session")
+        sys.exit(1)
+
+
+@session.command("list")
+@click.option("--project", help="Filter by project slug")
+@click.option("--processed/--unprocessed", default=None, help="Filter by processed status")
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    help="Output format",
+)
+def session_list(project: Optional[str], processed: Optional[bool], output_format: str) -> None:
+    """List captured sessions."""
+    from .session import SessionManager
+
+    manager = SessionManager()
+    sessions = manager.list_sessions(project=project, processed=processed)
+
+    if output_format == "json":
+        click.echo(json.dumps(sessions, indent=2))
+    else:
+        if not sessions:
+            click.echo("No sessions found")
+            return
+
+        click.echo(f"Found {len(sessions)} sessions:\n")
+        for session in sessions:
+            click.echo(f"  [{session['project']}] {session['session_id'][:8]}")
+            click.echo(f"    Captured: {session.get('captured_at', 'unknown')}")
+            click.echo(f"    Processed: {'Yes' if session.get('processed') else 'No'}")
+            if session.get("transcript_path"):
+                click.echo(f"    Transcript: {session['transcript_path']}")
+            click.echo(f"    File: {session['file']}")
+            click.echo("")
+
+
+@session.command("view")
+@click.argument("session_file")
+def session_view(session_file: str) -> None:
+    """View session details."""
+    from .session import SessionManager
+
+    manager = SessionManager()
+    session = manager.get_session(session_file)
+
+    if not session:
+        click.echo(f"Session not found: {session_file}", err=True)
+        sys.exit(1)
+
+    click.echo("Session Details")
+    click.echo("=" * 40)
+    click.echo(f"Session ID: {session.get('session_id', 'unknown')}")
+    click.echo(f"Project: {session.get('project', 'unknown')}")
+    click.echo(f"Path: {session.get('cwd', 'unknown')}")
+    click.echo(f"Captured: {session.get('captured_at', 'unknown')}")
+    click.echo(f"Processed: {'Yes' if session.get('processed') else 'No'}")
+    if session.get("processed_at"):
+        click.echo(f"Processed At: {session['processed_at']}")
+    if session.get("repo"):
+        click.echo(f"Repository: {session['repo']}")
+    if session.get("transcript_path"):
+        click.echo(f"Transcript: {session['transcript_path']}")
+
+
+@session.command("stats")
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["text", "json"]),
+    default="text",
+    help="Output format",
+)
+def session_stats(output_format: str) -> None:
+    """Show session statistics."""
+    from .session import SessionStats
+
+    learnings_dir = Path.home() / ".claude" / "learnings"
+    stats_file = learnings_dir / "session_stats.json"
+
+    stats = SessionStats.load(stats_file)
+
+    if output_format == "json":
+        click.echo(
+            json.dumps(
+                {
+                    "total": stats.total,
+                    "processed": stats.processed,
+                    "by_project": stats.by_project,
+                    "last_session": stats.last_session,
+                },
+                indent=2,
+            )
+        )
+    else:
+        click.echo("Session Statistics")
+        click.echo("=" * 40)
+        click.echo(f"Total sessions: {stats.total}")
+        click.echo(f"Processed sessions: {stats.processed}")
+        click.echo(f"Unprocessed sessions: {stats.total - stats.processed}")
+        if stats.last_session:
+            click.echo(f"Last session: {stats.last_session}")
+        click.echo("")
+        click.echo("By Project:")
+        for project, count in stats.by_project.items():
+            click.echo(f"  {project}: {count}")
+
+
+@session.command("mark-processed")
+@click.argument("session_file")
+def session_mark_processed(session_file: str) -> None:
+    """Mark a session as processed."""
+    from .session import SessionManager
+
+    manager = SessionManager()
+
+    if manager.mark_processed(session_file):
+        click.echo(f"Marked session as processed: {session_file}")
+    else:
+        click.echo(f"Failed to mark session as processed: {session_file}", err=True)
+        sys.exit(1)
+
+
 # === TMUX COMMAND GROUP ===
 
 
