@@ -1246,5 +1246,109 @@ def notify_send(
         sys.exit(1)
 
 
+# === BROWSER CAPTURE COMMAND ===
+
+
+@main.command("browser-capture")
+@click.option("--page", default="browser", help="Page description for session naming")
+@click.option("--console", is_flag=True, help="Capture console messages only")
+@click.option("--network", is_flag=True, help="Capture network requests only")
+@click.option("--performance", is_flag=True, help="Capture performance trace only")
+@click.option("--all", "capture_all", is_flag=True, help="Capture all logs")
+@click.option("--output", default=None, help="Output directory (default: ~/browser-logs)")
+@click.option("--exclude-static", is_flag=True, default=True, help="Exclude static resources from network logs")
+@click.option("--errors-only", is_flag=True, help="Capture only errors and warnings")
+def browser_capture(
+    page: str,
+    console: bool,
+    network: bool,
+    performance: bool,
+    capture_all: bool,
+    output: Optional[str],
+    exclude_static: bool,
+    errors_only: bool,
+):
+    """
+    Capture browser console, network, and performance logs to local files.
+
+    Uses Chrome DevTools MCP to capture browser activity for debugging.
+    Creates timestamped session directories with organized log files.
+
+    Works with any Chromium-based browser (Dia, Chrome, Edge, Brave, etc.)
+    that supports the Chrome DevTools Protocol.
+
+    Examples:
+
+      forge browser-capture --page "Dashboard" --all
+
+      forge browser-capture --console --errors-only
+
+      forge browser-capture --page "Login Flow" --output ./test-logs
+
+      forge browser-capture --network --exclude-static
+    """
+    from .utils.browser_capture import BrowserLogCapture
+
+    logger.info(f"Starting browser log capture: page={page}, output={output}")
+
+    try:
+        # Initialize capture manager
+        capture = BrowserLogCapture(output_dir=output)
+        session_dir = capture.start_session(page_description=page)
+
+        # Determine what to capture
+        if not any([console, network, performance]):
+            capture_all = True  # Default to all if nothing specified
+
+        captured_items = []
+
+        # Capture console logs
+        if console or capture_all:
+            click.echo("Capturing console logs...")
+            count = capture.capture_console_logs(errors_only=errors_only)
+            captured_items.append(f"console messages: {count}")
+
+        # Capture network logs
+        if network or capture_all:
+            click.echo("Capturing network logs...")
+            count = capture.capture_network_logs(exclude_static=exclude_static)
+            captured_items.append(f"network requests: {count}")
+
+        # Capture performance trace
+        if performance or capture_all:
+            click.echo("Capturing performance trace...")
+            trace_path = capture.capture_performance_trace()
+            if trace_path:
+                captured_items.append("performance trace saved")
+
+        # Success message
+        click.echo(f"\n✅ Browser logs captured successfully!")
+        click.echo(f"\n📁 Session: {session_dir}")
+        for item in captured_items:
+            click.echo(f"   ✓ {item}")
+
+        click.echo(f"\n💡 Use browser-debug skill for automated analysis")
+
+        logger.info(f"Browser log capture completed: {session_dir}")
+        log_hook_execution(
+            hook_type="browser-capture",
+            operation="capture-logs",
+            success=True,
+            details={"session_dir": str(session_dir), "items": captured_items},
+        )
+        sys.exit(0)
+
+    except Exception as e:
+        click.echo(f"❌ Error: {e}", err=True)
+        logger.error(f"Browser log capture failed: {e}")
+        log_hook_execution(
+            hook_type="browser-capture",
+            operation="capture-logs",
+            success=False,
+            details={"error": str(e)},
+        )
+        sys.exit(1)
+
+
 if __name__ == "__main__":
     main()
