@@ -174,7 +174,7 @@ function validate_plugin_cache() {
 
 function validate_plugin_structure() {
     local plugin_dir="$1"
-    claude plugin validate "$plugin_dir" &>/dev/null
+    (unset CLAUDECODE; claude plugin validate "$plugin_dir" &>/dev/null)
 }
 
 function detect_issues() {
@@ -336,7 +336,7 @@ function ensure_marketplace_registered() {
     log_warn "Marketplace not registered, re-adding..."
 
     if [ "$DRY_RUN" = false ]; then
-        if claude plugin marketplace add "$REPO_ROOT"; then
+        if (unset CLAUDECODE; claude plugin marketplace add "$REPO_ROOT"); then
             log_success "Marketplace re-added"
             return 0
         else
@@ -354,7 +354,7 @@ function reinstall_plugin() {
     local plugin_name="$1"
 
     if [ "$DRY_RUN" = false ]; then
-        if claude plugin install "${plugin_name}@product-forge-marketplace"; then
+        if (unset CLAUDECODE; claude plugin install "${plugin_name}@product-forge-marketplace"); then
             log_success "Installed: $plugin_name"
             return 0
         else

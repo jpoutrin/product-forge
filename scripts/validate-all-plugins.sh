@@ -43,7 +43,7 @@ if [ -n "$SPECIFIC_PLUGIN" ]; then
     echo "Validating: $SPECIFIC_PLUGIN"
     echo "----------------------------------------"
 
-    if claude plugin validate "$plugin_dir" 2>&1; then
+    if (unset CLAUDECODE; claude plugin validate "$plugin_dir") 2>&1; then
         echo "✅ $SPECIFIC_PLUGIN - VALID"
         exit 0
     else
@@ -70,7 +70,7 @@ for plugin_dir in "$PLUGINS_DIR"/*; do
     echo "----------------------------------------"
 
     # Run claude plugin validate
-    if claude plugin validate "$plugin_dir" 2>&1; then
+    if (unset CLAUDECODE; claude plugin validate "$plugin_dir") 2>&1; then
         echo "✅ $plugin_name - VALID"
         VALID_PLUGINS=$((VALID_PLUGINS + 1))
     else
