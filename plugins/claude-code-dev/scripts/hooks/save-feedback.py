@@ -143,6 +143,10 @@ def save_session(hook_data: dict) -> Optional[Path]:
 
 def main() -> int:
     """Main entry point."""
+    # Print deprecation warning
+    print("⚠️  DEPRECATED: Use 'forge session save' instead", file=sys.stderr)
+    print("See: forge session --help", file=sys.stderr)
+
     hook_data = parse_hook_input()
 
     if not hook_data:

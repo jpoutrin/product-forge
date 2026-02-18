@@ -11,7 +11,7 @@
           },
           {
             "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/save-feedback.py",
+            "command": "forge session save",
             "timeout": 10
           }
         ]

@@ -230,6 +230,10 @@ def extract_feedback_from_prompt_output(hook_data: dict) -> list:
 
 def main() -> int:
     """Main entry point."""
+    # Print deprecation warning
+    print("⚠️  DEPRECATED: Use 'forge feedback save' instead", file=sys.stderr)
+    print("See: forge feedback --help", file=sys.stderr)
+
     # Parse input
     hook_data = parse_hook_input()
 
