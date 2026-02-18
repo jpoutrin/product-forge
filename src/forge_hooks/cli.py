@@ -121,6 +121,51 @@ def logs_command(lines: Optional[int], follow: bool, log_file: Optional[str]) ->
         sys.exit(1)
 
 
+@main.command("init")
+@click.option("--skip-webhook", is_flag=True, help="Skip webhook notification system setup")
+@click.option("--skip-feedback", is_flag=True, help="Skip feedback/learnings directory setup")
+@click.option("--skip-browser", is_flag=True, help="Skip browser capture directory setup")
+@click.option("--force", is_flag=True, help="Force reinstall all subsystems")
+def init_command(skip_webhook: bool, skip_feedback: bool, skip_browser: bool, force: bool):
+    """
+    Initialize all Product Forge subsystems.
+
+    Sets up:
+    - Feedback/learnings directory structure
+    - Browser capture directory and config
+    - Webhook notification system (optional)
+
+    Examples:
+
+      forge init                    # Initialize everything
+
+      forge init --skip-webhook     # Skip webhook setup
+
+      forge init --force            # Force reinstall all
+    """
+    from .common.init_output import InitOutputFormatter
+    from .utils.initializer import InitializerOrchestrator
+
+    # Print header
+    formatter = InitOutputFormatter()
+    formatter.print_header()
+
+    # Initialize subsystems
+    orchestrator = InitializerOrchestrator(formatter=formatter)
+    results = orchestrator.initialize_all(
+        skip_feedback=skip_feedback,
+        skip_browser=skip_browser,
+        skip_webhook=skip_webhook,
+        force=force,
+    )
+
+    # Print summary
+    formatter.print_summary(results)
+
+    # Exit with appropriate code
+    sys.exit(0 if not results.has_failures() else 1)
+
+
 @main.group()
 def validate():
     """File validation commands."""
