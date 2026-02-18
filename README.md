@@ -292,12 +292,91 @@ The `mcp-security` skill automatically activates and warns when detecting:
 /plugin marketplace add jpoutrin/product-forge
 ```
 
-### Manual Installation
+### Manual Installation from GitHub
 
-Clone the repository to your Claude Code plugins directory:
+**Step 1: Clone the repository**
 
 ```bash
+# Clone to your preferred location
+git clone https://github.com/jpoutrin/product-forge.git ~/projects/product-forge
+cd ~/projects/product-forge
+```
+
+**Step 2: Install the Forge CLI**
+
+The Forge CLI provides command-line utilities for browser capture, feedback management, and webhook notifications.
+
+```bash
+# Install using uv (recommended)
+uv tool install -e .
+
+# Verify installation
+forge --version  # Should show: forge, version 0.2.0
+forge --help     # Show available commands
+```
+
+**Step 3: Initialize all subsystems**
+
+```bash
+# Initialize everything (prompts for webhook confirmation)
+forge init
+
+# Or skip webhook system
+forge init --skip-webhook
+
+# Or initialize only specific subsystems
+forge init --skip-feedback --skip-webhook  # Browser capture only
+```
+
+This will set up:
+- ✅ **Feedback/learnings directory** (`~/.claude/forge/learnings/`)
+- ✅ **Browser capture system** (`~/browser-logs/` with config)
+- ✅ **Webhook notifications** (optional - LaunchAgent + shell config)
+
+**Step 4: Install the Claude Code plugin**
+
+```bash
+# Install plugin from local directory
+claude plugin install ~/projects/product-forge
+
+# Or install to standard location
 git clone https://github.com/jpoutrin/product-forge.git ~/.claude/plugins/product-forge
+```
+
+### Prerequisites
+
+- **Python 3.9+** - Required for Forge CLI
+- **uv** - Python package manager ([install guide](https://docs.astral.sh/uv/))
+- **Claude Code** - Latest version recommended
+
+### Forge CLI Commands
+
+After installation, the `forge` command provides:
+
+```bash
+# Browser log capture (Chromium browsers: Dia, Chrome, Edge)
+forge browser-capture --page "Dashboard" --all
+
+# View forge logs
+forge logs -f
+
+# Feedback management
+forge feedback list
+forge feedback stats
+
+# Webhook notifications (macOS only)
+forge webhook status
+
+# Session management
+forge session list
+```
+
+### Updating
+
+```bash
+cd ~/projects/product-forge
+git pull
+uv tool install -e . --force  # Reinstall CLI
 ```
 
 ## Quick Start
