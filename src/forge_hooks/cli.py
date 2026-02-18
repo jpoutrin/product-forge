@@ -882,7 +882,7 @@ def tmux_go(location: str, no_activate: bool):
 
         # Activate iTerm2 unless disabled
         if not no_activate:
-            manager.activate_iterm()
+            manager.activate_iterm_intelligent(session)
 
         # Success message
         click.echo(f"Navigated to {location}")
